@@ -1,0 +1,27 @@
+# Python Executable
+*.pyc
+
+# Python ByteCode
+*.py[co]
+
+# Packaging files
+*.egg*
+
+# Editor temp files
+*.swp
+*~
+
+# SqLite3 database
+*.db
+*.sqlite3
+
+# Log files
+*.log
+
+# conf
+conf/*
+
+# Misc
+media/
+local.py
+.DS_Store
