@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+admin.autodiscover()
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^health/$', 'eproweb.views.health_view', name='health'),
+    url(r'^epro/', include('epro.urls')),
 ]
