@@ -39,10 +39,10 @@ class Region(CommonBaseAbstractModel):
         return Country.objects.filter(region_id=self.pk)
 
     def __unicode__(self):
-        return u'%s - %s' % (code, name)
+        return u'%s - %s' % (self.code, self.name)
 
     def __str__(self):
-        return '%s - %s' % (code, name)
+        return '%s - %s' % (self.code, self.name)
 
     class Meta(object):
         verbose_name = 'Region'
@@ -63,10 +63,10 @@ class Country(CommonBaseAbstractModel):
         return Currency.objects.filter(currency_id=self.pk)
 
     def __unicode__(self):
-        return u'%s - %s' % (iso2, name)
+        return u'%s - %s' % (self.iso2, self.name)
 
     def __str__(self):
-        return '%s - %s' % (iso2, name)
+        return '%s - %s' % (self.iso2, self.name)
 
     class Meta(object):
         verbose_name = 'Country'
@@ -82,10 +82,10 @@ class Office(CommonBaseAbstractModel):
     name = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s - %s' % (code, name)
+        return u'%s - %s' % (self.code, self.name)
 
     def __str__(self):
-        return '%s - %s' % (code, name)
+        return '%s - %s' % (self.code, self.name)
 
     class Meta(object):
         verbose_name = 'Office'
@@ -98,10 +98,10 @@ class Currency(CommonBaseAbstractModel):
     name = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s - %s' % (code, name)
+        return u'%s - %s' % (self.code, self.name)
 
     def __str__(self):
-        return '%s - %s' % (code, name)
+        return '%s - %s' % (self.code, self.name)
 
     class Meta(object):
         verbose_name = 'Currency'
@@ -112,10 +112,10 @@ class FundCode(CommonBaseAbstractModel):
     code = models.CharField(unique=True, max_length=5, null=False, blank=False, db_index=True)
 
     def __unicode__(self):
-        return u'%s' % code
+        return u'%s' % self.code
 
     def __ustr__(self):
-        return u'%s' % code
+        return u'%s' % self.code
 
     class Meta(object):
         verbose_name = 'Fund Code'
@@ -126,10 +126,10 @@ class DeptCode(CommonBaseAbstractModel):
     code = models.CharField(unique=True, max_length=5, null=False, blank=False, db_index=True)
 
     def __unicode__(self):
-        return u'%s' % code
+        return u'%s' % self.code
 
     def __str__(self):
-        return u'%s' % code
+        return u'%s' % self.code
 
     class Meta(object):
         verbose_name = 'Department Code'
@@ -181,10 +181,10 @@ class PurchaseRequest(CommonBaseAbstractModel):
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
-        return u'%s-%s: %s' % (pr_number, name, project_reference)
+        return u'%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
 
     def __str__(self):
-        return '%s-%s: %s' % (pr_number, name, project_reference)
+        return '%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
 
     class Meta(object):
         verbose_name = 'Purchase Request'
@@ -222,10 +222,17 @@ class Item(CommonBaseAbstractModel):
     """
                                         
     def __unicode__(self):
-        return u'%s: %s' % (description_pr)
+        return u'%s: %s' % (self.description_pr)
 
     def __str__(self):
-        return '%s: %s' % (description_pr)
+        return '%s: %s' % (self.description_pr)
+
+    def save(self, *args, **kwargs):
+        if not self.description_po and self.description_pr:
+            self.description_po = self.description_pr
+        self.price_estimated_local_subtotal = self.price_estimated_local * self.quantity_requested
+        self.price_estimated_usd_subtotal = self.price_estimated_usd * self.quantity_requested
+        super(Item, self).save(*args, **kwargs)
 
     class Meta(object):
         verbose_name = 'Item'
@@ -256,6 +263,7 @@ class PurchaseOrder(CommonBaseAbstractModel):
     def save(self, *args, **kwargs):
         if self.pk:
             self.total_local = self.purchase_order_items.Aggregate(Sum(price_subtotal_local))
+            self.total_usd = self.purchase_order_items.Aggregate(Sum(price_subtotal_usd))
         super(PurchaseOrder, self).save(*args, **kwargs)
 
     class Meta(object):
