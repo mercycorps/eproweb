@@ -272,6 +272,9 @@ class PurchaseOrder(CommonBaseAbstractModel):
 
 
 class PurchaseOrderItems(CommonBaseAbstractModel):
+    """
+    A through table for the m2m relationship b/w PurchaseOrder and Item with additional fields.
+    """
     purchase_order = models.ForeignKey(PurchaseOrder, related_name='purchase_order_items')
     item = models.ForeignKey(Item, related_name='purchase_order_items')
     quantity_ordered = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
@@ -310,6 +313,9 @@ class GoodsReceivedNote(CommonBaseAbstractModel):
 
 
 class GoodsReceivedNoteItems(CommonBaseAbstractModel):
+    """
+    A through table fro the m2m relationship b/w GoodsReceivedNote and Item with extra field
+    """
     goods_received_note = models.ForeignKey(GoodsReceivedNote, 
                                             related_name='goods_received_note_items',
                                             on_delete=models.CASCADE)

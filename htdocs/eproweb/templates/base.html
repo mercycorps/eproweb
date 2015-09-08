@@ -1,5 +1,5 @@
 {# Stuff that's common to every non-error-page on the site #}
-{% load compress i18n %}
+
 {% load static from staticfiles %}
 
 <!DOCTYPE html>
@@ -15,21 +15,17 @@
         {% block extra-meta %}{% endblock %}
         
         
-        <link rel="shortcut icon" href="{% static 'blog/images/favicon.png' %}" type="image/x-icon">
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
         
-        <title>{% block title %}{% trans "MC PALM" %}{% endblock %} {% if settings.ENVIRONMENT != 'production' %}{{ settings.ENVIRONMENT }} {% endif %}{{ settings.INSTANCE_NAME }}</title>
+        <title>{% block title %}MC PALM {% if settings.ENVIRONMENT != 'production' %}{{ settings.ENVIRONMENT }} {% endif %}{{ settings.INSTANCE_NAME } } {% endblock title %}</title>
         
         <!-- CSS -->
         {% block css %}
         <!-- Bootstrap css-->
-        <link href="{% static 'blog/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
-        
-        <!-- JQuery css -->
-        <link href="{% static 'blog/css/jquery-ui-1.10.4.custom.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
         
         <!-- site css -->
-        <link href="{% static 'blog/css/app.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'blog/css/select2.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'css/app.css' %}" rel="stylesheet" type="text/css">
         {% endblock css %}
         
         <!-- Page-specific CSS -->
@@ -49,9 +45,11 @@
                         </button>
                     
                         <!-- LOGO -->
-                        <a class="navbar-brand" href="{% url 'home' %}">
-                            <img style="margin-top: -15px;" width="152" height="34" src="{% static 'blog/images/logo.png' %}" />
-                        </a>
+                        <section id="logo">
+                            <a class="navbar-brand" href="{% url 'home' %}" title="Home">
+                                <img style="margin-top: -15px;" width="152" height="34" src="{% static 'images/logo-plain.png' %}" />
+                            </a>
+                        </section>
                         <!-- END LOGO -->
                     
                     </div><!-- END NAVIGATION HEADER -->
@@ -85,7 +83,7 @@
                             </li>
                         </ul>
                         {% else %}
-                        <form class="navbar-form navbar-right" role="form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                        <form class="navbar-form navbar-right" role="form" method="post" action="#">
                             {% csrf_token %}
                             <div class="form-group">
                                 <input type="hidden" name="next" value="{{ next }}" />
@@ -152,7 +150,7 @@
                             Mercy Corps {% now "Y" %}
                         </span>
                         <span style="float:right; padding: 20px; " class="text-muted">
-                            <a href="{% url 'about' %}" class="text-muted">About</a> | 
+                            <a href="#" class="text-muted">About</a> | 
                             <a href="#" id = "contact_id" class="text-muted">Contact</a>
                         </span>
                     </div>
@@ -164,12 +162,16 @@
         <!-- JavaScript -->
     
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script type="text/javascript" src="{% static 'blog/js/jquery-1.11.0.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'blog/js/select2.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     
+        <!-- AngularJS library -->
+        <script type="text/javascript" src="{% static 'js/angular.min.js' %}"></script>
+        
         <!-- Bootstrap compiled javascript plugins -->
-        <script type="text/javascript" src="{% static 'blog/js/bootstrap.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'blog/js/app.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+        
+        <!-- Application javascript -->
+        <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
  
         {% endblock js %}
     

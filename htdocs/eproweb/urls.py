@@ -13,9 +13,15 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
+from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.static import static
+
 from django.contrib import admin
+
 from rest_framework import routers, serializers, viewsets
+
+from .views import HomeView
 from api.users_api import *
 from api.epro_api import *
 
@@ -24,16 +30,20 @@ admin.autodiscover()
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-#router.register(r'regions', RegionViewSet)
-router.register(r'regs', RViewSet, base_name='readonlyregions')
-router.register(r'bregsw', RWriteViewSet)
-router.register(r'countries', CountryViewSet)
-router.register(r'offices', OfficeViewSet)
+router.register(r'regions', RegionReadViewSet, base_name='regions')
+router.register(r'region', RegionWriteViewSet)
+router.register(r'countries', CountryReadViewSet, base_name='countries')
+router.register(r'country', CountryWriteViewSet)
+router.register(r'offices', OfficeReadViewSet, base_name='offices')
+router.register(r'office', OfficeWriteViewSet)
 
 urlpatterns = [
+    url(r'^api/v1/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^health/$', 'eproweb.views.health_view', name='health'),
-    url(r'^api/', include(router.urls)),
+    url(r'^home/$', HomeView.as_view(), name='home'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^epro/', include('epro.urls')),
-]
+] 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
