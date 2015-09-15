@@ -189,6 +189,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
     class Meta(object):
         verbose_name = 'Purchase Request'
         ordering = ['country', 'office', 'pr_number']
+        get_latest_by = "pr_date"
 
 
 class Vendor(CommonBaseAbstractModel):
@@ -237,7 +238,7 @@ class Item(CommonBaseAbstractModel):
     class Meta(object):
         verbose_name = 'Item'
         ordering = ['purchase_request']
-
+        order_with_respect_to = 'purchase_request'
 
 class PurchaseOrder(CommonBaseAbstractModel):
     purchase_request = models.ForeignKey(PurchaseRequest, 
