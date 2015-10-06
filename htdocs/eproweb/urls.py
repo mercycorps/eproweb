@@ -23,7 +23,6 @@ from rest_framework import routers, serializers, viewsets
 
 from .views import HomeView
 from api.users_api import *
-#from api.epro_api import *
 from epro.api import *
 
 admin.autodiscover()
@@ -39,11 +38,12 @@ router.register(r'offices', OfficeReadViewSet, base_name='offices')
 router.register(r'office', OfficeWriteViewSet)
 
 urlpatterns = [
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/v1/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^health/$', 'eproweb.views.health_view', name='health'),
     url(r'^home/$', HomeView.as_view(), name='home'),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^epro/', include('epro.urls')),
 ] 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
