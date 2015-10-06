@@ -23,7 +23,7 @@ def validate_positive(value):
 
 class CommonBaseAbstractModel(models.Model):
     created_by = models.ForeignKey(User, blank=False, null=False, related_name="%(app_label)s_%(class)s_created")
-    last_updated_by = models.ForeignKey(User, blank=False, null=False, related_name="%(app_label)s_%(class)s_updated")
+    updated_by = models.ForeignKey(User, blank=False, null=False, related_name="%(app_label)s_%(class)s_updated")
     created = models.DateTimeField(auto_now=False, auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False, blank=True, null=True)
 
@@ -46,7 +46,7 @@ class Region(CommonBaseAbstractModel):
 
     class Meta(object):
         verbose_name = 'Region'
-        ordering = ['code', 'name']
+        ordering = ['code']
 
 
 class Country(CommonBaseAbstractModel):
@@ -70,7 +70,7 @@ class Country(CommonBaseAbstractModel):
 
     class Meta(object):
         verbose_name = 'Country'
-        ordering = ['iso2', 'name']
+        ordering = ['iso2']
 
 
 class Office(CommonBaseAbstractModel):
@@ -90,6 +90,7 @@ class Office(CommonBaseAbstractModel):
     class Meta(object):
         verbose_name = 'Office'
         ordering = ['country', 'code']
+
 
 class Currency(CommonBaseAbstractModel):
     code = models.CharField(unique=True, max_length=3, null=False, blank=False)
@@ -162,22 +163,44 @@ class PurchaseRequest(CommonBaseAbstractModel):
         (TYPE_SERVICES, 'Services'),
     )
 
+    EXPENSE_TYPE_PROGRAM = 0
+    EXPENSE_TYPE_OPERATIONAL = 1
+    EXPENSE_TYPE_CHOICES = (
+        (EXPENSE_TYPE_PROGRAM, 'Program'),
+        (EXPENSE_TYPE_OPERATIONAL, 'Operational'),
+    )
+
     def is_finalized(self):
         return self.status == STATUS_COMPLETED
 
     def is_canceled(self):
         return self.status == STATUS_CANCELED
 
-    pr_number = models.PositiveIntegerField(validators=[validate_positive,])
+    #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
     country = models.ForeignKey(Country, related_name='purchase_requests', on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='purchase_requests', on_delete=models.DO_NOTHING)
     currency = models.ForeignKey(Currency, related_name='purchase_requests', 
                                     on_delete=models.SET_NULL, null=True, blank=True)
+    dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2,
+                                        validators=[MinValueValidator(0.0)], null=False, blank=False)
+    delivery_address = models.CharField(max_length=100, blank=False, null=False)
+    project_reference = models.CharField(max_length=250, null=True, blank=True)
+    originator = models.ForeignKey(User, related_name='purchase_requests')
+    origination_date = models.DateField(auto_now=False, auto_now_add=True)
+    required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
+    submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    approver1 = models.ForeignKey(User, related_name='purchase_requests_approvers1')
+    approval1_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    approver2 = models.ForeignKey(User, related_name='purchase_requests_approver2')
+    approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    finance_reviewer = models.ForeignKey(User, related_name='purchase_requests_reviewer')
+    finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     status = models.IntegerField(choices=PR_STATUS_CHOICES, default=STATUS_ONGOING)
     pr_type = models.IntegerField(choices=PR_TYPE_CHOICES, default=TYPE_GOODS)
-    project_reference = models.CharField(max_length=250, null=True, blank=True)
-    cancelled_on = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    notes = models.TextField(null=False, blank=True)
+    expense_type = models.IntegerField(choices=EXPENSE_TYPE_CHOICES, null=False, blank=False)
+    processing_office = models.ForeignKey(Office, related_name='purchase_requests_processing_office')
+    notes = models.TextField(max_length=255, null=False, blank=True)
+    cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
@@ -188,20 +211,50 @@ class PurchaseRequest(CommonBaseAbstractModel):
 
     class Meta(object):
         verbose_name = 'Purchase Request'
-        ordering = ['country', 'office', 'pr_number']
-        get_latest_by = "pr_date"
+        ordering = ['country', 'office']
+        get_latest_by = "submission_date"
 
 
 class Vendor(CommonBaseAbstractModel):
     name = models.CharField(max_length=100, null=False, blank=False)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    contact_person = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=100, null=True, blank=True)
+    phone = models.CharField(max_length=25, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    black_listed = models.BooleanField(default=False)
+    reason_black_listed = models.CharField(max_length=255, null=True, blank=True)
+    black_listed_date = models.DateField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+
+class FinanceCodes(CommonBaseAbstractModel):
+    gl_account = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
+    fund_code = models.ForeignKey(FundCode, null=False, blank=False)
+    dept_code = models.ForeignKey(DeptCode, null=False, blank=False)
+    office_code = models.ForeignKey(Office, null=False, blank=False)
+    lin_code = models.CharField(max_length=9, blank=True, null=True)
+    activity_code = models.CharField(max_length=9, blank=True, null=True)
+    employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
+
+    def __unicode__(self):
+        return "%s-%s" % (self.gl_account, str(self.fund_code).join(self.dept_code))
+
+    def __str__(self):
+        return "%s-%s" % (self.gl_account, str(self.fund_code).join(self.dept_code))
 
 
 class Item(CommonBaseAbstractModel):
     purchase_request = models.ForeignKey(PurchaseRequest, 
                                             related_name='items', 
                                             on_delete=models.CASCADE)
-    unit = models.CharField(max_length=20, null=False, blank=False)
     quantity_requested = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
+    unit = models.CharField(max_length=20, null=False, blank=False)
     description_pr = models.TextField(null=False, blank=True)
     description_po = models.TextField(null=False, blank=True)
     price_estimated_local = models.DecimalField(max_digits=10, decimal_places=2,
@@ -218,9 +271,7 @@ class Item(CommonBaseAbstractModel):
                                         validators=[MinValueValidator(0.0)],
                                         verbose_name='Price estimated in US Dollars Subtotal',
                                         default=Decimal('0.00'),)
-    """
-    finance_codes
-    """
+    finance_codes = models.ManyToManyField(FinanceCodes, null=False, blank=False)
                                         
     def __unicode__(self):
         return u'%s: %s' % (self.description_pr)
@@ -278,13 +329,14 @@ class PurchaseOrderItems(CommonBaseAbstractModel):
     """
     purchase_order = models.ForeignKey(PurchaseOrder, related_name='purchase_order_items')
     item = models.ForeignKey(Item, related_name='purchase_order_items')
-    quantity_ordered = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
+    quantity_ordered = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],null=False, blank=False)
     price_local = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
                                         verbose_name='Price in local currency',
                                         help_text='Price of one unit in local currency',
-                                        default=Decimal('0.00'),)
-    price_usd = USDCurrencyField(verbose_name='Price USD', help_text='Price of one unit in US Dollars')
+                                        default=Decimal('0.00'),
+                                        blank=False, null=False)
+    price_usd = USDCurrencyField(verbose_name='Price USD', help_text='Price of one unit in US Dollars', blank=False, null=False)
     price_subtotal_local = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
                                         verbose_name='Subtotal local currency',
@@ -292,9 +344,9 @@ class PurchaseOrderItems(CommonBaseAbstractModel):
     price_subtotal_usd = USDCurrencyField(verbose_name='Subtal US Dollars')
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            self.price_subtotal_local = self.price_local * self.quantity_ordered
-            self.price_subtotal_usd = self.price_usd * self.quantity_ordered
+        #if self.pk:
+        self.price_subtotal_local = self.price_local * self.quantity_ordered
+        self.price_subtotal_usd = self.price_usd * self.quantity_ordered
         super(PurchaseOrderItems, self).save(*args, **kwargs)
 
 

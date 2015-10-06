@@ -13,7 +13,7 @@
 
         {% block extra-meta %}{% endblock %}
         
-        <title>{% block title %} Proposal Development Visualization {% endblock %}</title>
+        <title>{% block title %} eProWeb {% endblock %}</title>
         
         <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
 
@@ -130,34 +130,31 @@
                 {% block content %} {% endblock %}
             </div>
 
-
             <div id = "loading" class="modal"> </div>
-
-            <!-- Placeholder for modal popup windows -->
-            <div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
-                <div class="modal-dialog modal-md">
-                    <div class="modal-content" id="modal_content">
-                        <!-- form will be inserted here -->
-                    </div> <!-- END modal-content -->
-                </div><!-- END modal-dialog -->
-            </div> <!-- END modal fade -->
-
-
-            <footer id="page-footer">
-                <div class="container-fluid">
-                    <span style="float: left; padding: 20px; " class="text-muted">
-                        Mercy Corps {% now "Y" %}
-                    </span>
-                    <span style="float:right; padding: 20px; " class="text-muted">
-                        <a href="#" class="text-muted">About</a> | 
-                        <a href="#" id = "contact_id" class="text-muted">Contact</a>
-                    </span>
-                </div>
-            </footer>
-
 
         </div> <!-- END WRAPPER -->
 
+        <!-- Placeholder for modal popup windows -->
+        <div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content" id="modal_content">
+                    <!-- form will be inserted here -->
+                </div> <!-- END modal-content -->
+            </div><!-- END modal-dialog -->
+        </div> <!-- END modal fade -->
+
+
+        <footer id="page-footer">
+            <div class="container-fluid">
+                <span style="float: left; padding: 20px; " class="text-muted">
+                    Mercy Corps {% now "Y" %}
+                </span>
+                <span style="float:right; padding: 20px; " class="text-muted">
+                    <a href="#" class="text-muted">About</a> | 
+                    <a href="#" id = "contact_id" class="text-muted">Contact</a>
+                </span>
+            </div>
+        </footer>
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>

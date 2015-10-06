@@ -11,7 +11,7 @@ class RegionReadSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Region
-        fields = ('countries', 'code', 'name', 'created_by', 'last_updated_by')
+        fields = ('countries', 'code', 'name', 'created_by', 'updated_by')
         #exclude = ('created', 'updated')
         depth = 1
 

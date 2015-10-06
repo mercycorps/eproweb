@@ -23,7 +23,8 @@ from rest_framework import routers, serializers, viewsets
 
 from .views import HomeView
 from api.users_api import *
-from api.epro_api import *
+#from api.epro_api import *
+from epro.api import *
 
 admin.autodiscover()
 
