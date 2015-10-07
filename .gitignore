@@ -25,3 +25,6 @@ conf/*
 media/
 local.py
 .DS_Store
+
+# ignore conf folder
+conf/
