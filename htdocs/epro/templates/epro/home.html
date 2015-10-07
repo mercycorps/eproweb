@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div data-ng-app="eProWebApp">
+    <h3>eProWeb Home</h3>
+
+    <div ng-view> </div>
+
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/app-epro.js"></script>
+    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/controllers/prlist-controller.js"></script>
+    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/services/prs-service.js"></script>
+{% endblock %}

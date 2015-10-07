@@ -156,18 +156,21 @@
             </div>
         </footer>
 
+        <!-- Angular Javascript Library -->
+        <script type="text/javascript" src = "{% static 'js/angular.min.js' %}"></script>
+        <script type="text/javascript" src = "{% static 'js/angular-resource.min.js' %}"></script>
+        <script type="text/javascript" src = "{% static 'js/angular-cookies.min.js' %}"></script>
+        <script type="text/javascript" src = "{% static 'js/angular-route.min.js' %}"></script>
+
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
-        
+
         <!-- Bootstrap compiled javascript plugins -->
         <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
-        
+
         <!-- App specific Javascript -->
         <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
-        
-        <!-- Highcharts for graphs -->
-        <script type="text/javascript" src="{% static  'js/highcharts.js' %}"></script>
-        
+
         {% block extra_js %}{% endblock %}
     </body>
 </html>

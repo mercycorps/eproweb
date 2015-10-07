@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
+from django.views.generic import TemplateView
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -75,7 +76,15 @@ class OfficeList(generics.ListCreateAPIView):
     serializer_class = OfficeReadSerializer
 
 
-class PurchaseRequestsList(APIView):
+class PurchaseRequestsList(generics.ListCreateAPIView):
+    """
+    List all boards, or create a new board.
+    """
+    queryset = PurchaseRequest.objects.all()
+    serializer_class = PurchaseRequestSerializer
+
+
+class PurchaseRequestsList2(APIView):
     """
     Lists all purchase_requests, or create a new one.
     """
