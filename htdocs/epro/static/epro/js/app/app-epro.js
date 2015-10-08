@@ -19,6 +19,9 @@ var eProWebApp = angular.module('eProWebApp', [
     // Django expects jQuery like headers
     // $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 
+    // To make sure Django's request.is_ajax() does not return false for ajax requests
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    
     // Routing
     $routeProvider.when('/', {
         templateUrl: '../static/epro/js/app/views/prlist.html',
