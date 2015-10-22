@@ -3,7 +3,13 @@ angular.module('eProWebApp')
         return $resource('/api/v1/regions/:id/');
     })
     .factory('Country', function($resource) {
-        return $resource('/api/v1/countries/');
+        return $resource('/api/v1/countries/:id/');
+    })
+    .factory('Office', function($resource) {
+        return $resource('/api/v1/offices/:id/');
+    })
+    .factory('Currency', function($resource) {
+        return $resource('/api/v1/currencies/:id/');
     })
     .factory('PRForm', ['$http', function($http) {
         var PRForm = {};

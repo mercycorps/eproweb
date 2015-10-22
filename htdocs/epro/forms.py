@@ -24,19 +24,30 @@ def angular_formfield_callback(f, **kwargs):
 
     return field
 
+
+"""
+A generic method used for setting up similar bootstrap properties on crispy forms
+"""
+def setup_boostrap_helpers(formtag=False):
+    helper = FormHelper()
+    helper.form_class = 'form-horizontal'
+    helper.label_class = 'col-sm-2'
+    helper.field_class = 'col-sm-10'
+    helper.label_size = ' col-sm-offset-2'
+    helper.html5_required = True
+    helper.form_tag = formtag
+    return helper
+
+
+
 class RegionForm(forms.ModelForm):
     formfield_callback = angular_formfield_callback
     class Meta:
         model = Region
         exclude = ['created', 'updated', 'created_by', 'updated_by',]
     def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-sm-2'
-        self.helper.field_class = 'col-sm-10'
-        self.helper.label_size = ' col-sm-offset-2'
-        self.helper.html5_required = True
-        self.helper.form_tag = False
-        #self.helper.add_input(Submit('submit', 'Submit'))
-        #self.helper.add_input(Reset('rest', 'Reset', css_class='btn-warning'))
+        self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.field_class = 'col-sm-4'
+        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Reset('rest', 'Reset', css_class='btn-warning'))
         super(RegionForm, self).__init__(*args, **kwargs)

@@ -32,11 +32,12 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class RegionSerializer(serializers.ModelSerializer):
+    api_url = serializers.SerializerMethodField()
     countries = CountrySerializer(many=True)
 
     class Meta:
         model = Region
-        fields = ('name', 'code', 'countries', 'created_by', 'updated_by')
+        fields = ('name', 'code', 'countries', 'api_url', 'created_by', 'updated_by')
 
     def create(self, validated_data):
         countries_data = validated_data.pop('countries')
@@ -44,3 +45,6 @@ class RegionSerializer(serializers.ModelSerializer):
         for country_data in countries_data:
             Country.objects.create(region=region, **country_data)
         return region
+
+    def get_api_url(self, obj):
+        return '#/region/%s/' % obj.id
