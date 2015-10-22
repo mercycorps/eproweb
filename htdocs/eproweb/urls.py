@@ -32,22 +32,27 @@ admin.autodiscover()
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'regions', RegionReadViewSet, base_name='regions')
-router.register(r'region', RegionWriteViewSet)
-router.register(r'countries', CountryReadViewSet, base_name='countries')
-router.register(r'country', CountryWriteViewSet)
-router.register(r'offices', OfficeReadViewSet, base_name='offices')
-router.register(r'office', OfficeWriteViewSet)
+router.register(r'regions', RegionViewSet, base_name='region')
+router.register(r'countries', CountryViewSet, base_name='country')
+router.register(r'currencies', CurrencyViewSet, base_name='currency')
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r'^api/v1/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^health/$', 'eproweb.views.health_view', name='health'),
     url(r'^home/$', HomeView.as_view(), name='home'),
     url(r'^epro/', include('epro.urls')),
-] 
+]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# https://docs.djangoproject.com/en/1.8/topics/http/views/
+# Customizing error views
+handler404 = 'eproweb.views.handler404'
+handler500 = 'eproweb.views.my_custom_error_view'
+#handler403 = 'views.my_custom_permission_denied_view'
+#handler400 = 'views.my_custom_bad_request_view'

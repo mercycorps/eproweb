@@ -28,3 +28,9 @@ local.py
 
 # ignore conf folder
 conf/
+
+# ignore static files folders
+htdocs/eproweb/static/admin/*
+htdocs/eproweb/static/epro/*
+htdocs/eproweb/static/rest_framework/*
+htdocs/eproweb/static/rest_framework_swagger/*

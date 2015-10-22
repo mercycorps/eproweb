@@ -1,25 +1,27 @@
-/*
-eProWebApp.controller('PurchaseRequestListController', function($scope){
-    $scope.prs = [{'name': 'abc', 'total': '7500'}, {'name': 'def', 'total': '8500'}];
-});
-*/
+var eProControllers = angular.module('eProWebApp.controllers', []);
 
-angular.module('eProWebApp')
-    .controller('PurchaseRequestListController', ['$scope', 'dataFactory', 
-        function ($scope, dataFactory) {
+eProControllers.controller('RegionCtrl', function RegionCtrl($scope, Region) {
+    $scope.regions = {};
+    Region.query(function(response) {
+        $scope.regions = response;
+    });
 
-    $scope.status;
-    $scope.users;
-    
-    getUsers();
-
-    function getUsers() {
-        dataFactory.getUsers()
-            .success(function (usrs) { 
-                $scope.users = usrs;
-            })
-            .error(function (error) {
-                $scope.status = "Unable to load users data: " + error.message;
-            });
+    $scope.regionSubmit = function(code, name) {
+        var region = new Region({code: code, name: name});
+        region.$save(function(){
+            $scope.regions.unshift(region);
+        });
     }
-}]);
+});
+
+eProControllers.controller('PRFormCtrl', function RegionCtrl($scope, PRForm) {
+    $scope.form;
+
+    PRForm.getForm()
+        .success(function (form) {
+            $scope.form = form;
+        })
+        .error(function (error) {
+            $scope.status = "Unable to load form: " + error.message;
+        });
+});

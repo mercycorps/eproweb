@@ -3,51 +3,30 @@ from rest_framework.response import Response
 from django.utils import six
 from .models import *
 
-class RegionReadSerializer(serializers.ModelSerializer):
-    #countries = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    
-    # StringRelatedField represents relationship's target using its __unicode__ method.
-    #countries = serializers.StringRelatedField(many=True)
-    
+
+class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Region
-        fields = ('countries', 'code', 'name', 'created_by', 'updated_by')
-        #exclude = ('created', 'updated')
-        depth = 1
+        model = Currency
+        fields = ('name', 'code', 'country', 'created_by', 'updated_by')
 
 
-class RegionWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Region
-
-
-class CountryReadSerializer(serializers.ModelSerializer):
+class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        depth = 1
+        fields = ('iso2', 'name', 'region', 'created_by', 'updated_by')
+        #depth = 1
 
 
-class CountryWriteSerializer(serializers.ModelSerializer):
+class RegionSerializer(serializers.ModelSerializer):
+    countries = CountrySerializer(many=True)
+
     class Meta:
-        model = Country
+        model = Region
+        fields = ('name', 'code', 'countries', 'created_by', 'updated_by')
 
-
-class OfficeReadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Office
-        depth = 2
-
-
-class OfficeWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Office
-
-
-class PurchaseRequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PurchaseRequest
-
-
-class PurchaseOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PurchaseOrder
+    def create(self, validated_data):
+        countries_data = validated_data.pop('countries')
+        region = Region.objects.creaet(**validated_data)
+        for country_data in countries_data:
+            Country.objects.create(region=region, **country_data)
+        return region

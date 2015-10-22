@@ -6,33 +6,28 @@ from epro.models import Country, Region
 from epro.serializers import *
 
 
-class RegionReadViewSet(viewsets.ReadOnlyModelViewSet):
+class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
-    serializer_class = RegionReadSerializer
+    serializer_class = RegionSerializer
+
+    def pre_save(self, obj):
+        obj.created_by = self.request.user
+        obj.updated_by = self.request.user
 
 
-class RegionWriteViewSet(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = Region.objects.all()
-    serializer_class = RegionWriteSerializer
-
-
-class CountryReadViewSet(viewsets.ReadOnlyModelViewSet):
+class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
-    serializer_class = CountryReadSerializer
+    serializer_class = CountrySerializer
+
+    def pre_save(self, obj):
+        obj.created_by = self.request.user
+        obj.updated_by = self.request.user
 
 
-class CountryWriteViewSet(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = Country.objects.all()
-    serializer_class = CountryWriteSerializer
+class CurrencyViewSet(viewsets.ModelViewSet):
+    queryset = Currency.objects.all()
+    serializer_class = CurrencySerializer
 
-
-class OfficeReadViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Office.objects.all()
-    serializer_class = OfficeReadSerializer
-
-
-class OfficeWriteViewSet(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = Office.objects.all()
-    serializer_class = OfficeWriteSerializer
-
-
+    def pre_save(self, obj):
+        obj.created_by = self.request.user
+        obj.updated_by = self.request.user
