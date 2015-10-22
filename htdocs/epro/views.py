@@ -13,8 +13,8 @@ from .forms import *
 
 class RegionFormView(FormView):
     form_class = RegionForm
-    template_name = 'epro/regionform.html'
-    success_url = '/epro/#/'
+    template_name = 'epro/genericform.html'
+    success_url = '/epro/'
 
     def form_valid(self, form):
         return super(RegionFormView, self).form_valid(form)
