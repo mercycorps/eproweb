@@ -2,9 +2,13 @@ var eProControllers = angular.module('eProWebApp.controllers', []);
 
 eProControllers.controller('RegionCtrl', function RegionCtrl($scope, Region) {
     $scope.regions = {};
-    Region.query(function(response) {
-        $scope.regions = response;
-    });
+    Region.query({ 'code': 'BACCA',})
+        .$promise.then(function(response) {
+            $scope.regions = response;
+        },
+        function (error) {
+            console.log("Could not fetch regions: " + error.message);
+        });
 
     $scope.regionSubmit = function(code, name) {
         var region = new Region({code: code, name: name});

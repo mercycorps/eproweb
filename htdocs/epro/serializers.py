@@ -10,11 +10,25 @@ class CurrencySerializer(serializers.ModelSerializer):
         fields = ('name', 'code', 'country', 'created_by', 'updated_by')
 
 
+class OfficeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Office
+        fields = ('code', 'name', 'country', 'created_by', 'updated_by')
+
+
 class CountrySerializer(serializers.ModelSerializer):
+    offices = OfficeSerializer(many=True)
+
     class Meta:
         model = Country
-        fields = ('iso2', 'name', 'region', 'created_by', 'updated_by')
-        #depth = 1
+        fields = ('iso2', 'name', 'offices', 'region', 'created_by', 'updated_by')
+
+    def create(self, validated_data):
+        offices_data = validated_data.pop('offices')
+        country = Country.object.create(**validated_data)
+        for office_data in offices_data:
+            Office.objects.create(country=country, **validated_data)
+        return country
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -26,7 +40,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         countries_data = validated_data.pop('countries')
-        region = Region.objects.creaet(**validated_data)
+        region = Region.objects.create(**validated_data)
         for country_data in countries_data:
             Country.objects.create(region=region, **country_data)
         return region

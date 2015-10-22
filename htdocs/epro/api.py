@@ -24,6 +24,15 @@ class CountryViewSet(viewsets.ModelViewSet):
         obj.updated_by = self.request.user
 
 
+class OfficeViewSet(viewsets.ModelViewSet):
+    queryset = Office.objects.all()
+    serializer_class = OfficeSerializer
+
+    def pre_save(self, obj):
+        obj.created_by = self.request.user
+        obj.updated_by = self.request.user
+
+
 class CurrencyViewSet(viewsets.ModelViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer

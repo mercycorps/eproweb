@@ -34,6 +34,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'regions', RegionViewSet, base_name='region')
 router.register(r'countries', CountryViewSet, base_name='country')
+router.register(r'offices', OfficeViewSet, base_name='office')
 router.register(r'currencies', CurrencyViewSet, base_name='currency')
 
 
