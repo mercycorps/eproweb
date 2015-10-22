@@ -1,4 +1,4 @@
-angular.module('eProWebApp.services', ['ngResource'])
+angular.module('eProWebApp')
     .factory('Region', function($resource) {
         return $resource('/api/v1/regions/:id/');
     })

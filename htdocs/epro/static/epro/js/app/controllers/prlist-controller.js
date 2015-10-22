@@ -1,6 +1,7 @@
-var eProControllers = angular.module('eProWebApp.controllers', []);
+//var eProControllers = angular.module('eProWebApp');
 
-eProControllers.controller('RegionCtrl', function RegionCtrl($scope, Region) {
+var eProWebControllers = {}; 
+eProWebControllers.RegionCtrl = function ($scope, Region) {
     $scope.regions = {};
     Region.query({ 'code': 'BACCA',})
         .$promise.then(function(response) {
@@ -16,16 +17,19 @@ eProControllers.controller('RegionCtrl', function RegionCtrl($scope, Region) {
             $scope.regions.unshift(region);
         });
     }
-});
+};
 
-eProControllers.controller('PRFormCtrl', function RegionCtrl($scope, PRForm) {
+eProWebControllers.PRFormCtrl = function PRFormCtrl($scope, $sce, PRForm) {
     $scope.form;
 
     PRForm.getForm()
         .success(function (form) {
-            $scope.form = form;
+            $scope.form = $sce.trustAsHtml(form);
+            
         })
         .error(function (error) {
             $scope.status = "Unable to load form: " + error.message;
         });
-});
+};
+
+angular.module('eProWebApp').controller(eProWebControllers);

@@ -1,11 +1,2 @@
 {% load crispy_forms_tags %}
-
-<form class="form-horizontal" method="post">
-
-    {% crispy form form.helper %}
-
-    <div class ="form-actions">
-        <input id = "blogpost_submit_btn" name="submit" value="Submit" class="btn btn-primary" id="submit-id-submit" type="submit">
-        <input name="rest" value="Reset" class="btn btn-inverse btn-warning" id="reset-id-rest" type="reset">
-    </div>
-</form>
+{% crispy form form.helper %}

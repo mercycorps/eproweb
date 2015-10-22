@@ -11,8 +11,6 @@ from .models import *
 from .forms import *
 
 
-
-
 class RegionFormView(FormView):
     form_class = RegionForm
     template_name = 'epro/regionform.html'

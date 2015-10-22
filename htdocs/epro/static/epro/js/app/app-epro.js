@@ -3,8 +3,6 @@
 var eProWebApp = angular.module('eProWebApp', [
     "ngRoute", 
     "ngResource",
-    "eProWebApp.services",
-    "eProWebApp.controllers",
 ])
 .config(function ($interpolateProvider, $httpProvider, $resourceProvider, $routeProvider) {
     // Use square brackets instead of curly brackets as template tags
@@ -35,7 +33,7 @@ var eProWebApp = angular.module('eProWebApp', [
         controller: 'RegionCtrl',
     }).
     when('/prform', {
-        templateUrl: 'regionform.html',
+        templateUrl: '../static/epro/js/app/views/pr.html', //'regionform.html',
         controller: 'PRFormCtrl',
     }).
     otherwise({ redirectTo: '/' });
