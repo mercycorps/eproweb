@@ -12,9 +12,17 @@ from .forms import *
 
 
 class RegionFormView(FormView):
-    form_class = RegionForm
+    form_class = PurchaseRequestForm
     template_name = 'epro/genericform.html'
     success_url = '/epro/'
+
+    def get_initial(self):
+        print(self.request.user)
+        init_data = {
+            'country': 1,
+            'originator': self.request.user.pk,
+            }
+        return init_data
 
     def form_valid(self, form):
         return super(RegionFormView, self).form_valid(form)
