@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework_swagger',
     'crispy_forms',
+    'djangocosign',
     'epro',
 )
 
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.auth.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -130,3 +132,9 @@ MESSAGE_TAGS = {message.DEBUG: 'debug',
                 message.SUCCESS: 'success',
                 message.WARNING: 'warning',
                 message.ERROR: 'danger',}
+
+# Using the Cosgin Authentication backend first.
+AUTHENTICATION_BACKENDS = (
+        'djangocosign.cosign.CosignBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )

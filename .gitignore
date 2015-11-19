@@ -28,6 +28,7 @@ local.py
 
 # ignore conf folder
 conf/
+djangocosign/
 
 # ignore static files folders
 htdocs/eproweb/static/admin/*
