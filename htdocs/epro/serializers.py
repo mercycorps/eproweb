@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.utils import six
+from djangocosign.models import Region, Country, Office
 from .models import *
 
 
@@ -13,7 +14,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 class OfficeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Office
-        fields = ('code', 'name', 'country', 'created_by', 'updated_by')
+        fields = ('name', 'long_name', 'country')
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -21,7 +22,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ('iso2', 'name', 'offices', 'region', 'created_by', 'updated_by')
+        fields = ('iso_two_letters_code', 'name', 'offices', 'region')
 
     def create(self, validated_data):
         offices_data = validated_data.pop('offices')

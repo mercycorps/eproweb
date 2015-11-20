@@ -11,6 +11,8 @@ from django.utils.timezone import utc
 
 from django.contrib.auth.models import User
 
+from djangocosign.models import Region, Country, Office
+
 from eproweb.utils import USDCurrencyField
 
 def validate_even(value):
@@ -30,71 +32,9 @@ class CommonBaseAbstractModel(models.Model):
     class Meta:
         abstract = True
 
-class Region(CommonBaseAbstractModel):
-    code = models.CharField(unique=True, max_length=20, null=False, blank=False)
-    name = models.CharField(unique=True, max_length=100, null=False, blank=False)
-
-    @property
-    def countries(self):
-        return Country.objects.filter(region_id=self.pk)
-
-    def __unicode__(self):
-        return u'%s - %s' % (self.code, self.name)
-
-    def __str__(self):
-        return '%s - %s' % (self.code, self.name)
-
-    class Meta(object):
-        verbose_name = 'Region'
-        ordering = ['code']
-
-
-class Country(CommonBaseAbstractModel):
-    name = models.CharField(unique=True, max_length=100, null=False, blank=False)
-    iso2 = models.CharField('2 Digit ISO', max_length=2)
-    region = models.ForeignKey(Region, related_name='countries', on_delete=models.DO_NOTHING)
-
-    @property
-    def offices(self):
-        return Office.objects.filter(country_id=self.pk)
-
-    @property
-    def currencies(self):
-        return Currency.objects.filter(currency_id=self.pk)
-
-    def __unicode__(self):
-        return u'%s - %s' % (self.iso2, self.name)
-
-    def __str__(self):
-        return '%s - %s' % (self.iso2, self.name)
-
-    class Meta(object):
-        verbose_name = 'Country'
-        ordering = ['iso2']
-
-
-class Office(CommonBaseAbstractModel):
-    code = models.CharField(unique=True, max_length=4, 
-                            null=True, blank=False, 
-                            db_index=True)
-    country = models.ForeignKey(Country, blank=False, null=False, 
-                                on_delete=models.CASCADE, related_name="offices")
-    name = models.CharField(max_length=50, null=True, blank=True)
-
-    def __unicode__(self):
-        return u'%s - %s' % (self.code, self.name)
-
-    def __str__(self):
-        return '%s - %s' % (self.code, self.name)
-
-    class Meta(object):
-        verbose_name = 'Office'
-        ordering = ['country', 'code']
-
-
 class Currency(CommonBaseAbstractModel):
     code = models.CharField(unique=True, max_length=3, null=False, blank=False)
-    country = models.ForeignKey(Country, blank=False, null=False, 
+    country = models.ForeignKey(Country, blank=False, null=False,
                                 on_delete=models.CASCADE, related_name="currencies")
     name = models.CharField(max_length=50, null=True, blank=True)
 
@@ -179,7 +119,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
     #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
     country = models.ForeignKey(Country, related_name='purchase_requests', on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='purchase_requests', on_delete=models.DO_NOTHING)
-    currency = models.ForeignKey(Currency, related_name='purchase_requests', 
+    currency = models.ForeignKey(Currency, related_name='purchase_requests',
                                     on_delete=models.SET_NULL, null=True, blank=True)
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)], null=False, blank=False)
@@ -251,8 +191,8 @@ class FinanceCodes(CommonBaseAbstractModel):
 
 
 class Item(CommonBaseAbstractModel):
-    purchase_request = models.ForeignKey(PurchaseRequest, 
-                                            related_name='items', 
+    purchase_request = models.ForeignKey(PurchaseRequest,
+                                            related_name='items',
                                             on_delete=models.CASCADE)
     quantity_requested = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
     unit = models.CharField(max_length=20, null=False, blank=False)
@@ -273,7 +213,7 @@ class Item(CommonBaseAbstractModel):
                                         verbose_name='Price estimated in US Dollars Subtotal',
                                         default=Decimal('0.00'),)
     finance_codes = models.ManyToManyField(FinanceCodes, null=False, blank=False)
-                                        
+
     def __unicode__(self):
         return u'%s: %s' % (self.description_pr)
 
@@ -344,12 +284,12 @@ class RequestForQuotationItem(CommonBaseAbstractModel):
 
 
 class PurchaseOrder(CommonBaseAbstractModel):
-    purchase_request = models.ForeignKey(PurchaseRequest, 
-                                            related_name='purchase_orders', 
+    purchase_request = models.ForeignKey(PurchaseRequest,
+                                            related_name='purchase_orders',
                                             on_delete=models.CASCADE)
     country = models.ForeignKey(Country, related_name='purchase_orders', on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='purchase_orders', on_delete=models.DO_NOTHING)
-    currency = models.ForeignKey(Currency, related_name='purchase_orders', 
+    currency = models.ForeignKey(Currency, related_name='purchase_orders',
                                     on_delete=models.SET_NULL, null=True, blank=True)
     po_issued_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
     vendor = models.ForeignKey(Vendor, related_name='purchase_orders', on_delete=models.DO_NOTHING, null=True, blank=True)
@@ -406,15 +346,15 @@ class PurchaseOrderItem(CommonBaseAbstractModel):
 
 
 class GoodsReceivedNote(CommonBaseAbstractModel):
-    purchase_request = models.ForeignKey(PurchaseRequest, 
-                                            related_name='goods_received_notes', 
+    purchase_request = models.ForeignKey(PurchaseRequest,
+                                            related_name='goods_received_notes',
                                             on_delete=models.CASCADE)
     po_number = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
     country = models.ForeignKey(Country, related_name='goods_received_notes', on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='goods_received_notes', on_delete=models.DO_NOTHING)
     received_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
     items = models.ManyToManyField(Item, through='GoodsReceivedNoteItem')
-    
+
     class Meta(object):
         verbose_name = 'Goods Received Note'
         ordering = ['purchase_request',]
@@ -424,7 +364,7 @@ class GoodsReceivedNoteItem(CommonBaseAbstractModel):
     """
     A through table fro the m2m relationship b/w GoodsReceivedNote and Item with extra field
     """
-    goods_received_note = models.ForeignKey(GoodsReceivedNote, 
+    goods_received_note = models.ForeignKey(GoodsReceivedNote,
                                             related_name='goods_received_note_items',
                                             on_delete=models.CASCADE)
     item = models.ForeignKey(Item, related_name='goods_received_note_items', on_delete=models.CASCADE)
@@ -435,7 +375,7 @@ class PurchaseRecord(CommonBaseAbstractModel):
     # payment_voucher_num
     # payment_request_date
     # tender_yes_no
-    # 
+    #
     pass
 
 

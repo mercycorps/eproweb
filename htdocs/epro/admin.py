@@ -1,10 +1,10 @@
 from django.contrib import admin
 from .models import *
 # Register your models here.
-admin.site.register(Region)
-admin.site.register(Country)
+#admin.site.register(Region)
+#admin.site.register(Country)
 admin.site.register(Currency)
-admin.site.register(Office)
+#admin.site.register(Office)
 admin.site.register(FundCode)
 admin.site.register(DeptCode)
 admin.site.register(PurchaseRequest)
