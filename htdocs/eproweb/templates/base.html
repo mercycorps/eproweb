@@ -20,6 +20,10 @@
         <!-- Bootstrap -->
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
 
+        <!-- selec2 css -->
+        <link href="{% static 'css/select2.css' %}" rel="stylesheet" type="text/css" />
+
+
         <!-- Custom Application css -->
         <link href="{% static 'css/app.css' %}" rel="stylesheet" type="text/css">
 
@@ -54,8 +58,8 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Views<b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="{{ prs_list_tab }}" href="/epro/"><span class="glyphicon glyphicon-list"></span> Global Dashboard</a></li>
-                                    <li><a class="{{ prs_monthly_tab }}" href="#"><span class="glyphicon glyphicon-dashboard"></span> Regional Dashboard</a></li>
+                                    <li><a class="{{ prs_list_tab }}" href="/epro/#/prform"><span class="glyphicon glyphicon-file"></span> New PR for Goods</a></li>
+                                    <li><a class="{{ prs_monthly_tab }}" href="#"><span class="glyphicon glyphicon-file"></span> New PR for Services</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -162,9 +166,13 @@
         <script type="text/javascript" src = "{% static 'js/angular-resource.min.js' %}"></script>
         <script type="text/javascript" src = "{% static 'js/angular-cookies.min.js' %}"></script>
         <script type="text/javascript" src = "{% static 'js/angular-route.min.js' %}"></script>
+        <script type="text/javascript" src = "{% static 'js/angular-sanitize.min.js' %}"></script>
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+
+        <!-- select2 js -->
+        <script type="text/javascript" src="{% static 'js/select2.min.js' %}"></script>
 
         <!-- Bootstrap compiled javascript plugins -->
         <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>

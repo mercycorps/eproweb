@@ -17,10 +17,14 @@ class RegionFormView(FormView):
     success_url = '/epro/'
 
     def get_initial(self):
-        print(self.request.user)
+        currencies = Currency.objects.filter(country=self.request.user.userprofile.country.pk)
+
         init_data = {
-            'country': 1,
+            'country': self.request.user.userprofile.country.pk,
             'originator': self.request.user.pk,
+            'pr_type': 0, # goods
+            'status': 1, # ongoing
+            'currency': currencies[0].pk if len(currencies) == 1 else 0,
             }
         return init_data
 

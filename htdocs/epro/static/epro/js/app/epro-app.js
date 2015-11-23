@@ -3,6 +3,7 @@
 var eProWebApp = angular.module('eProWebApp', [
     "ngRoute", 
     "ngResource",
+    'ngSanitize',
 ])
 .config(function ($interpolateProvider, $httpProvider, $resourceProvider, $routeProvider) {
     // Use square brackets instead of curly brackets as template tags
@@ -37,6 +38,39 @@ var eProWebApp = angular.module('eProWebApp', [
         controller: 'PRFormCtrl',
     }).
     otherwise({ redirectTo: '/' });
+})
+.directive('chosen', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            //attrs references any attributes on the directive element in html
+            //iElement is the actual DOM element of the directive,
+            //so you can bind to it with jQuery
+            /*
+            $(iElement).bxSlider({
+                mode: 'fade',
+                captions: true
+            });
+            
+             //OR you could use that to find the element inside that needs the plugin
+            $(iElement).find('.bx-wrapper').bxSlider({
+                mode: 'fade',
+                captions: true
+            });
+            */
+            function myFunction() {
+
+                //var movable = document.getElementById('#id_approver1');
+                //console.log(element.children());
+                //console.log('movable');
+  
+                
+                //$('#id_approver1').select2();
+            }
+            scope.$on('$viewContentLoaded', myFunction);
+
+        }
+    };
 })
 .factory('AuthUser', function() { 
     return {

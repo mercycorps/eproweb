@@ -39,10 +39,10 @@ class Currency(CommonBaseAbstractModel):
     name = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.code, self.name)
+        return self.code
 
     def __str__(self):
-        return '%s - %s' % (self.code, self.name)
+        return self.code
 
     class Meta(object):
         verbose_name = 'Currency'
@@ -117,29 +117,27 @@ class PurchaseRequest(CommonBaseAbstractModel):
         return self.status == STATUS_CANCELED
 
     #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
-    country = models.ForeignKey(Country, related_name='purchase_requests', on_delete=models.CASCADE)
-    office = models.ForeignKey(Office, related_name='purchase_requests', on_delete=models.DO_NOTHING)
-    currency = models.ForeignKey(Currency, related_name='purchase_requests',
-                                    on_delete=models.SET_NULL, null=True, blank=True)
-    dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2,
-                                        validators=[MinValueValidator(0.0)], null=False, blank=False)
+    country = models.ForeignKey(Country, related_name='purchase_requests', null=True, blank=True, on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, related_name='purchase_requests', null=True, blank=True, on_delete=models.DO_NOTHING)
+    currency = models.ForeignKey(Currency, related_name='purchase_requests', null=False, blank=False, on_delete=models.CASCADE)
+    dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
     delivery_address = models.CharField(max_length=100, blank=False, null=False)
-    project_reference = models.CharField(max_length=250, null=True, blank=True)
+    project_reference = models.CharField(max_length=250, null=False, blank=False)
     originator = models.ForeignKey(User, related_name='purchase_requests')
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     approver1 = models.ForeignKey(User, related_name='purchase_requests_approvers1')
-    approval1_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver2 = models.ForeignKey(User, related_name='purchase_requests_approver2')
+    approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
+    approver2 = models.ForeignKey(User, blank=True, null=True, related_name='purchase_requests_approver2')
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    finance_reviewer = models.ForeignKey(User, related_name='purchase_requests_reviewer')
+    finance_reviewer = models.ForeignKey(User, blank=True, null=True, related_name='purchase_requests_reviewer')
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    status = models.IntegerField(choices=PR_STATUS_CHOICES, default=STATUS_ONGOING)
+    status = models.IntegerField(choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
     pr_type = models.IntegerField(choices=PR_TYPE_CHOICES, default=TYPE_GOODS)
-    expense_type = models.IntegerField(choices=EXPENSE_TYPE_CHOICES, null=False, blank=False)
-    processing_office = models.ForeignKey(Office, related_name='purchase_requests_processing_office')
-    notes = models.TextField(max_length=255, null=False, blank=True)
+    expense_type = models.IntegerField(choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
+    processing_office = models.ForeignKey(Office, related_name='purchase_requests_processing_office', blank=True, null=True)
+    notes = models.TextField(max_length=255, null=True, blank=True)
     preferred_supplier = models.BooleanField(default=False)
     cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     objects = PurchaseRequestManager() # Changing the default manager

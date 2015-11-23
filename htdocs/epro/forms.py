@@ -13,9 +13,13 @@ from crispy_forms.bootstrap import FormActions
 from .models import *
 from django.contrib.auth.models import User
 
+from .fields import AutoCompleteSelect
+from .widgets import AngularAutoCompleteSelect
+from crispy_forms.layout import Layout, Field
+
 #http://blog.headspin.com/?p=581
 def angular_formfield_callback(f, **kwargs):
-    print("angular_formfield_callback called!!!")
+    #print("angular_formfield_callback called!!!")
     if isinstance(f, PositiveIntegerField):
         field = f.formfield(widget = PositiveIntWidget(), **kwargs)
     else:
@@ -61,7 +65,11 @@ class PurchaseRequestForm(forms.ModelForm):
     formfield_callback = angular_formfield_callback
     class Meta:
         model = PurchaseRequest
-        exclude = ['country', 'originator', 'submission_date', 'pr_type', 'status', 'approver1', 'approval1_date', 'approver2', 'approval2_date', 'finance_reviewer', 'finance_review_date', 'currency', 'notes', 'created', 'updated', 'created_by', 'updated_by',]
+        #exclude = ['country', 'originator', 'submission_date', 'pr_type', 'status', 'approver1', 'approval1_date', 'approver2', 'approval2_date', 'finance_reviewer', 'finance_review_date', 'currency', 'notes', 'created', 'updated', 'created_by', 'updated_by',]
+        fields = ['project_reference', 'delivery_address', 'currency', 'dollar_exchange_rate', 'required_date', 'approver1', 'approver2', ]
+        #widgets = {
+        #    'approver1': AngularAutoCompleteSelect(verbose_name='Approver Level 1', is_stacked=True, attrs={'placeholder': u'--Approver 1--', 'ng-model': 'dj_approver1', 'class': ''})
+        #}
 
     def __init__(self, *args, **kwargs):
         self.helper = setup_boostrap_helpers(formtag=True)
@@ -71,4 +79,7 @@ class PurchaseRequestForm(forms.ModelForm):
         self.helper.add_input(Button('cancel', 'Back', css_class='btn-default', onclick="window.history.back()"))
         self.helper.add_input(Button('cancel', "ePro", css_class='btn btn-default',onclick="javascript:location.href = '/epro/';"))
         self.helper.attrs = {'id': 'id_region_form', 'data_id': '/whatever', 'data-ng-submit': 'submit()', 'novalidate': True}
+        self.helper.layout = Layout(
+            Field('approver1', chosen=''),
+        )
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
