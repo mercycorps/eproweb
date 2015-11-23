@@ -47,7 +47,6 @@ urlpatterns = [
     url(r'^login/$', 'django.contrib.auth.views.login', name='login', kwargs={'template_name': '404.html'}),
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout', kwargs={'next_page': '/'}),
     url(r'^health/$', 'eproweb.views.health_view', name='health'),
-    url(r'^home/$', HomeView.as_view(), name='home'),
     url(r'^epro/', include('epro.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

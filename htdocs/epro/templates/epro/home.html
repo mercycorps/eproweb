@@ -1,16 +1,8 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-<div data-ng-app="eProWebApp">
-    <h3>eProWeb Home</h3>
 
-    <div ng-view> </div>
-
+<div class="page-header">
+    <h3>ePro <small> A list of all your PRs</small></h3>
 </div>
 {% endblock content %}
-
-{% block extra_js %}
-    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/epro-app.js"></script>
-    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/controllers/epro-controller.js"></script>
-    <script type="text/javascript" src = "{{ STATIC_URL }}epro/js/app/services/epro-service.js"></script>
-{% endblock %}
