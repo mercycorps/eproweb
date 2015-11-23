@@ -9,9 +9,8 @@ from epro.views import *
 
 
 urlpatterns = [
-    #url(r'^$', PurchaseRequestsList.as_view(), name='pr-list'),
-    url(r'^$', TemplateView.as_view(template_name="epro/home.html"), name='home'),
-    #url(r'^$', RegionFormView.as_view(), name='home'),
+    url(r'^$', TemplateView.as_view(template_name="epro/home.html"), name='eprohome'),
+    url(r'^newpr/$', PurchaseRequestCreateView.as_view(), name='newpr'),
     url(r'^regionform/$', RegionFormView.as_view(), name='prform'),
 
 ]
