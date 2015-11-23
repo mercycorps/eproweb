@@ -148,6 +148,9 @@ class PurchaseRequest(CommonBaseAbstractModel):
     def __str__(self):
         return '%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
 
+    def get_absolute_url(self):
+        return reverse('purchase_request', kwargs={'pk': self.pk}) #args=[str(self.id)])
+
     class Meta(object):
         verbose_name = 'Purchase Request'
         ordering = ['country', 'office']
@@ -170,6 +173,9 @@ class Vendor(CommonBaseAbstractModel):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('vendor', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
 
 class FinanceCodes(CommonBaseAbstractModel):
@@ -224,6 +230,9 @@ class Item(CommonBaseAbstractModel):
         self.price_estimated_local_subtotal = self.price_estimated_local * self.quantity_requested
         self.price_estimated_usd_subtotal = self.price_estimated_usd * self.quantity_requested
         super(Item, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('item', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Item'

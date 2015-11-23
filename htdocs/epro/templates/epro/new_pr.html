@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal" method="post" >
+                {% csrf_token %}
+                <legend>New Purchase Request for Goods</legend>
+                {% crispy form %}
+                <fieldset>
+                    <legend>Items</legend>
+                    {{ itemformset.management_form }}
+                    {{ itemformset.non_form_errors }}
+                    {% for itemform in itemformset %}
+                        {{ itemform.id }}
+                        <div class="inline {{ itemformset.prefix }}">
+                            {{ itemform.description.errors }}
+                            {{ itemform.description.label_tag }}
+                            {{ itemform.description }}
+                        </div>
+                    {% endfor %}
+                    {% crispy itemformset itemformset_helper %}
+                </fieldset>
+                <input type="submit" value="Add Item" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+{% endblock content %}
