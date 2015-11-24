@@ -1,7 +1,63 @@
 
+$(document).ready(function() { 
+    update_office_select($("#id_country").val());
+    update_currency_select($("#id_country").val());
+
+    $("#id_country").select2({ allowClear: true, });
+    $("#id_office").select2({ allowClear: true, });
+    $("#id_currency").select2({ allowClear: true, });
+    $("#id_approver1").select2({ allowClear: true, });
+    $("#id_approver2").select2({ allowClear: true, });
+});
 
 
-function createAlert (type, message) {
+/* 
+ * Every time the Country dropdown changes, update the Office dropdown options
+ */
+$('body').on('change', 'select#id_country', function() {
+    update_office_select($(this).val());
+    update_currency_select($(this).val());
+});
+
+
+/*
+ * Show relevant offices for the selected country dropdown.
+ */
+function update_office_select(country_id) {
+    $("#div_id_office").find("span#select2-chosen-2").filter(':visible:first').text("---------");
+    var url = '/api/v1/offices/?country=' + country_id;
+    $.getJSON(url, function(offices) {
+        var options = "<option value=''>---------</option>";
+        for (var i = 0; i < offices.length; i++) {
+            options += '<option value="' + offices[i].id + '">' + offices[i].name + '</option>';
+        }
+        $("select#id_office").html(options);
+        $("select#id_office option:first").attr('selected', 'selected'); 
+    });
+}
+
+
+/*
+ * Show relevant currencies for the selected country dropdown.
+ */
+function update_currency_select(country_id) {
+    $("#div_id_currency").find("span#select2-chosen-2").filter(':visible:first').text("---------");
+    var url = '/api/v1/currencies/?country=' + country_id;
+    $.getJSON(url, function(currencies) {
+        var options = "<option value=''>---------</option>";
+        for (var i = 0; i < currencies.length; i++) {
+            options += '<option value="' + currencies[i].id + '">' + currencies[i].code + '</option>';
+        }
+        $("select#id_currency").html(options);
+        $("select#id_currency option:first").attr('selected', 'selected'); 
+    });
+}
+
+
+/*
+ * Create and show a Bootstrap alert.
+ */
+function createAlert (type, message, fade) {
     $("#messages").append(
         $(
             "<div class='alert alert-" + type + " dynamic-alert alert-dismissable'>" +
@@ -10,8 +66,10 @@ function createAlert (type, message) {
             "</div>"
         )
     );
-    // Remove the alert after 30 seconds if the user does not close it.
-    $(".dynamic-alert").delay(30000).fadeOut("slow", function () { $(this).remove(); });
+    if (fade == true) {
+        // Remove the alert after 5 seconds if the user does not close it.
+        $(".dynamic-alert").delay(5000).fadeOut("slow", function () { $(this).remove(); });
+    }
 }
 
 

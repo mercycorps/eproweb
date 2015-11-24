@@ -14,7 +14,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 class OfficeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Office
-        fields = ('name', 'long_name', 'country')
+        fields = ('id', 'name', 'long_name', 'country')
 
 
 class CountrySerializer(serializers.ModelSerializer):

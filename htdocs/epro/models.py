@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 
@@ -25,7 +26,7 @@ def validate_positive(value):
 
 class CommonBaseAbstractModel(models.Model):
     created_by = models.ForeignKey(UserProfile, blank=False, null=False, related_name="%(app_label)s_%(class)s_created")
-    updated_by = models.ForeignKey(UserProfile, blank=False, null=False, related_name="%(app_label)s_%(class)s_updated")
+    updated_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_updated")
     created = models.DateTimeField(auto_now=False, auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False, blank=True, null=True)
 
@@ -87,24 +88,24 @@ class PurchaseRequestManager(models.Manager):
 
 
 class PurchaseRequest(CommonBaseAbstractModel):
-    STATUS_COMPLETED = 0
-    STATUS_ONGOING = 1
-    STATUS_CANCELED = 2
+    STATUS_COMPLETED = 'completed'
+    STATUS_ONGOING = 'ongoing'
+    STATUS_CANCELED = 'canceled'
     PR_STATUS_CHOICES = (
         (STATUS_COMPLETED, 'Completed'),
         (STATUS_ONGOING, 'Ongoing'),
         (STATUS_CANCELED, 'Canceled'),
     )
 
-    TYPE_GOODS = 0
-    TYPE_SERVICES = 1
+    TYPE_GOODS = 'goods'
+    TYPE_SERVICES = 'services'
     PR_TYPE_CHOICES = (
         (TYPE_GOODS, 'Goods'),
         (TYPE_SERVICES, 'Services'),
     )
 
-    EXPENSE_TYPE_PROGRAM = 0
-    EXPENSE_TYPE_OPERATIONAL = 1
+    EXPENSE_TYPE_PROGRAM = 'program'
+    EXPENSE_TYPE_OPERATIONAL = 'operationa'
     EXPENSE_TYPE_CHOICES = (
         (EXPENSE_TYPE_PROGRAM, 'Program'),
         (EXPENSE_TYPE_OPERATIONAL, 'Operational'),
@@ -117,7 +118,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
         return self.status == STATUS_CANCELED
 
     #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
-    country = models.ForeignKey(Country, related_name='purchase_requests', null=True, blank=True, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, related_name='purchase_requests', null=False, blank=False, on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='purchase_requests', null=True, blank=True, on_delete=models.DO_NOTHING)
     currency = models.ForeignKey(Currency, related_name='purchase_requests', null=False, blank=False, on_delete=models.CASCADE)
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
@@ -133,10 +134,10 @@ class PurchaseRequest(CommonBaseAbstractModel):
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='purchase_requests_reviewer')
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    status = models.IntegerField(choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
-    pr_type = models.IntegerField(choices=PR_TYPE_CHOICES, default=TYPE_GOODS)
-    expense_type = models.IntegerField(choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
-    processing_office = models.ForeignKey(Office, related_name='purchase_requests_processing_office', blank=True, null=True)
+    status = models.CharField(max_length=50, choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
+    pr_type = models.CharField(max_length=50, choices=PR_TYPE_CHOICES, default=TYPE_GOODS, null=True, blank=True)
+    expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
+    processing_office = models.ForeignKey(Office, related_name='pr_processing_office', blank=True, null=True)
     notes = models.TextField(max_length=255, null=True, blank=True)
     preferred_supplier = models.BooleanField(default=False)
     cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
@@ -149,7 +150,10 @@ class PurchaseRequest(CommonBaseAbstractModel):
         return '%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
 
     def get_absolute_url(self):
-        return reverse('purchase_request', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        """
+        Redirect to this URl after an object is created using CreateView
+        """
+        return reverse('pr_detail', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Purchase Request'

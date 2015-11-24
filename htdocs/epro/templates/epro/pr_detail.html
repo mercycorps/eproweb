@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h1>{{ object.project_reference }}</h1>
+        <p>{{ object.originator }}</p>
+        <p>Reporter: {{ object.origination_date|date }}</p>
+    </div>
+</div>
+{% endblock content %}

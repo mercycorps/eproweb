@@ -16,8 +16,14 @@ class RegionViewSet(viewsets.ModelViewSet):
 
 
 class CountryViewSet(viewsets.ModelViewSet):
-    queryset = Country.objects.all()
     serializer_class = CountrySerializer
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        region_id = self.request.query_params.get('region', None)
+        if region_id:
+            queryset = queryset.filter(region=region_id)
+        return queryset
 
     def pre_save(self, obj):
         obj.created_by = self.request.user
@@ -25,8 +31,14 @@ class CountryViewSet(viewsets.ModelViewSet):
 
 
 class OfficeViewSet(viewsets.ModelViewSet):
-    queryset = Office.objects.all()
     serializer_class = OfficeSerializer
+
+    def get_queryset(self):
+        queryset = Office.objects.all()
+        country_id = self.request.query_params.get('country', None)
+        if country_id:
+            queryset = queryset.filter(country=country_id)
+        return queryset
 
     def pre_save(self, obj):
         obj.created_by = self.request.user
@@ -34,8 +46,14 @@ class OfficeViewSet(viewsets.ModelViewSet):
 
 
 class CurrencyViewSet(viewsets.ModelViewSet):
-    queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+
+    def get_queryset(self):
+        queryset = Currency.objects.all()
+        country_id = self.request.query_params.get('country', None)
+        if country_id:
+            queryset = queryset.filter(country=country_id)
+        return queryset
 
     def pre_save(self, obj):
         obj.created_by = self.request.user
