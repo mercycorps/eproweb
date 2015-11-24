@@ -1,7 +1,4 @@
 from django.core.urlresolvers import reverse_lazy
-from django.core.validators import MaxValueValidator, EmailValidator
-from django.core.exceptions import ValidationError
-from django.db.models import PositiveIntegerField
 
 from django import forms
 from django.forms import ModelForm, inlineformset_factory, HiddenInput

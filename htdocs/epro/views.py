@@ -4,22 +4,13 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, FormView, View
 from django.views.generic.detail import DetailView
 
-from django.utils.decorators import method_decorator
 from django.utils import timezone
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .serializers import *
 from .models import *
 from .forms import *
-
-
-class LoginRequiredMixin(View):
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        """ this is fired up first regardless of what http method is used """
-        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
+from .mixins import *
 
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
