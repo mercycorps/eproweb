@@ -11,7 +11,7 @@ from django.utils.timezone import utc
 
 from django.contrib.auth.models import User
 
-from djangocosign.models import Region, Country, Office
+from djangocosign.models import UserProfile, Region, Country, Office
 
 from eproweb.utils import USDCurrencyField
 
@@ -24,8 +24,8 @@ def validate_positive(value):
         raise ValidationError('%s is not greater than zero' % value)
 
 class CommonBaseAbstractModel(models.Model):
-    created_by = models.ForeignKey(User, blank=False, null=False, related_name="%(app_label)s_%(class)s_created")
-    updated_by = models.ForeignKey(User, blank=False, null=False, related_name="%(app_label)s_%(class)s_updated")
+    created_by = models.ForeignKey(UserProfile, blank=False, null=False, related_name="%(app_label)s_%(class)s_created")
+    updated_by = models.ForeignKey(UserProfile, blank=False, null=False, related_name="%(app_label)s_%(class)s_updated")
     created = models.DateTimeField(auto_now=False, auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False, blank=True, null=True)
 
@@ -123,15 +123,15 @@ class PurchaseRequest(CommonBaseAbstractModel):
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
     delivery_address = models.CharField(max_length=100, blank=False, null=False)
     project_reference = models.CharField(max_length=250, null=False, blank=False)
-    originator = models.ForeignKey(User, related_name='purchase_requests')
+    originator = models.ForeignKey(UserProfile, related_name='purchase_requests')
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver1 = models.ForeignKey(User, related_name='purchase_requests_approvers1')
+    approver1 = models.ForeignKey(UserProfile, related_name='purchase_requests_approvers1')
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    approver2 = models.ForeignKey(User, blank=True, null=True, related_name='purchase_requests_approver2')
+    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='purchase_requests_approver2')
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    finance_reviewer = models.ForeignKey(User, blank=True, null=True, related_name='purchase_requests_reviewer')
+    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='purchase_requests_reviewer')
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     status = models.IntegerField(choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
     pr_type = models.IntegerField(choices=PR_TYPE_CHOICES, default=TYPE_GOODS)
