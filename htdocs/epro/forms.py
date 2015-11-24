@@ -16,30 +16,6 @@ from crispy_forms.bootstrap import FormActions
 
 from .models import PurchaseRequest, Item, FinanceCodes
 
-ItemFormset = inlineformset_factory(PurchaseRequest, Item, extra=1, fields=(
-                                                                    'quantity_requested',
-                                                                    'unit',
-                                                                    'description_pr',
-                                                                    'price_estimated_local',
-                                                                    'price_estimated_usd',
-                                                                    'price_estimated_local_subtotal',)
-                                                                    )
-
-class ItemFormsetHelper(FormHelper):
-    """
-    This is just a helper for the AttachmentFormset defined above to make it crispier
-    """
-    def __init__(self, *args, **kwargs):
-        super(ItemFormsetHelper, self).__init__(*args, **kwargs)
-        self.html5_required = True
-        self.render_required_fields = True
-        self.form_class = 'form-horizontal'
-        self.label_class = 'col-sm-2'
-        self.field_class = 'col-sm-10'
-        self.form_tag = False
-        self.render_required_fields = True
-        self.disable_csrf = True
-        self.form_show_labels = True
 
 """
 A generic method used for setting up similar bootstrap properties on crispy forms
@@ -48,7 +24,7 @@ def setup_boostrap_helpers(formtag=False):
     helper = FormHelper()
     helper.form_class = 'form-horizontal'
     helper.label_class = 'col-sm-2'
-    helper.field_class = 'col-sm-10'
+    helper.field_class = 'col-sm-8 input-sm'
     helper.label_size = ' col-sm-offset-2'
     helper.html5_required = True
     helper.form_show_labels = True
@@ -66,8 +42,8 @@ class PurchaseRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = setup_boostrap_helpers(formtag=False)
         # self.helper.field_class = 'col-sm-4'
-        self.helper.add_input(Submit('submit', 'Submit'))
-        self.helper.add_input(Reset('rest', 'Reset', css_class='btn-warning'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Reset('rest', 'Reset', css_class='btn-sm btn-warning'))
         #self.helper.add_input(Button('cancel', 'Back', css_class='btn-default', onclick="window.history.back()"))
         #self.helper.add_input(Button('cancel', "ePro", css_class='btn btn-default',onclick="javascript:location.href = '/epro/';"))
         self.helper.attrs = {'id': 'id_pr_form'}

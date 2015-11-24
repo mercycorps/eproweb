@@ -3,28 +3,44 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="row">
+    <div id = "pr_form_div" class="row">
         <div class="col-md-12">
-            <form class="form-horizontal" method="post" >
+            <form id='id_prform' class="form-horizontal" method="post" >
                 {% csrf_token %}
                 <legend>New Purchase Request for Goods</legend>
                 {% crispy form %}
-                <fieldset>
-                    <legend>Items</legend>
-                    {{ itemformset.management_form }}
-                    {{ itemformset.non_form_errors }}
-                    {% for itemform in itemformset %}
-                        {{ itemform.id }}
-                        <div class="inline {{ itemformset.prefix }}">
-                            {{ itemform.description.errors }}
-                            {{ itemform.description.label_tag }}
-                            {{ itemform.description }}
-                        </div>
-                    {% endfor %}
-                    {% crispy itemformset itemformset_helper %}
-                </fieldset>
-                <input type="submit" value="Add Item" class="btn btn-primary" />
             </form>
         </div>
     </div>
+    <div id="pr_itemforset_div" class="row" >
+        <div class="panel panel-default">
+            <div class="panel-heading">Purchase Request Detail<div class='pull-right'><button id='back_to_pr_form' class='btn btn-xs btn-info'> <span class='glyphicon glyphicon-menu-left'></span> Back</button></div></div>
+            <div class="clearfix"></div>
+            <div class="panel-body">
+                
+            </div>
+        </div>
+    </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script type = "text/javascript">
+    $(document).ready(function() { 
+        $("#id_currency").select2({ allowClear: true, });
+        $("#id_approver1").select2({ allowClear: true, });
+        $("#id_approver2").select2({ allowClear: true, });
+
+        // submit the form via ajax and then show to add items to it.
+        $("#id_prform").submit(function( event ) {
+            event.preventDefault();
+            $(this).find('label').each(function(){
+                console.log($(this).text() + " : " +  $(this).parent().find('input,textarea,select').filter(':visible:first').val()); 
+            });
+            
+            // hide the form and show its summary
+            $('#pr_form_div').hide();
+            $('#pr_itemforset_div').show();
+        });
+    });
+</script>
+{% endblock %}
