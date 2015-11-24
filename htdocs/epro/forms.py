@@ -24,7 +24,7 @@ def setup_boostrap_helpers(formtag=False):
     helper = FormHelper()
     helper.form_class = 'form-horizontal'
     helper.label_class = 'col-sm-2'
-    helper.field_class = 'col-sm-8 input-sm'
+    helper.field_class = 'col-sm-10 input-sm'
     helper.label_size = ' col-sm-offset-2'
     helper.html5_required = True
     helper.form_show_labels = True
@@ -40,11 +40,12 @@ class PurchaseRequestForm(forms.ModelForm):
         fields = ['project_reference', 'delivery_address', 'currency', 'dollar_exchange_rate', 'required_date', 'approver1', 'approver2', ]
 
     def __init__(self, *args, **kwargs):
-        self.helper = setup_boostrap_helpers(formtag=False)
+        self.helper = setup_boostrap_helpers(formtag=True)
         # self.helper.field_class = 'col-sm-4'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
-        self.helper.add_input(Reset('rest', 'Reset', css_class='btn-sm btn-warning'))
+        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
+        self.helper.add_input(Button('Next', 'Cancel', css_class='btn-sm btn-info'))
         #self.helper.add_input(Button('cancel', 'Back', css_class='btn-default', onclick="window.history.back()"))
         #self.helper.add_input(Button('cancel', "ePro", css_class='btn btn-default',onclick="javascript:location.href = '/epro/';"))
-        self.helper.attrs = {'id': 'id_pr_form'}
+        self.helper.attrs = {'id': 'id_prform'}
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
