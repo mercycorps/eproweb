@@ -1,13 +1,6 @@
 
 $(document).ready(function() { 
-    update_office_select($("#id_country").val());
-    update_currency_select($("#id_country").val());
 
-    $("#id_country").select2({ allowClear: true, });
-    $("#id_office").select2({ allowClear: true, });
-    $("#id_currency").select2({ allowClear: true, });
-    $("#id_approver1").select2({ allowClear: true, });
-    $("#id_approver2").select2({ allowClear: true, });
 });
 
 

@@ -52,3 +52,29 @@ class PurchaseRequestForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.helper.attrs = {'id': 'id_prform', }
+
+
+class PurchaseRequestItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ['purchase_request', 'quantity_requested', 'unit', 'description_pr', 'price_estimated_usd', ]
+        widgets = {'purchase_request': forms.HiddenInput()}
+
+    def __init__(self, *args, **kwargs):
+        super(PurchaseRequestItemForm, self).__init__(*args, **kwargs)
+        self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
+
+
+class FinanceCodesForm(forms.ModelForm):
+    class Meta:
+        model = FinanceCodes
+        fields = ['gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id',]
+
+    def __init__(self):
+        super(FinanceCodesForm, self).__init__(*args, **kwargs)
+        self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
+

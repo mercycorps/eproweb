@@ -144,10 +144,10 @@ class PurchaseRequest(CommonBaseAbstractModel):
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
-        return u'%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
+        return '%s-%s: %s' % (self.country.iso_two_letters_code, self.pk, self.project_reference)
 
     def __str__(self):
-        return '%s-%s: %s' % (self.pr_number, self.name, self.project_reference)
+        return '%s-%s: %s' % (self.country.iso_two_letters_code, self.pk, self.project_reference)
 
     def get_absolute_url(self):
         """
@@ -192,10 +192,10 @@ class FinanceCodes(CommonBaseAbstractModel):
     employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
 
     def __unicode__(self):
-        return "%s-%s" % (self.gl_account, str(self.fund_code).join(self.dept_code))
+        return "%s-%s" % (self.gl_account, str(self.fund_code))
 
     def __str__(self):
-        return "%s-%s" % (self.gl_account, str(self.fund_code).join(self.dept_code))
+        return "%s-%s" % (self.gl_account, str(self.fund_code))
 
 
 class Item(CommonBaseAbstractModel):
@@ -223,10 +223,10 @@ class Item(CommonBaseAbstractModel):
     finance_codes = models.ManyToManyField(FinanceCodes, null=False, blank=False)
 
     def __unicode__(self):
-        return u'%s: %s' % (self.description_pr)
+        return u'%s' % (self.description_pr)
 
     def __str__(self):
-        return '%s: %s' % (self.description_pr)
+        return '%s' % (self.description_pr)
 
     def save(self, *args, **kwargs):
         if not self.description_po and self.description_pr:

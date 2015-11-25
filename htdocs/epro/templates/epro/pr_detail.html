@@ -1,13 +1,140 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
-<div class="row">
-    <div class="col-md-12">
-        <h1>{{ object.project_reference }}</h1>
-        <p>{{ object.originator }}</p>
-        <p>Reporter: {{ object.origination_date|date }}</p>
+<div class="panel panel-success">
+    <!-- Default panel contents -->
+    <div class="panel-heading">{{ pr.project_reference }} <button type="button" class="btn btn-xs btn-info pull-right"> Edit </button></div>
+    <div class="clearfix"></div>
+    <div class="table-responsive">
+        <table class = "table table-bordered table-condensed">
+        <tr>
+            <td colspan="4">
+                <span class="label label-default">Delivery Address</span>
+                <span class="label label-primary">{{ pr.delivery_address }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Required Date</span>
+                <span class="label label-danger">{{ pr.required_date|date }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="label label-default">Country</span>
+                <span class="label label-primary">{{ pr.country }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Office</span>
+                <span class="label label-primary">{{ pr.office|default_if_none:"not specified" }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Currency</span>
+                <span class="label label-primary">{{ pr.currency }}</span>
+            </td>
+            <td>
+                <span class="label label-default">USD Exchange Rate</span>
+                <span class="label label-primary">{{ pr.dollar_exchange_rate }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="label label-default">Originator</span>
+                <span class="label label-primary">{{ pr.originator }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Date Originated</span>
+                <span class="label label-primary">{{ pr.origination_date|date }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Date Submitted</span>
+                <span class="label label-primary">{{ pr.submission_date|date }}</span>
+            </td>
+            <td>
+                <span class="label label-default">Approver 1</span>
+                <span class="label label-primary">{{ pr.approver1|default_if_none:"" }} approved on {{ pr.approval1_date|date }} </span>
+            </td>
+            <td>
+                <span class="label label-default">Approver 2</span>
+                <span class="label label-primary">{{ pr.approver2|default_if_none:"" }} approved on {{ pr.approval2_date|date }}</span>
+            </td>
+        </tr>
+        <tr>
+            <!--
+            Either show date originated or date submitted
+            show canceled only if PR is canceled.
+            show approver1 or approver2 if approved otherwise show waiting for approvalal
+            show financial review by ... on ... otherwise waiting for review
+            embed pr number somewhere in here
+            show pr_status ( completed or ongoing) if submitted otherwise show draft_mode
+            
+            add draft to pr_status
+            if there is only one currency for a country choose it for the user by default
+            add validation rule for required_date; configurable.
+            add feedback/issue reporting form and notification
+            add logger
+            remove 'about' page
+            record these issues in jira
+            setup test group with Greg
+            work out integration points with Navigator; ask Greg
+            add breadcrumb
+            update userprofile menu
+            -->
+            <td>
+                <span class="label label-default">Fin. Review</span>
+                <span class="label label-primary">{{ pr.finance_reviewer|default_if_none:"" }} reviewed on {{ finance_review_date|date }} </span>
+            </td>
+        </tr>
+    </table>
+    </div>
+
+    <div class="panel-body">
+        <p> Below is a list of all the items that have been added to this PR</p>
+    </div>
+    <div class = "table-responsive">
+        <table class="table table-bordered table-striped table-hover table-condensed">
+        <tr>
+            <th>SNo</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th>Description</th>
+            <th>Cost</th>
+            <th>Total</th>
+            <th style="width: 30px;">Action</th>
+        </tr>
+        {% for item in items %}
+            <tr>
+                <td> {{ forloop.counter }} </td>
+                <td> {{ item.quantity_requested }} </td>
+                <td> {{ item.unit }} </td>
+                <td> {{ item.description_pr }} </td>
+                <td> {{ item.price_estimated_local }} </td>
+                <td> {{ item.price_estimated_local_subtotal }} </td>
+                <td> <button typee="button" class="btn btn-xs btn-warning"> Add Codes </button> </td>
+            </tr>
+        {% endfor %}
+    </table>
+    </div>
+    
+
+    <div class="panel-footer">
+        <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#pritem_modal"> Add Item</button>
     </div>
 </div>
+
+<!-- Placeholder for modal popup windows -->
+<div class="modal fade" id="pritem_modal" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content" id="modal_content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Adding Item to PR</h4>
+            </div>
+            <div class="modal-body">
+                {% crispy itemform %}
+            </div>
+        </div> <!-- END modal-content -->
+    </div><!-- END modal-dialog -->
+</div> <!-- END modal fade -->
 {% endblock content %}

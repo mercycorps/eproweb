@@ -42,4 +42,11 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateV
 class PurchaseRequestDetailView(DetailView):
     model = PurchaseRequest
     template_name = 'epro/pr_detail.html'
+    context_object_name = 'pr'
+
+    def get_context_data(self, **kwargs):
+        context = super(PurchaseRequestDetailView, self).get_context_data(**kwargs)
+        context['items'] = Item.objects.filter(purchase_request=self.object.pk)
+        context['itemform'] = PurchaseRequestItemForm(initial={'purchase_request': self.kwargs['pk']})
+        return context
 
