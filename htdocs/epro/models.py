@@ -236,7 +236,7 @@ class Item(CommonBaseAbstractModel):
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('item', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        return reverse('pr_detail', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Item'

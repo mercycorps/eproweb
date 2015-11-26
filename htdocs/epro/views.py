@@ -10,7 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import *
 from .forms import *
-from .mixins import *
+from .mixins import AjaxFormResponseMixin, LoginRequiredMixin
 
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -49,4 +49,35 @@ class PurchaseRequestDetailView(DetailView):
         context['items'] = Item.objects.filter(purchase_request=self.object.pk)
         context['itemform'] = PurchaseRequestItemForm(initial={'purchase_request': self.kwargs['pk']})
         return context
+
+
+class PurchaseRequestItemDetailView(DetailView):
+    model = Item
+    template_name = None
+    context_object_name = 'item'
+
+
+class PurchaseRequestItemCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, CreateView):
+    model = Item
+    form_class = PurchaseRequestItemForm
+    #template_name = 'epro/pr_detail.html'
+    context_object_name = 'item'
+    success_message = "Item, %(description_pr)s created successfully."
+
+    def get_initial(self):
+        init_data = {
+            'purchase_request': 9,
+        }
+        return init_data
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user.userprofile
+        form.instance.originator = self.request.user.userprofile
+        return super(PurchaseRequestItemCreateView, self).form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data, description_pr=self.object.description_pr)
+
+    #def get_success_url(self):
+    #    return reverse_lazy('item_detail', kwargs={ "pk": self.object.pk })
 

@@ -95,22 +95,24 @@
     <div class = "table-responsive">
         <table class="table table-bordered table-striped table-hover table-condensed">
         <tr>
-            <th>SNo</th>
             <th>Quantity</th>
             <th>Unit</th>
             <th>Description</th>
             <th>Cost</th>
             <th>Total</th>
+            <th>Cost $</th>
+            <th>Total $</th>
             <th style="width: 30px;">Action</th>
         </tr>
         {% for item in items %}
             <tr>
-                <td> {{ forloop.counter }} </td>
                 <td> {{ item.quantity_requested }} </td>
                 <td> {{ item.unit }} </td>
                 <td> {{ item.description_pr }} </td>
                 <td> {{ item.price_estimated_local }} </td>
                 <td> {{ item.price_estimated_local_subtotal }} </td>
+                <td> {{ item.price_estimated_usd }} </td>
+                <td> {{ item.price_estimated_usd_subtotal }} </td>
                 <td> <button typee="button" class="btn btn-xs btn-warning"> Add Codes </button> </td>
             </tr>
         {% endfor %}
@@ -138,3 +140,28 @@
     </div><!-- END modal-dialog -->
 </div> <!-- END modal fade -->
 {% endblock content %}
+
+
+{% block extra_js %}
+<script type = "text/javascript">
+    $(document).ready(function() { 
+        $('#pritem_modal').on('submit', '#pr_item_form', function(e) {
+            e.preventDefault();
+            //var data = $($(this).find(':input')).serializeArray();
+            //console.log(JSON.stringify(data));
+            var url = $(this).attr('action');
+            var data = $(this).serialize();
+            console.log("url: " + url + " data: " + data);
+            $.post(url, data)
+                .done(function(data, textStatus, jqXHR) {
+                    alert("textSTatus: " + textStatus + " data: " + data + " jqXHR: " + jqXHR);
+                    // var content = $( data ).find( "#content" );
+                    // $( "#result" ).empty().append( content );
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    alert( "status: " + textStatus + " errorThrown: " + errorThrown + " jqXHR: " + jqXHR);
+                });
+        });
+    });
+</script>
+{% endblock extra_js%}

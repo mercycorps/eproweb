@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 
 from django import forms
 from django.forms import ModelForm, inlineformset_factory, HiddenInput
@@ -63,6 +63,8 @@ class PurchaseRequestItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PurchaseRequestItemForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.form_action = reverse_lazy('item_new')
+        self.helper.form_id = 'pr_item_form'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
 
