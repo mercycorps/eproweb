@@ -3,6 +3,34 @@ $(document).ready(function() {
 
 });
 
+var $loading = $('#loading');
+
+/* 
+ * A global ajaxComplete method that shows you any messages that are set in Django's view
+ */
+$( document )
+    .ajaxStart( function() {
+        $loading.show();
+    })
+    .ajaxStop( function() {
+        $loading.hide();
+    })
+    .ajaxComplete(function(e, xhr, settings) {
+        var contentType = xhr.getResponseHeader("Content-Type");
+
+        if (contentType == "application/javascript" || contentType == "application/json") {
+            var json = $.parseJSON(xhr.responseText);
+            if (json.django_messages != undefined) {
+                $.each(json.django_messages, function (i, item) {
+                    createAlert(item.extra_tags, item.message, true);
+                });
+            }
+        }
+    })
+    .ajaxError(function(e, xhr, settings, thrownError) {
+        createAlert("danger", "Error " + xhr.status + ": " +  thrownError, false);
+    });
+
 
 /* 
  * Every time the Country dropdown changes, update the Office dropdown options
@@ -37,6 +65,7 @@ function update_currency_select(country_id) {
     $("#div_id_currency").find("span#select2-chosen-2").filter(':visible:first').text("---------");
     var url = '/api/v1/currencies/?country=' + country_id;
     $.getJSON(url, function(currencies) {
+        console.log(currencies);
         var options = "<option value=''>---------</option>";
         for (var i = 0; i < currencies.length; i++) {
             options += '<option value="' + currencies[i].id + '">' + currencies[i].code + '</option>';

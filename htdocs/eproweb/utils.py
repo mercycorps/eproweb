@@ -22,7 +22,7 @@ class USDCurrencyField(DecimalField):
     """
     DecimalField with useful defaults for USD currency.
     """
-    def __init__(self, max_digits=10, decimal_places=3, default=Decimal('0.00'), **kwargs):
+    def __init__(self, max_digits=10, decimal_places=2, default=Decimal('0.00'), **kwargs):
         validators = kwargs.pop('validators', [MinValueValidator(0.0)])
         super(USDCurrencyField, self).__init__(
             max_digits=max_digits,

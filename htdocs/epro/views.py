@@ -47,7 +47,14 @@ class PurchaseRequestDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestDetailView, self).get_context_data(**kwargs)
         context['items'] = Item.objects.filter(purchase_request=self.object.pk)
-        context['itemform'] = PurchaseRequestItemForm(initial={'purchase_request': self.kwargs['pk']})
+        context['item_form'] = PurchaseRequestItemForm(initial={
+                                    'purchase_request': self.kwargs['pk'],
+                                    'form_action': 'item_new',
+                                    })
+        context['finance_codes_form'] = FinanceCodesForm()
+        item_totals = Item.objects.filter(purchase_request=self.object.pk).aggregate(total_usd = Sum('price_estimated_usd_subtotal'), total_local = Sum('price_estimated_local_subtotal'))
+        context['total_usd'] = item_totals['total_local']
+        context['total_local'] = item_totals['total_usd']
         return context
 
 
@@ -60,14 +67,11 @@ class PurchaseRequestItemDetailView(DetailView):
 class PurchaseRequestItemCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, CreateView):
     model = Item
     form_class = PurchaseRequestItemForm
-    #template_name = 'epro/pr_detail.html'
     context_object_name = 'item'
     success_message = "Item, %(description_pr)s created successfully."
 
     def get_initial(self):
-        init_data = {
-            'purchase_request': 9,
-        }
+        init_data = { 'form_action': 'item_update', }
         return init_data
 
     def form_valid(self, form):
@@ -80,4 +84,22 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, AjaxFormResponseMixin, S
 
     #def get_success_url(self):
     #    return reverse_lazy('item_detail', kwargs={ "pk": self.object.pk })
+
+
+class PurchaseRequestItemUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, UpdateView):
+    model = Item
+    form_class = PurchaseRequestItemForm
+    context_object_name = 'pr'
+    success_message = "Item, %(description_pr)s updated successfully."
+
+    def get_initial(self):
+        init_data = { 'form_action': 'item_update', }
+        return init_data
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user.userprofile
+        return super(PurchaseRequestItemUpdateView, self).form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data, description_pr=self.object.description_pr)
 

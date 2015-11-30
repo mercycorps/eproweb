@@ -60,6 +60,8 @@
                                 <ul class="dropdown-menu">
                                     <li><a class="{{ prs_list_tab }}" href="{% url 'newpr' %}"><span class="glyphicon glyphicon-file"></span> New PR for Goods</a></li>
                                     <li><a class="{{ prs_monthly_tab }}" href="#"><span class="glyphicon glyphicon-file"></span> New PR for Services</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span> My PRs</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -76,7 +78,6 @@
                                 <ul class="dropdown-menu">
                                     <li class="dropdown-header">External Services</li>
                                     <li><a class="{{ googledrive_tab }}" href="#"><span class="glyphicon glyphicon-cloud"></span> Update Profile </a></li>
-                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span> My PRs</a></li>
                                     <li><a href="{% url 'logout' %}"> Log out </a></li>
                                 </ul>
                             </li>

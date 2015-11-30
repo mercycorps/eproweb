@@ -25,7 +25,7 @@ class JsonSerializer(Serializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ('name', 'code', 'country', 'created_by', 'updated_by')
+        fields = ('id', 'name', 'code', 'country', 'created_by', 'updated_by')
 
 
 class OfficeSerializer(serializers.ModelSerializer):

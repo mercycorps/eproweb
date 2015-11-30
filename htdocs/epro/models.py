@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse_lazy
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 
@@ -153,7 +153,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
         """
         Redirect to this URl after an object is created using CreateView
         """
-        return reverse('pr_detail', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        return reverse_lazy('pr_detail', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Purchase Request'
@@ -179,7 +179,7 @@ class Vendor(CommonBaseAbstractModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('vendor', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        return reverse_lazy('vendor', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
 
 class FinanceCodes(CommonBaseAbstractModel):
@@ -202,19 +202,18 @@ class Item(CommonBaseAbstractModel):
     purchase_request = models.ForeignKey(PurchaseRequest,
                                             related_name='items',
                                             on_delete=models.CASCADE)
-    quantity_requested = models.PositiveIntegerField(validators=[MinValueValidator(0.0)],)
+    quantity_requested = models.PositiveIntegerField(validators=[MinValueValidator(0.0)], verbose_name='Quantity')
     unit = models.CharField(max_length=20, null=False, blank=False)
-    description_pr = models.TextField(null=False, blank=True)
+    description_pr = models.TextField(null=False, blank=False, verbose_name='Description')
     description_po = models.TextField(null=False, blank=True)
     price_estimated_local = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
-                                        verbose_name='Price in local currency',
-                                        help_text='Price of one unit in local currency',
-                                        default=Decimal('0.00'),)
+                                        verbose_name='Price',
+                                        help_text='Price of one unit in local currency',)
     price_estimated_usd = USDCurrencyField(verbose_name='Price USD', help_text='Price of one unit in US Dollars')
     price_estimated_local_subtotal = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
-                                        verbose_name='Price estimated in local currency Subtotal',
+                                        verbose_name='Price Subtotal',
                                         default=Decimal('0.00'),)
     price_estimated_usd_subtotal = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
@@ -231,12 +230,13 @@ class Item(CommonBaseAbstractModel):
     def save(self, *args, **kwargs):
         if not self.description_po and self.description_pr:
             self.description_po = self.description_pr
-        self.price_estimated_local_subtotal = self.price_estimated_local * self.quantity_requested
-        self.price_estimated_usd_subtotal = self.price_estimated_usd * self.quantity_requested
+        self.price_estimated_local_subtotal = round(self.price_estimated_local * self.quantity_requested,2)
+        self.price_estimated_usd = round(self.price_estimated_local / self.purchase_request.dollar_exchange_rate, 2)
+        self.price_estimated_usd_subtotal = round(self.price_estimated_usd * self.quantity_requested, 2)
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('pr_detail', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
+        return reverse_lazy('pr_detail', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Item'
@@ -316,7 +316,6 @@ class PurchaseOrder(CommonBaseAbstractModel):
     quotation_analysis = models.ForeignKey(QuotationAnalysis, related_name='purchase_orders', null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        #if self.pk:
         self.total_local = self.purchase_order_items.Aggregate(Sum(price_subtotal_local))
         self.total_usd = self.purchase_order_items.Aggregate(Sum(price_subtotal_usd))
         if self.quotation_analysis:
@@ -350,7 +349,6 @@ class PurchaseOrderItem(CommonBaseAbstractModel):
     price_subtotal_usd = USDCurrencyField(verbose_name='Subtal US Dollars')
 
     def save(self, *args, **kwargs):
-        #if self.pk:
         self.price_subtotal_local = self.price_local * self.quantity_ordered
         self.price_subtotal_usd = self.price_usd * self.quantity_ordered
         super(PurchaseOrderItems, self).save(*args, **kwargs)

@@ -4,9 +4,27 @@
 
 {% block content %}
 
-<div class="panel panel-success">
+<div class="panel panel-info">
     <!-- Default panel contents -->
-    <div class="panel-heading">{{ pr.project_reference }} <button type="button" class="btn btn-xs btn-info pull-right"> Edit </button></div>
+    <div class="panel-heading">
+        {{ pr.project_reference }} 
+        <div role="group" class="btn-group btn-group-xs pull-right">
+            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class= "glyphicon glyphicon-menu-hamburger"> </span> PR options
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#"><span class="glyphicon glyphicon-send"></span> Submit</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-print"></span> Print</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span> Cancel</a></li>
+                <li class="divider"></li>
+                <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
+            </ul>
+        </div>
+    </div>
+
     <div class="clearfix"></div>
     <div class="table-responsive">
         <table class = "table table-bordered table-condensed">
@@ -62,6 +80,10 @@
         </tr>
         <tr>
             <!--
+            TODO:
+                a. check form action for item form
+                b. 
+            SEtup a list view for seeing PRs. (filter by status)
             Either show date originated or date submitted
             show canceled only if PR is canceled.
             show approver1 or approver2 if approved otherwise show waiting for approvalal
@@ -69,7 +91,7 @@
             embed pr number somewhere in here
             show pr_status ( completed or ongoing) if submitted otherwise show draft_mode
             
-            add draft to pr_status
+            add draft, canceled, rejected to pr_status
             if there is only one currency for a country choose it for the user by default
             add validation rule for required_date; configurable.
             add feedback/issue reporting form and notification
@@ -80,6 +102,16 @@
             work out integration points with Navigator; ask Greg
             add breadcrumb
             update userprofile menu
+            provide users the ability to rate vednors
+            PR can be deleted if status=draft.
+            how to handle PR items' changes.
+            navigator integrations:
+                1. Get users' Office to set the default office location necessary for generating PR originating location
+                2. Get the weekly exchange rate for calculating the PR estimated total in USD.
+                3. for each pr, get the payments made to a vendor in USD or local currency.
+                4. Get a list of vendors from Naviagtor for each country.
+                5. Get a list of all fund codes, dept codes, office-codes.
+                6. 
             -->
             <td>
                 <span class="label label-default">Fin. Review</span>
@@ -93,19 +125,22 @@
         <p> Below is a list of all the items that have been added to this PR</p>
     </div>
     <div class = "table-responsive">
-        <table class="table table-bordered table-striped table-hover table-condensed">
+        <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
         <tr>
-            <th>Quantity</th>
+            <th style="width: 5px;"></th>
+            <th style="display:none;">PR</th>
+            <th>Qty</th>
             <th>Unit</th>
             <th>Description</th>
             <th>Cost</th>
             <th>Total</th>
             <th>Cost $</th>
             <th>Total $</th>
-            <th style="width: 30px;">Action</th>
         </tr>
         {% for item in items %}
             <tr>
+                <td><input type="radio" name="item_id" value={{ item.pk }} /></td>
+                <td style="display:none;"> {{ item.purchase_request.pk }} </td>
                 <td> {{ item.quantity_requested }} </td>
                 <td> {{ item.unit }} </td>
                 <td> {{ item.description_pr }} </td>
@@ -113,15 +148,34 @@
                 <td> {{ item.price_estimated_local_subtotal }} </td>
                 <td> {{ item.price_estimated_usd }} </td>
                 <td> {{ item.price_estimated_usd_subtotal }} </td>
-                <td> <button typee="button" class="btn btn-xs btn-warning"> Add Codes </button> </td>
             </tr>
         {% endfor %}
+        <tfoot>
+            <tr class="info">
+                <td colspan="5"></td>
+                <td>{{ total_usd }}</td>
+                <td></td>
+                <td>{{ total_local }}</td>
+            </tr>
+        </tfoot>
     </table>
     </div>
     
 
     <div class="panel-footer">
-        <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#pritem_modal"> Add Item</button>
+        <div role="group" class="btn-group btn-group-xs">
+            <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#pritem_modal"><span class="glyphicon glyphicon-modal-window"> </span> Add Item</button>
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#"><span class="glyphicon glyphicon-edit"></span> Edit Item</a></li>
+                <li class="divider"></li>
+                <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete Item</a></li>
+            </ul>
+        </div>
+
     </div>
 </div>
 
@@ -134,7 +188,19 @@
                 <h4 class="modal-title" id="myModalLabel">Adding Item to PR</h4>
             </div>
             <div class="modal-body">
-                {% crispy itemform %}
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active" id="item_tab"><a href="#item_form" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
+                    <li role="presentation" id="finance_tab"><a href="#finance_codes_form" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="item_form"><br />{% crispy item_form %}</div>
+                    <div role="tabpanel" class="tab-pane" id="finance_codes_form"><br />{% crispy finance_codes_form %}</div>
+                </div>
+
             </div>
         </div> <!-- END modal-content -->
     </div><!-- END modal-dialog -->
@@ -145,22 +211,39 @@
 {% block extra_js %}
 <script type = "text/javascript">
     $(document).ready(function() { 
+
+        //$("#finance_tab").hide();
+        $("#id_fund_code").select2();
+        $("#id_dept_code").select2();
+        $("#id_office_code").select2();
+
         $('#pritem_modal').on('submit', '#pr_item_form', function(e) {
             e.preventDefault();
             //var data = $($(this).find(':input')).serializeArray();
-            //console.log(JSON.stringify(data));
             var url = $(this).attr('action');
             var data = $(this).serialize();
-            console.log("url: " + url + " data: " + data);
             $.post(url, data)
                 .done(function(data, textStatus, jqXHR) {
-                    alert("textSTatus: " + textStatus + " data: " + data + " jqXHR: " + jqXHR);
-                    // var content = $( data ).find( "#content" );
-                    // $( "#result" ).empty().append( content );
+                    var tr = "<tr class='warning'>";
+                    tr += '<td><input type="radio" name="item_id" value={{ item.pk }} /></td>';
+                    tr += "<td style='display:none;'>" + data['object'][0]['purchase_request'] + "</td>";
+                    tr += "<td>" + data['object'][0]['quantity_requested'] + "</td>";
+                    tr += "<td>" + data['object'][0]['unit'] + "</td>";
+                    tr += "<td>" + data['object'][0]['description_pr'] + "</td>";
+                    tr += "<td>" + data['object'][0]['price_estimated_local'] + "</td>";
+                    tr += "<td>" + data['object'][0]['price_estimated_local_subtotal'] + "</td>";
+                    tr += "<td>" + data['object'][0]['price_estimated_usd'] + "</td>";
+                    tr += "<td>" + data['object'][0]['price_estimated_usd_subtotal'] + "</td>";
+                    tr += "</tr>";
+                    $("#pr_items").append(tr);
+                    setTimeout(function(){
+                        $("#pr_items tr:nth-last-child(1)").removeClass('warning');
+                        }, 1000);
                 })
                 .fail(function(jqXHR, textStatus, errorThrown) {
-                    alert( "status: " + textStatus + " errorThrown: " + errorThrown + " jqXHR: " + jqXHR);
+                    console.log( "status: " + textStatus + " errorThrown: " + errorThrown + " jqXHR: " + jqXHR);
                 });
+            $('#pritem_modal').modal('hide');
         });
     });
 </script>
