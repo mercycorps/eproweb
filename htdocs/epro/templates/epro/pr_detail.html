@@ -7,7 +7,7 @@
 <div class="panel panel-info">
     <!-- Default panel contents -->
     <div class="panel-heading">
-        {{ pr.project_reference }} 
+        {{ pr }} 
         <div role="group" class="btn-group btn-group-xs pull-right">
             <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class= "glyphicon glyphicon-menu-hamburger"> </span> PR options
@@ -164,8 +164,8 @@
 
     <div class="panel-footer">
         <div role="group" class="btn-group btn-group-xs">
-            <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#pritem_modal"><span class="glyphicon glyphicon-modal-window"> </span> Add Item</button>
-            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#pritem_modal"><span class="glyphicon glyphicon-modal-window"> </span> Add Item</button>
+            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
@@ -175,7 +175,6 @@
                 <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete Item</a></li>
             </ul>
         </div>
-
     </div>
 </div>
 
@@ -217,7 +216,7 @@
         $("#id_dept_code").select2();
         $("#id_office_code").select2();
 
-        $('#pritem_modal').on('submit', '#pr_item_form', function(e) {
+        $('#pritem_modal').on('submit', '#id_pr_item_form', function(e) {
             e.preventDefault();
             //var data = $($(this).find(':input')).serializeArray();
             var url = $(this).attr('action');
@@ -236,14 +235,26 @@
                     tr += "<td>" + data['object'][0]['price_estimated_usd_subtotal'] + "</td>";
                     tr += "</tr>";
                     $("#pr_items").append(tr);
+
+                    $("#id_item_id").val(data['object'][0]['id']);
+
                     setTimeout(function(){
                         $("#pr_items tr:nth-last-child(1)").removeClass('warning');
                         }, 1000);
-                })
-                .fail(function(jqXHR, textStatus, errorThrown) {
-                    console.log( "status: " + textStatus + " errorThrown: " + errorThrown + " jqXHR: " + jqXHR);
                 });
-            $('#pritem_modal').modal('hide');
+            //$('#pritem_modal').modal('hide');
+        });
+
+        //$("#finance_codes_form").submit(function(event) {
+        $('#pritem_modal').on('submit', '#id_finance_codes_form', function(event) {
+            event.preventDefault();
+            var url = $(this).attr('action');
+            var data = $(this).serialize();
+            console.log("URL: " + url);
+            $.post(url, data)
+                .done(function(data, textStatus, jqXHR) {
+                    console.log(JSON.stringify(data));
+                });
         });
     });
 </script>

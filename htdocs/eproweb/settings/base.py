@@ -57,6 +57,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'eproweb.middleware.AjaxMessaging',
+    'eproweb.middleware.TimingMiddleware',
 )
 
 ROOT_URLCONF = 'eproweb.urls'

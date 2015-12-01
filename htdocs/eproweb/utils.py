@@ -4,10 +4,6 @@ from math import floor
 import re
 from time import time
 
-from django.conf import settings
-from django.core.validators import MinValueValidator
-from django.db.models import DecimalField
-
 
 def is_int(value):
     try:
@@ -18,16 +14,24 @@ def is_int(value):
         return True
 
 
-class USDCurrencyField(DecimalField):
+TIME_MAP = (
+    ('w', 604800),
+    ('d', 86400),
+    ('h', 3600),
+    ('m', 60),
+    ('s', 1)
+)
+
+def describe_seconds(value):
     """
-    DecimalField with useful defaults for USD currency.
+    Convert a seconds value into a human readable (ie week, day, hour) value.
+    :param value: integer value of the number of seconds.
+    :return: a string with the humanized value.
     """
-    def __init__(self, max_digits=10, decimal_places=2, default=Decimal('0.00'), **kwargs):
-        validators = kwargs.pop('validators', [MinValueValidator(0.0)])
-        super(USDCurrencyField, self).__init__(
-            max_digits=max_digits,
-            decimal_places=decimal_places,
-            validators=validators,
-            default=default,
-            **kwargs
-        )
+    value_vector = []
+    for unit, factor in iter(TIME_MAP):
+        component, value = int(value / factor), value % factor
+        if component:
+            value_vector.append('%s%s' % (component, unit))
+    return ' '.join(value_vector)
+

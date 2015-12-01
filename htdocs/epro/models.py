@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.core.urlresolvers import reverse_lazy
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 
 from django.db.models import Q, Sum, Max, Min, Count
@@ -14,7 +14,9 @@ from django.contrib.auth.models import User
 
 from djangocosign.models import UserProfile, Region, Country, Office
 
-from eproweb.utils import USDCurrencyField
+from .fields import USDCurrencyField
+from django.utils.timezone import utc
+import datetime, time, logging
 
 def validate_even(value):
     if value % 2 != 0:
@@ -24,14 +26,24 @@ def validate_positive(value):
     if value <= 0:
         raise ValidationError('%s is not greater than zero' % value)
 
+
 class CommonBaseAbstractModel(models.Model):
-    created_by = models.ForeignKey(UserProfile, blank=False, null=False, related_name="%(app_label)s_%(class)s_created")
+    created_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_created")
     updated_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_updated")
-    created = models.DateTimeField(auto_now=False, auto_now_add=True, editable=False)
-    updated = models.DateTimeField(auto_now=True, auto_now_add=False, editable=False, blank=True, null=True)
+    created = models.DateTimeField(editable=False, blank=True, null=True)
+    updated = models.DateTimeField(editable=False, blank=True, null=True)
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        now_utc = datetime.datetime.utcnow().replace(tzinfo=utc)
+        if self.id:
+            self.updated = now_utc
+        else:
+            self.created = now_utc
+        super(CommonBaseAbstractModel, self).save(*args, **kwargs)
+
 
 class Currency(CommonBaseAbstractModel):
     code = models.CharField(unique=True, max_length=3, null=False, blank=False)
@@ -88,12 +100,20 @@ class PurchaseRequestManager(models.Manager):
 
 
 class PurchaseRequest(CommonBaseAbstractModel):
-    STATUS_COMPLETED = 'completed'
+    STATUS_DRAFT = 'drafted'
+    STATUS_PENDING_APPROVAL = 'pending_approval'
+    STATUS_PENDING_FINANCIAL_REVIEW = 'pending_financial_review'
     STATUS_ONGOING = 'ongoing'
+    STATUS_COMPLETED = 'completed'
     STATUS_CANCELED = 'canceled'
+    STATUS_REJECTED = 'rejected'
     PR_STATUS_CHOICES = (
-        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_DRAFT, 'Draf'),
+        (STATUS_PENDING_APPROVAL, 'pending_approval'),
+        (STATUS_PENDING_FINANCIAL_REVIEW, 'pending_financial_review'),
         (STATUS_ONGOING, 'Ongoing'),
+        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_REJECTED, 'Rejected'),
         (STATUS_CANCELED, 'Canceled'),
     )
 
@@ -118,42 +138,46 @@ class PurchaseRequest(CommonBaseAbstractModel):
         return self.status == STATUS_CANCELED
 
     #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
-    country = models.ForeignKey(Country, related_name='purchase_requests', null=False, blank=False, on_delete=models.CASCADE)
-    office = models.ForeignKey(Office, related_name='purchase_requests', null=True, blank=True, on_delete=models.DO_NOTHING)
-    currency = models.ForeignKey(Currency, related_name='purchase_requests', null=False, blank=False, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING)
+    currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
     delivery_address = models.CharField(max_length=100, blank=False, null=False)
     project_reference = models.CharField(max_length=250, null=False, blank=False)
-    originator = models.ForeignKey(UserProfile, related_name='purchase_requests')
+    originator = models.ForeignKey(UserProfile, related_name='prs')
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver1 = models.ForeignKey(UserProfile, related_name='purchase_requests_approvers1')
+    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1')
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='purchase_requests_approver2')
+    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2')
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='purchase_requests_reviewer')
+    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer')
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     status = models.CharField(max_length=50, choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
     pr_type = models.CharField(max_length=50, choices=PR_TYPE_CHOICES, default=TYPE_GOODS, null=True, blank=True)
     expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
     processing_office = models.ForeignKey(Office, related_name='pr_processing_office', blank=True, null=True)
+    assignedTo = models.ForeignKey(UserProfile, blank=True, null=True, related_name='assignee')
     notes = models.TextField(max_length=255, null=True, blank=True)
     preferred_supplier = models.BooleanField(default=False)
     cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
-        return '%s-%s: %s' % (self.country.iso_two_letters_code, self.pk, self.project_reference)
+        return '%s-%s: %s' % (self.office.name, self.pk, self.project_reference)
 
     def __str__(self):
-        return '%s-%s: %s' % (self.country.iso_two_letters_code, self.pk, self.project_reference)
+        return '%s-%s: %s' % (self.office.name, self.pk, self.project_reference)
 
     def get_absolute_url(self):
-        """
-        Redirect to this URl after an object is created using CreateView
-        """
+        # Redirect to this URl after an object is created using CreateView
         return reverse_lazy('pr_detail', kwargs={'pk': self.pk}) #args=[str(self.id)])
+
+    def clean(self):
+        # Don't allow draft purchase_requests to have a submission_date
+        if self.status == 'draft' and self.submission_date is not None:
+            raise ValidationError(_('Draft Purchase Requests may not have a submission date.'))
 
     class Meta(object):
         verbose_name = 'Purchase Request'
@@ -189,7 +213,11 @@ class FinanceCodes(CommonBaseAbstractModel):
     office_code = models.ForeignKey(Office, null=False, blank=False)
     lin_code = models.CharField(max_length=9, blank=True, null=True)
     activity_code = models.CharField(max_length=9, blank=True, null=True)
-    employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
+    employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=True, blank=True)
+    allocation_percent = models.DecimalField(max_digits=5, decimal_places=2,
+                                validators=[MaxValueValidator(100.00), MinValueValidator(1.00) ],
+                                blank=False, null=False,
+                                default=Decimal("100.00"))
 
     def __unicode__(self):
         return "%s-%s" % (self.gl_account, str(self.fund_code))
@@ -197,6 +225,8 @@ class FinanceCodes(CommonBaseAbstractModel):
     def __str__(self):
         return "%s-%s" % (self.gl_account, str(self.fund_code))
 
+    def get_absolute_url(self):
+        return reverse_lazy('pr_detail', kwargs={'pk': 1})
 
 class Item(CommonBaseAbstractModel):
     purchase_request = models.ForeignKey(PurchaseRequest,
@@ -204,7 +234,8 @@ class Item(CommonBaseAbstractModel):
                                             on_delete=models.CASCADE)
     quantity_requested = models.PositiveIntegerField(validators=[MinValueValidator(0.0)], verbose_name='Quantity')
     unit = models.CharField(max_length=20, null=False, blank=False)
-    description_pr = models.TextField(null=False, blank=False, verbose_name='Description')
+    description_pr = models.TextField(null=False, blank=False, verbose_name='Description',
+                                        help_text='Provide detailed description')
     description_po = models.TextField(null=False, blank=True)
     price_estimated_local = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
@@ -217,9 +248,8 @@ class Item(CommonBaseAbstractModel):
                                         default=Decimal('0.00'),)
     price_estimated_usd_subtotal = models.DecimalField(max_digits=10, decimal_places=2,
                                         validators=[MinValueValidator(0.0)],
-                                        verbose_name='Price estimated in US Dollars Subtotal',
-                                        default=Decimal('0.00'),)
-    finance_codes = models.ManyToManyField(FinanceCodes, null=False, blank=False)
+                                        verbose_name='Price estimated in US Dollars Subtotal',)
+    finance_codes = models.ManyToManyField(FinanceCodes, related_name='items', null=False, blank=False)
 
     def __unicode__(self):
         return u'%s' % (self.description_pr)

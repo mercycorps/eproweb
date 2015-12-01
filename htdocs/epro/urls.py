@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^pr/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_detail'),
     url(r'^item/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
     url(r'^item/(?P<pk>\d+)/$', PurchaseRequestItemDetailView.as_view(), name='item_detail'),
+    url(r'^financecodes_new/$', FinanceCodesCreateView.as_view(), name='financecodes_new'),
 
 ]
 

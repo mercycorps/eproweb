@@ -11,7 +11,7 @@ from django.views.generic.edit import CreateView, UpdateView
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Reset, Button, HTML, Layout, Field, Div, Column
-from crispy_forms.bootstrap import FormActions
+from crispy_forms.bootstrap import FormActions, AppendedText
 
 from .models import PurchaseRequest, Item, FinanceCodes
 
@@ -65,49 +65,37 @@ class PurchaseRequestItemForm(forms.ModelForm):
         form_action = kwargs['initial'].pop('form_action')
         self.helper = setup_boostrap_helpers(formtag=True)
         self.helper.form_action = reverse_lazy(form_action if form_action else 'item_new')
-        self.helper.form_id = 'pr_item_form'
+        self.helper.form_id = 'id_pr_item_form'
         self.helper.add_input(Submit('submit', 'Add Item', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.fields['description_pr'].widget.attrs['rows'] = 3
 
 
 class FinanceCodesForm(forms.ModelForm):
+    item_id = forms.IntegerField()
     class Meta:
         model = FinanceCodes
-        fields = ['gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id',]
+        fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
 
     def __init__(self, *args, **kwargs):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
+        form_action = kwargs['initial'].pop('form_action')
         self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_new')
+        self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-3'
         self.helper.field_class = 'col-sm-9'
         self.helper.add_input(Submit('submit', 'Add Finance Codes', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
-        """
         self.helper.layout = Layout(
-            Div(
-                Column(
-                    Field('gl_account', css_class='input-sm'),
-                    Field('fund_code', css_class='input-sm'),
-                    Field('dept_code', css_class='input-sm'),
-                    Field('office_code', css_class='input-sm'),
-                    Field('lin_code', css_class='input-sm'),
-                    Field('activity_code', css_class='input-sm'),
-                    Field('employee_id', css_class='input-sm'),
-                    css_class='col-sm-12',
-                ),
-                css_class='row',
-            ),
-            Div(
-                Column(
-                    FormActions(
-                        Submit('submit', 'Add Finance Code', css_class='btn btn-primary btn-sm'),
-                    ),
-                    css_class='col-sm-12',
-                ),
-                css_class='row',
-            ),
+            'item_id',
+            'gl_account',
+            'fund_code',
+            'dept_code',
+            'office_code',
+            'lin_code',
+            'activity_code',
+            'employee_id',
+            AppendedText('allocation_percent', '%'),
         )
-        """
-
 

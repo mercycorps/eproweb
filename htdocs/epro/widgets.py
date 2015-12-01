@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 
+
 class AngularAutoCompleteSelect(forms.Select):
     """
     A Select for Anugular ui-select .

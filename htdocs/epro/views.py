@@ -14,6 +14,9 @@ from .mixins import AjaxFormResponseMixin, LoginRequiredMixin
 
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    """
+    PR Create View
+    """
     model = PurchaseRequest
     form_class = PurchaseRequestForm
     template_name = 'epro/new_pr.html'
@@ -40,6 +43,9 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateV
 
 
 class PurchaseRequestDetailView(DetailView):
+    """
+    PR Detail View
+    """
     model = PurchaseRequest
     template_name = 'epro/pr_detail.html'
     context_object_name = 'pr'
@@ -51,7 +57,7 @@ class PurchaseRequestDetailView(DetailView):
                                     'purchase_request': self.kwargs['pk'],
                                     'form_action': 'item_new',
                                     })
-        context['finance_codes_form'] = FinanceCodesForm()
+        context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new',})
         item_totals = Item.objects.filter(purchase_request=self.object.pk).aggregate(total_usd = Sum('price_estimated_usd_subtotal'), total_local = Sum('price_estimated_local_subtotal'))
         context['total_usd'] = item_totals['total_local']
         context['total_local'] = item_totals['total_usd']
@@ -65,13 +71,16 @@ class PurchaseRequestItemDetailView(DetailView):
 
 
 class PurchaseRequestItemCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, CreateView):
+    """
+    PR Item Create View
+    """
     model = Item
     form_class = PurchaseRequestItemForm
     context_object_name = 'item'
     success_message = "Item, %(description_pr)s created successfully."
 
     def get_initial(self):
-        init_data = { 'form_action': 'item_update', }
+        init_data = { 'form_action': 'item_new', }
         return init_data
 
     def form_valid(self, form):
@@ -87,6 +96,9 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, AjaxFormResponseMixin, S
 
 
 class PurchaseRequestItemUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, UpdateView):
+    """
+    PR Item Update View
+    """
     model = Item
     form_class = PurchaseRequestItemForm
     context_object_name = 'pr'
@@ -103,3 +115,23 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, S
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(cleaned_data, description_pr=self.object.description_pr)
 
+
+class FinanceCodesCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, CreateView):
+    model = FinanceCodes
+    form_class = FinanceCodesForm
+    context_object_name = 'finance_codes'
+    success_message = "Finance Codes, added to PR %(description_pr)s successfully."
+
+    def get_initial(self):
+        init_data = { 'form_action': 'financecodes_new', }
+        return init_data
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user.userprofile
+        self.object = form.save()
+        item = Item.objects.get(pk=form.cleaned_data['item_id'])
+        item.finance_codes.add(self.object)
+        return super(FinanceCodesCreateView, self).form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data, description_pr=self.object.fund_code)
