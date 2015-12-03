@@ -31,11 +31,10 @@ $( document )
         createAlert("danger", "Error " + xhr.status + ": " +  thrownError, false);
     });
 
-
 /* 
  * Every time the Country dropdown changes, update the Office dropdown options
  */
-$('body').on('change', 'select#id_country', function() {
+$('body').on('change', 'select#id_country', function(e) {
     update_office_select($(this).val());
     update_currency_select($(this).val());
 });

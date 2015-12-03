@@ -101,18 +101,22 @@ class PurchaseRequestManager(models.Manager):
 
 class PurchaseRequest(CommonBaseAbstractModel):
     STATUS_DRAFT = 'drafted'
+    STATUS_PENDING_PROCUREMENT_VERIFICATION = 'pending_procurement_verification'
     STATUS_PENDING_APPROVAL = 'pending_approval'
     STATUS_PENDING_FINANCIAL_REVIEW = 'pending_financial_review'
     STATUS_ONGOING = 'ongoing'
     STATUS_COMPLETED = 'completed'
+    STATUS_ONHOLD = 'onhold'
     STATUS_CANCELED = 'canceled'
     STATUS_REJECTED = 'rejected'
     PR_STATUS_CHOICES = (
         (STATUS_DRAFT, 'Draf'),
-        (STATUS_PENDING_APPROVAL, 'pending_approval'),
-        (STATUS_PENDING_FINANCIAL_REVIEW, 'pending_financial_review'),
+        (STATUS_PENDING_PROCUREMENT_VERIFICATION, 'Pending Procurement Verification'),
+        (STATUS_PENDING_APPROVAL, 'Pending Approval'),
+        (STATUS_PENDING_FINANCIAL_REVIEW, 'Pending Financial Review'),
         (STATUS_ONGOING, 'Ongoing'),
         (STATUS_COMPLETED, 'Completed'),
+        (STATUS_ONHOLD, 'On Hold'),
         (STATUS_REJECTED, 'Rejected'),
         (STATUS_CANCELED, 'Canceled'),
     )
@@ -418,3 +422,26 @@ class PurchaseRecord(CommonBaseAbstractModel):
     pass
 
 
+class Feedback(CommonBaseAbstractModel):
+    ISSUE_BUG = 'bug'
+    TYPE_FEATURE = 'feature'
+    TYPE_GENERAL = 'general'
+    ISSUE_TYPE_CHOICES = (
+        (TYPE_GENERAL, 'General Feedback'),
+        (TYPE_FEATURE, 'Feature Request'),
+        (ISSUE_BUG, 'Bug'),
+    )
+    REPORTER_ROLE_CHOICES = (
+        ('originator', 'Originator'),
+        ('procurement_manager', 'Procurement Manager'),
+        ('procurement', 'Procurement'),
+        ('finance', 'Finance'),
+        ('approving_manager', 'Approving Manager'),
+    )
+    reporter_role = models.CharField(max_length=50, choices=REPORTER_ROLE_CHOICES, null=False, blank=False, verbose_name='Your Role')
+    issue_type = models.CharField(max_length=50, choices=ISSUE_TYPE_CHOICES, null=False, blank=False)
+    summary = models.CharField(max_length=80, null=False, blank=False, help_text="Provide a one sentence summary of the issue")
+    description = models.CharField(max_length=500, null=False, blank=False,
+        help_text="Provide detail description of the problem/bug including steps to replicate it; if it is a feature request, describe how the feature should work and what probelm will it solve")
+    reference = models.URLField(null=True, blank=True,
+        help_text="Include the link to the page, where the bug/problem occurs or if applicable where the feature should be implemented")

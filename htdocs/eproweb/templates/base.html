@@ -143,24 +143,12 @@
         <!-- Placeholder for modal popup windows -->
         <div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
             <div class="modal-dialog modal-md">
-                <div class="modal-content" id="modal_content">
-                    <!--
-                    <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&amp;times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                    </div>
-                    <div class="modal-body">
-                    <h3>Modal Body</h3>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                    </div> -->
+                <div class="modal-content"> 
                     <!-- form will be inserted here -->
                 </div> <!-- END modal-content -->
             </div><!-- END modal-dialog -->
         </div> <!-- END modal fade -->
-
+        <div id="contact_form"></div>
 
         <footer id="page-footer">
             <div class="container-fluid">
@@ -168,8 +156,7 @@
                     Mercy Corps {% now "Y" %}
                 </span>
                 <span style="float:right; padding: 20px; " class="text-muted">
-                    <a href="#" class="text-muted">About</a> | 
-                    <a href="#" id = "contact_id" class="text-muted">Contact</a>
+                    <a href="{% url 'feedback' %}" id="feedback_btn" class="text-muted" data-toggle="modal" data-target="#form_modal">Feedback</a>
                 </span>
             </div>
         </footer>

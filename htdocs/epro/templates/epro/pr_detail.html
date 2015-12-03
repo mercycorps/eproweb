@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
+{% load customtags %}
 
 {% block content %}
 
@@ -83,27 +84,6 @@
             TODO:
                 a. check form action for item form
                 b. 
-            SEtup a list view for seeing PRs. (filter by status)
-            Either show date originated or date submitted
-            show canceled only if PR is canceled.
-            show approver1 or approver2 if approved otherwise show waiting for approvalal
-            show financial review by ... on ... otherwise waiting for review
-            embed pr number somewhere in here
-            show pr_status ( completed or ongoing) if submitted otherwise show draft_mode
-            
-            add draft, canceled, rejected to pr_status
-            if there is only one currency for a country choose it for the user by default
-            add validation rule for required_date; configurable.
-            add feedback/issue reporting form and notification
-            add logger
-            remove 'about' page
-            record these issues in jira
-            setup test group with Greg
-            work out integration points with Navigator; ask Greg
-            add breadcrumb
-            update userprofile menu
-            provide users the ability to rate vednors
-            PR can be deleted if status=draft.
             how to handle PR items' changes.
             navigator integrations:
                 1. Get users' Office to set the default office location necessary for generating PR originating location
@@ -111,7 +91,8 @@
                 3. for each pr, get the payments made to a vendor in USD or local currency.
                 4. Get a list of vendors from Naviagtor for each country.
                 5. Get a list of all fund codes, dept codes, office-codes.
-                6. 
+                6. Facilitate the Purchase Request workflow from drafting, procurement verficiation, approval, financial review, 
+                http://damienfremont.com/2014/12/19/how-to-expandcollapse-table-rows-with-bootstrap/
             -->
             <td>
                 <span class="label label-default">Fin. Review</span>
@@ -126,41 +107,40 @@
     </div>
     <div class = "table-responsive">
         <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
-        <tr>
-            <th style="width: 5px;"></th>
-            <th style="display:none;">PR</th>
-            <th>Qty</th>
-            <th>Unit</th>
-            <th>Description</th>
-            <th>Cost</th>
-            <th>Total</th>
-            <th>Cost $</th>
-            <th>Total $</th>
-        </tr>
-        {% for item in items %}
             <tr>
-                <td><input type="radio" name="item_id" value={{ item.pk }} /></td>
-                <td style="display:none;"> {{ item.purchase_request.pk }} </td>
-                <td> {{ item.quantity_requested }} </td>
-                <td> {{ item.unit }} </td>
-                <td> {{ item.description_pr }} </td>
-                <td> {{ item.price_estimated_local }} </td>
-                <td> {{ item.price_estimated_local_subtotal }} </td>
-                <td> {{ item.price_estimated_usd }} </td>
-                <td> {{ item.price_estimated_usd_subtotal }} </td>
+                <th style="width: 5px;"></th>
+                <th style="display:none;">PR ID</th>
+                <th>Qty</th>
+                <th>Unit</th>
+                <th>Description</th>
+                <th>Cost</th>
+                <th>Total</th>
+                <th>Cost $</th>
+                <th>Total $</th>
             </tr>
-        {% endfor %}
-        <tfoot>
-            <tr class="info">
-                <td colspan="5"></td>
-                <td>{{ total_usd }}</td>
-                <td></td>
-                <td>{{ total_local }}</td>
-            </tr>
-        </tfoot>
-    </table>
+            {% for item in items %}
+                <tr>
+                    <td><input type="radio" name="item_id" value={{ item.pk }} /></td>
+                    <td style="display:none;"> {{ item.purchase_request.pk }} </td>
+                    <td> {{ item.quantity_requested }} </td>
+                    <td> {{ item.unit }} </td>
+                    <td> {{ item.description_pr|urlizetrunc:15|url_target_blank|safe }} </td>
+                    <td> {{ item.price_estimated_local }} </td>
+                    <td> {{ item.price_estimated_local_subtotal }} </td>
+                    <td> {{ item.price_estimated_usd }} </td>
+                    <td> {{ item.price_estimated_usd_subtotal }} </td>
+                </tr>
+            {% endfor %}
+            <tfoot>
+                <tr class="info">
+                    <td colspan="5"></td>
+                    <td>{{ total_usd }}</td>
+                    <td></td>
+                    <td>{{ total_local }}</td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
-    
 
     <div class="panel-footer">
         <div role="group" class="btn-group btn-group-xs">
@@ -189,15 +169,52 @@
             <div class="modal-body">
 
                 <!-- Nav tabs -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active" id="item_tab"><a href="#item_form" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
-                    <li role="presentation" id="finance_tab"><a href="#finance_codes_form" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
+                <ul id="pritems_tabs" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#item_tab" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
+                    <li role="presentation"><a href="#finance_codes_tab" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="item_form"><br />{% crispy item_form %}</div>
-                    <div role="tabpanel" class="tab-pane" id="finance_codes_form"><br />{% crispy finance_codes_form %}</div>
+                    <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy item_form %}</div>
+                    <div role="tabpanel" class="tab-pane" id="finance_codes_tab"><br />
+                        <div class = "table-responsive">
+                            <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
+                                <tr>
+                                    <th style="display:none;">item_id</th>
+                                    <th style="display:none;">id</th>
+                                    <th>GL</th>
+                                    <th>Fund</th>
+                                    <th>Dept</th>
+                                    <th>Office</th>
+                                    <th>LIN</th>
+                                    <th>Activity</th>
+                                    <th>Emp ID</th>
+                                    <th>% Alloc</th>
+                                    <th></th>
+                                </tr>
+                                
+                                    <tr>
+                                        <td style="display:none;"> 1 </td>
+                                        <td style="display:none;"> 1 </td>
+                                        <td> 12345 </td>
+                                        <td> 12229 </td>
+                                        <td> 10009 </td>
+                                        <td> US01 </td>
+                                        <td> 12229L123 </td>
+                                        <td> 12229A001 </td>
+                                        <td> 65400 </td>
+                                        <td> 52 </td>
+                                        <td>
+                                            <a href="#"><span class="glyphicon glyphicon-edit"></span></a>
+                                            <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                                        </td>
+                                    </tr>
+                                
+                            </table>
+                        </div>
+                        {% crispy finance_codes_form %}
+                    </div>
                 </div>
 
             </div>
@@ -209,53 +226,74 @@
 
 {% block extra_js %}
 <script type = "text/javascript">
-    $(document).ready(function() { 
 
-        //$("#finance_tab").hide();
-        $("#id_fund_code").select2();
-        $("#id_dept_code").select2();
-        $("#id_office_code").select2();
+$(document).ready(function() { 
+    // Hide the finance code tab by default; show it after an item is added.
+    // $('#pritems_tabs a[href="#finance_codes_tab"]').hide();
 
-        $('#pritem_modal').on('submit', '#id_pr_item_form', function(e) {
-            e.preventDefault();
-            //var data = $($(this).find(':input')).serializeArray();
-            var url = $(this).attr('action');
-            var data = $(this).serialize();
-            $.post(url, data)
-                .done(function(data, textStatus, jqXHR) {
-                    var tr = "<tr class='warning'>";
-                    tr += '<td><input type="radio" name="item_id" value={{ item.pk }} /></td>';
-                    tr += "<td style='display:none;'>" + data['object'][0]['purchase_request'] + "</td>";
-                    tr += "<td>" + data['object'][0]['quantity_requested'] + "</td>";
-                    tr += "<td>" + data['object'][0]['unit'] + "</td>";
-                    tr += "<td>" + data['object'][0]['description_pr'] + "</td>";
-                    tr += "<td>" + data['object'][0]['price_estimated_local'] + "</td>";
-                    tr += "<td>" + data['object'][0]['price_estimated_local_subtotal'] + "</td>";
-                    tr += "<td>" + data['object'][0]['price_estimated_usd'] + "</td>";
-                    tr += "<td>" + data['object'][0]['price_estimated_usd_subtotal'] + "</td>";
-                    tr += "</tr>";
-                    $("#pr_items").append(tr);
+    $("#id_fund_code").select2();
+    $("#id_dept_code").select2();
+    $("#id_office_code").select2();
 
-                    $("#id_item_id").val(data['object'][0]['id']);
+});
 
-                    setTimeout(function(){
-                        $("#pr_items tr:nth-last-child(1)").removeClass('warning');
-                        }, 1000);
-                });
-            //$('#pritem_modal').modal('hide');
+$('#pritem_modal').on('shown.bs.modal', function (e) {
+    $("#id_quantity_requested").focus();
+});
+
+$('#pritems_tabs a[href="#finance_codes_tab"]').on('shown.bs.tab', function (e) {
+    $("#id_gl_account").focus();
+});
+
+$('#pritems_tabs a[href="#item_tab"]').on('shown.bs.tab', function (e) {
+    $("#id_quantity_requested").focus();
+});
+
+// Stop HTTP Posting of Item form; submit it via AJAX
+$('#pritem_modal').on('submit', '#id_pr_item_form', function(e) {
+    e.preventDefault();
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+    $.post(url, data)
+        .done(function(data, textStatus, jqXHR) {
+            var tr = "<tr class='warning'>";
+            tr += '<td><input type="radio" name="item_id" value={{ item.pk }} /></td>';
+            tr += "<td style='display:none;'>" + data['object'][0]['purchase_request'] + "</td>";
+            tr += "<td>" + data['object'][0]['quantity_requested'] + "</td>";
+            tr += "<td>" + data['object'][0]['unit'] + "</td>";
+            tr += "<td>" + data['object'][0]['description_pr'] + "</td>";
+            tr += "<td>" + data['object'][0]['price_estimated_local'] + "</td>";
+            tr += "<td>" + data['object'][0]['price_estimated_local_subtotal'] + "</td>";
+            tr += "<td>" + data['object'][0]['price_estimated_usd'] + "</td>";
+            tr += "<td>" + data['object'][0]['price_estimated_usd_subtotal'] + "</td>";
+            tr += "</tr>";
+            $("#pr_items").append(tr);
+
+            // Set the item_id field in the finance codes with the item that just got added.
+            $("#id_item_id").val(data['object'][0]['id']);
+
+            setTimeout(function(){
+                $("#pr_items tr:nth-last-child(1)").removeClass('warning');
+                }, 1000);
+
+            // Show the Finance Codes tab now that an item has been saved.
+            $('#pritems_tabs a[href="#finance_codes_tab"]').show();
+            $('#pritems_tabs a[href="#finance_codes_tab"]').trigger('click');
         });
+    //$('#pritem_modal').modal('hide');
+});
 
-        //$("#finance_codes_form").submit(function(event) {
-        $('#pritem_modal').on('submit', '#id_finance_codes_form', function(event) {
-            event.preventDefault();
-            var url = $(this).attr('action');
-            var data = $(this).serialize();
-            console.log("URL: " + url);
-            $.post(url, data)
-                .done(function(data, textStatus, jqXHR) {
-                    console.log(JSON.stringify(data));
-                });
+// Stop HTTP posting of finance codes form; submit it via AJAX
+$('#pritem_modal').on('submit', '#id_finance_codes_form', function(event) {
+    event.preventDefault();
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+    
+    $.post(url, data)
+        .done(function(data, textStatus, jqXHR) {
+            console.log(JSON.stringify(data));
         });
-    });
+});
+
 </script>
 {% endblock extra_js%}
