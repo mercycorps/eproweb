@@ -36,7 +36,7 @@
             </td>
             <td>
                 <span class="label label-default">Required Date</span>
-                <span class="label label-danger">{{ pr.required_date|date }}</span>
+                <span class="label label-danger">{{ pr.required_date|date }} &nbsp; ({{ pr.required_date|get_due_date_string }})</span>
             </td>
         </tr>
         <tr>
@@ -80,20 +80,6 @@
             </td>
         </tr>
         <tr>
-            <!--
-            TODO:
-                a. check form action for item form
-                b. 
-            how to handle PR items' changes.
-            navigator integrations:
-                1. Get users' Office to set the default office location necessary for generating PR originating location
-                2. Get the weekly exchange rate for calculating the PR estimated total in USD.
-                3. for each pr, get the payments made to a vendor in USD or local currency.
-                4. Get a list of vendors from Naviagtor for each country.
-                5. Get a list of all fund codes, dept codes, office-codes.
-                6. Facilitate the Purchase Request workflow from drafting, procurement verficiation, approval, financial review, 
-                http://damienfremont.com/2014/12/19/how-to-expandcollapse-table-rows-with-bootstrap/
-            -->
             <td>
                 <span class="label label-default">Fin. Review</span>
                 <span class="label label-primary">{{ pr.finance_reviewer|default_if_none:"" }} reviewed on {{ finance_review_date|date }} </span>
@@ -106,10 +92,8 @@
         <p> Below is a list of all the items that have been added to this PR</p>
     </div>
     <div class = "table-responsive">
-        <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
+        <table id="pr_items_table" class="table table-bordered table-striped table-hover table-condensed">
             <tr>
-                <th style="width: 5px;"></th>
-                <th style="display:none;">PR ID</th>
                 <th>Qty</th>
                 <th>Unit</th>
                 <th>Description</th>
@@ -117,11 +101,10 @@
                 <th>Total</th>
                 <th>Cost $</th>
                 <th>Total $</th>
+                <th style="width: 45px;"></th>
             </tr>
-            {% for item in items %}
+            {% for item in pr.items.all %}
                 <tr>
-                    <td><input type="radio" name="item_id" value={{ item.pk }} /></td>
-                    <td style="display:none;"> {{ item.purchase_request.pk }} </td>
                     <td> {{ item.quantity_requested }} </td>
                     <td> {{ item.unit }} </td>
                     <td> {{ item.description_pr|urlizetrunc:15|url_target_blank|safe }} </td>
@@ -129,171 +112,97 @@
                     <td> {{ item.price_estimated_local_subtotal }} </td>
                     <td> {{ item.price_estimated_usd }} </td>
                     <td> {{ item.price_estimated_usd_subtotal }} </td>
+                    <td>
+                        <a href="{% url 'item_edit' item.pk %}" id='edit_item_link'><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                    </td>
                 </tr>
             {% endfor %}
             <tfoot>
                 <tr class="info">
-                    <td colspan="5"></td>
+                    <td colspan="4"></td>
                     <td>{{ total_usd }}</td>
                     <td></td>
-                    <td>{{ total_local }}</td>
+                    <td colspan=2>{{ total_local }}</td>
                 </tr>
             </tfoot>
         </table>
     </div>
 
-    <div class="panel-footer">
+    <div class="panel-footer" id="pr_panel_footer_div">
         <div role="group" class="btn-group btn-group-xs">
-            <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#pritem_modal"><span class="glyphicon glyphicon-modal-window"> </span> Add Item</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                <li><a href="#"><span class="glyphicon glyphicon-edit"></span> Edit Item</a></li>
-                <li class="divider"></li>
-                <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete Item</a></li>
-            </ul>
+            <a href="{% url 'item_new' pr.pk %}" id="add_item_link" type="button" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-modal-window"> </span> Add Item</a>
         </div>
     </div>
 </div>
 
-<!-- Placeholder for modal popup windows -->
-<div class="modal fade" id="pritem_modal" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+<div class="modal fade" id="pritem_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-md">
-        <div class="modal-content" id="modal_content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Adding Item to PR</h4>
-            </div>
-            <div class="modal-body">
+        <div class="modal-content" id="pr_items_modal_content_div">
 
-                <!-- Nav tabs -->
-                <ul id="pritems_tabs" class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#item_tab" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
-                    <li role="presentation"><a href="#finance_codes_tab" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
-                </ul>
-
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy item_form %}</div>
-                    <div role="tabpanel" class="tab-pane" id="finance_codes_tab"><br />
-                        <div class = "table-responsive">
-                            <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
-                                <tr>
-                                    <th style="display:none;">item_id</th>
-                                    <th style="display:none;">id</th>
-                                    <th>GL</th>
-                                    <th>Fund</th>
-                                    <th>Dept</th>
-                                    <th>Office</th>
-                                    <th>LIN</th>
-                                    <th>Activity</th>
-                                    <th>Emp ID</th>
-                                    <th>% Alloc</th>
-                                    <th></th>
-                                </tr>
-                                
-                                    <tr>
-                                        <td style="display:none;"> 1 </td>
-                                        <td style="display:none;"> 1 </td>
-                                        <td> 12345 </td>
-                                        <td> 12229 </td>
-                                        <td> 10009 </td>
-                                        <td> US01 </td>
-                                        <td> 12229L123 </td>
-                                        <td> 12229A001 </td>
-                                        <td> 65400 </td>
-                                        <td> 52 </td>
-                                        <td>
-                                            <a href="#"><span class="glyphicon glyphicon-edit"></span></a>
-                                            <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
-                                        </td>
-                                    </tr>
-                                
-                            </table>
-                        </div>
-                        {% crispy finance_codes_form %}
-                    </div>
-                </div>
-
-            </div>
-        </div> <!-- END modal-content -->
-    </div><!-- END modal-dialog -->
-</div> <!-- END modal fade -->
+        </div>
+    </div>
+</div>
 {% endblock content %}
-
-
+<!-- http://damienfremont.com/2014/12/19/how-to-expandcollapse-table-rows-with-bootstrap/ -->
 {% block extra_js %}
 <script type = "text/javascript">
 
-$(document).ready(function() { 
-    // Hide the finance code tab by default; show it after an item is added.
-    // $('#pritems_tabs a[href="#finance_codes_tab"]').hide();
+    $(document).ready(function() { 
+        //$('#pritems_tabs_ul a[href="#financecodes_tab_div"]').hide();
 
-    $("#id_fund_code").select2();
-    $("#id_dept_code").select2();
-    $("#id_office_code").select2();
+        $("#id_fund_code").select2();
+        $("#id_dept_code").select2();
+        $("#id_office_code").select2();
+    });
 
-});
+    $('#pr_items_table').on('click', '#edit_item_link', function(e) {
+        e.preventDefault();
+        $("#pr_items_modal_content_div").load($(this).attr("href"), "#item_edit_div");
+        $('#pritem_modal_div').modal('show');
+    });
 
-$('#pritem_modal').on('shown.bs.modal', function (e) {
-    $("#id_quantity_requested").focus();
-});
-
-$('#pritems_tabs a[href="#finance_codes_tab"]').on('shown.bs.tab', function (e) {
-    $("#id_gl_account").focus();
-});
-
-$('#pritems_tabs a[href="#item_tab"]').on('shown.bs.tab', function (e) {
-    $("#id_quantity_requested").focus();
-});
-
-// Stop HTTP Posting of Item form; submit it via AJAX
-$('#pritem_modal').on('submit', '#id_pr_item_form', function(e) {
-    e.preventDefault();
-    var url = $(this).attr('action');
-    var data = $(this).serialize();
-    $.post(url, data)
-        .done(function(data, textStatus, jqXHR) {
-            var tr = "<tr class='warning'>";
-            tr += '<td><input type="radio" name="item_id" value={{ item.pk }} /></td>';
-            tr += "<td style='display:none;'>" + data['object'][0]['purchase_request'] + "</td>";
-            tr += "<td>" + data['object'][0]['quantity_requested'] + "</td>";
-            tr += "<td>" + data['object'][0]['unit'] + "</td>";
-            tr += "<td>" + data['object'][0]['description_pr'] + "</td>";
-            tr += "<td>" + data['object'][0]['price_estimated_local'] + "</td>";
-            tr += "<td>" + data['object'][0]['price_estimated_local_subtotal'] + "</td>";
-            tr += "<td>" + data['object'][0]['price_estimated_usd'] + "</td>";
-            tr += "<td>" + data['object'][0]['price_estimated_usd_subtotal'] + "</td>";
-            tr += "</tr>";
-            $("#pr_items").append(tr);
-
-            // Set the item_id field in the finance codes with the item that just got added.
-            $("#id_item_id").val(data['object'][0]['id']);
-
-            setTimeout(function(){
-                $("#pr_items tr:nth-last-child(1)").removeClass('warning');
-                }, 1000);
-
-            // Show the Finance Codes tab now that an item has been saved.
-            $('#pritems_tabs a[href="#finance_codes_tab"]').show();
-            $('#pritems_tabs a[href="#finance_codes_tab"]').trigger('click');
-        });
-    //$('#pritem_modal').modal('hide');
-});
-
-// Stop HTTP posting of finance codes form; submit it via AJAX
-$('#pritem_modal').on('submit', '#id_finance_codes_form', function(event) {
-    event.preventDefault();
-    var url = $(this).attr('action');
-    var data = $(this).serialize();
+    $('#pr_panel_footer_div').on('click', '#add_item_link', function(e) {
+        e.preventDefault();
+        $("#pr_items_modal_content_div").load($(this).attr("href"), "#item_edit_div");
+        $('#pritem_modal_div').modal('show');
+    });
     
-    $.post(url, data)
-        .done(function(data, textStatus, jqXHR) {
-            console.log(JSON.stringify(data));
-        });
-});
 
+    // Stop HTTP Posting of Item form; submit it via AJAX
+    $('#pritem_modal_div').on('submit', '#id_pr_item_form', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('action');
+        var data = $(this).serialize();
+        
+        $.ajax({
+            method: 'POST',
+            url: url,
+            data: data,
+            global: false,
+            })
+            .done(function(data, textStatus, jqXHR) {
+                item = data['object'][0];
+                // Show the Finance Codes tab now that an item has been saved.
+                $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').show();
+                $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').trigger('click');
+                
+                var json = $.parseJSON(jqXHR.responseText);
+                show_django_ajax_messages(json, "#modal_messages");
+            });
+        
+        /*
+        $.post(url, data)
+            .done(function(data, textStatus, jqXHR) {
+                item = data['object'][0];
+                // Show the Finance Codes tab now that an item has been saved.
+            
+                $('#pritems_tabs a[href="#finance_codes_tab"]').show();
+                $('#pritems_tabs a[href="#finance_codes_tab"]').trigger('click');
+            }); */
+    });
+    $('#pritem_modal_div').on('hidden.bs.modal', function (e) {
+        $("#pr_items_modal_content_div").empty();
+    });
 </script>
-{% endblock extra_js%}
+{% endblock extra_js %}

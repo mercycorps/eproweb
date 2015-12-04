@@ -13,8 +13,8 @@ urlpatterns = [
     url(r'^feedback/$', FeedbackCreateView.as_view(), name='feedback'),
     url(r'^newpr/$', PurchaseRequestCreateView.as_view(), name='newpr'),
     url(r'^pr/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_detail'),
-    url(r'^item/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
-    url(r'^item/(?P<pk>\d+)/$', PurchaseRequestItemDetailView.as_view(), name='item_detail'),
+    url(r'^item/add/(?P<pr>\d+)/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
+    url(r'^item/edit/(?P<pk>\d+)/$', PurchaseRequestItemUpdateView.as_view(), name='item_edit'),
     url(r'^financecodes_new/$', FinanceCodesCreateView.as_view(), name='financecodes_new'),
 
 ]

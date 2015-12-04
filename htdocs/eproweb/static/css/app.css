@@ -28,3 +28,8 @@ html {
     background-color: #ffffb3; /*  #FCF8E3 */
     color: #999;
 }
+
+/* bootstrap by default add 20px margin-bottom, which is too much */
+.alert {
+    margin-bottom: 5px;
+}

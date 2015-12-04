@@ -17,19 +17,24 @@ $( document )
     })
     .ajaxComplete(function(e, xhr, settings) {
         var contentType = xhr.getResponseHeader("Content-Type");
-
         if (contentType == "application/javascript" || contentType == "application/json") {
             var json = $.parseJSON(xhr.responseText);
-            if (json.django_messages != undefined) {
-                $.each(json.django_messages, function (i, item) {
-                    createAlert(item.extra_tags, item.message, true);
-                });
-            }
+            show_django_ajax_messages(json);
         }
     })
     .ajaxError(function(e, xhr, settings, thrownError) {
         createAlert("danger", "Error " + xhr.status + ": " +  thrownError, false);
     });
+
+
+function show_django_ajax_messages(json, whereToAppend) {
+    if (json.django_messages != undefined) {
+        $.each(json.django_messages, function (i, item) {
+            createAlert(item.extra_tags, item.message, true, whereToAppend);
+        });
+    }
+}
+
 
 /* 
  * Every time the Country dropdown changes, update the Office dropdown options
@@ -64,7 +69,6 @@ function update_currency_select(country_id) {
     $("#div_id_currency").find("span#select2-chosen-2").filter(':visible:first').text("---------");
     var url = '/api/v1/currencies/?country=' + country_id;
     $.getJSON(url, function(currencies) {
-        console.log(currencies);
         var options = "<option value=''>---------</option>";
         for (var i = 0; i < currencies.length; i++) {
             options += '<option value="' + currencies[i].id + '">' + currencies[i].code + '</option>';
@@ -78,8 +82,11 @@ function update_currency_select(country_id) {
 /*
  * Create and show a Bootstrap alert.
  */
-function createAlert (type, message, fade) {
-    $("#messages").append(
+function createAlert (type, message, fade, whereToAppend) {
+    if (whereToAppend == undefined ){
+        whereToAppend = "#messages";
+    }
+    $(whereToAppend).append(
         $(
             "<div class='alert alert-" + type + " dynamic-alert alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +

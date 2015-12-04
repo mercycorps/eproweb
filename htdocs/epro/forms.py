@@ -61,13 +61,20 @@ class PurchaseRequestItemForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PurchaseRequestItemForm, self).__init__(*args, **kwargs)
-        form_action = kwargs['initial'].pop('form_action')
-        self.helper = setup_boostrap_helpers(formtag=True)
-        self.helper.form_action = reverse_lazy(form_action if form_action else 'item_new')
-        self.helper.form_id = 'id_pr_item_form'
-        self.helper.add_input(Submit('submit', 'Add Item', css_class='btn-sm btn-primary'))
-        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.fields['description_pr'].widget.attrs['rows'] = 3
+        self.helper = setup_boostrap_helpers(formtag=True)
+
+        try:
+            item_id = kwargs['initial'].pop('pk')
+            self.helper.form_action = reverse_lazy('item_edit', kwargs={'pk':item_id})
+        except Exception as e:
+            pr_id = kwargs['initial']['purchase_request']
+            self.helper.form_action = reverse_lazy('item_new', kwargs={'pr':pr_id})
+
+        self.helper.form_id = 'id_pr_item_form'
+        self.helper.add_input(Submit('submit', 'Save', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
+
 
 
 class FinanceCodesForm(forms.ModelForm):
@@ -85,7 +92,7 @@ class FinanceCodesForm(forms.ModelForm):
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'
-        self.helper.add_input(Submit('submit', 'Add Finance Codes', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Submit('submit', 'Save Finance Codes', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.helper.layout = Layout(
             Div(
@@ -119,4 +126,4 @@ class FeedbackForm(forms.ModelForm):
         self.helper.form_id = 'id_feedback_form'
         self.helper.label_class = 'col-sm-3'
         self.helper.field_class = 'col-sm-9'
-        self.helper.add_input(Submit('submit', 'Send', css_class='btn-sm btn-primary'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))

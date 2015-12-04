@@ -1,0 +1,55 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4>
+    <span id="modal_messages"></span>
+</div>
+<div class="modal-body">
+    <!-- Nav tabs -->
+    <ul id="pritems_tabs_ul" class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#item_tab_div" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
+        <li role="presentation"><a href="#financecodes_tab_div" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="item_tab_div"><br />{% crispy form %}</div>
+        <div role="tabpanel" class="tab-pane" id="financecodes_tab_div">
+            <div class = "table-responsive">
+                <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
+                    <tr>
+                        <th style="display:none;">item_id</th>
+                        <th style="display:none;">finance_codes_id</th>
+                        <th>GL</th>
+                        <th>Fund</th>
+                        <th>Dept</th>
+                        <th>Office</th>
+                        <th>LIN</th>
+                        <th>Activity</th>
+                        <th>Emp ID</th>
+                        <th>% Alloc</th>
+                        <th></th>
+                    </tr>
+                    {% for fc in item.finance_codes.all %}
+                        <tr>
+                            <td style="display:none;"> {{ item.pk }} </td>
+                            <td style="display:none;"> {{ fc.pk }} </td>
+                            <td> {{ fc.gl_account }} </td>
+                            <td> {{ fc.fund_code }} </td>
+                            <td> {{ fc.dept_code }} </td>
+                            <td> {{ fc.office_code }} </td>
+                            <td> {{ fc.lin_code }} </td>
+                            <td> {{ fc.activity_code }} </td>
+                            <td> {{ fc.employee_id }} </td>
+                            <td> {{ fc.allocation_percent }} </td>
+                            <td>
+                                <a href="#"><span class="glyphicon glyphicon-edit"></span></a>
+                                <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% crispy finance_codes_form %}
+    </div>
+</div>

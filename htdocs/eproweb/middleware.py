@@ -38,7 +38,8 @@ class AjaxMessaging(object):
 
                 django_messages = []
 
-                for message in messages.get_messages(request):
+                storage = messages.get_messages(request)
+                for message in storage:
                     django_messages.append({
                         "level": message.level,
                         "message": message.message,
