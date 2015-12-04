@@ -98,9 +98,6 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new',})
         return context
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, description_pr=self.object.description_pr)
-
 
 class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, UpdateView):
     """
@@ -126,9 +123,6 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
             'item_id': self.object.pk,
         })
         return context
-
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, description_pr=self.object.description_pr)
 
 
 class FinanceCodesCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):

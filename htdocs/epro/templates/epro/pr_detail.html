@@ -136,7 +136,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="pritem_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+<div class="modal fade" id="pr_items_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content" id="pr_items_modal_content_div">
 
@@ -149,10 +149,11 @@
 <script type = "text/javascript">
 
     // When the modal loads, apply select2 to the dropdowns in the financecodes form.
-    $('#pritem_modal_div').on('shown.bs.modal', function (e) {
+    $('#pr_items_modal_div').on('shown.bs.modal', function (e) {
         $("#id_fund_code").select2();
         $("#id_dept_code").select2();
         $("#id_office_code").select2();
+        $("#id_quantity_requested").focus();
     });
 
 
@@ -160,7 +161,7 @@
     $('#pr_items_table').on('click', '#edit_item_link', function(e) {
         e.preventDefault();
         $("#pr_items_modal_content_div").load($(this).attr("href"));
-        $('#pritem_modal_div').modal('show');
+        $('#pr_items_modal_div').modal('show');
     });
 
 
@@ -169,14 +170,14 @@
         e.preventDefault();
         $("#pr_items_modal_content_div").load($(this).attr("href"), function(response, status, xhr) {
             //console.log(xhr.status + " " + xhr.statusText + " " +  status);
-            $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').hide();
+            $('#pr_items_tabs_ul a[href="#financecodes_tab"]').hide();
         });
-        $('#pritem_modal_div').modal('show');
+        $('#pr_items_modal_div').modal('show');
     });
 
 
     // Submit ItemForm via AJAX for adding and editing of items to a PR.
-    $('#pritem_modal_div').on('submit', '#id_pr_item_form', function(e) {
+    $('#pr_items_modal_div').on('submit', '#id_pr_item_form', function(e) {
         e.preventDefault();
         var form_url = $(this).attr('action');
         var form_data = $(this).serialize();
@@ -184,8 +185,8 @@
             .done(function(data, textStatus, jqXHR) {
                 // var item = data['object'][0];
                 // Show the Finance Codes tab now and switch to it.
-                $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').show();
-                $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').trigger('click');
+                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').show();
+                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').trigger('click');
                 
                 // Show django messages that may have been set in the View.
                 var json = $.parseJSON(jqXHR.responseText);
@@ -195,7 +196,7 @@
 
 
     // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
-    $('#pritem_modal_div').on('submit', '#id_finance_codes_form', function(event) {
+    $('#pr_items_modal_div').on('submit', '#id_finance_codes_form', function(event) {
         event.preventDefault();
         var url = $(this).attr('action');
         var data = $(this).serialize();

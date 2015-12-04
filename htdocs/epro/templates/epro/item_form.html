@@ -2,19 +2,23 @@
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="modal-title" id="myModalLabel">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4>
+    <h4 class="modal-title">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4>
     <span id="modal_messages"></span>
 </div>
 <div class="modal-body">
     <!-- Nav tabs -->
-    <ul id="pritems_tabs_ul" class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#item_tab_div" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a></li>
-        <li role="presentation"><a href="#financecodes_tab_div" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a></li>
+    <ul id="pr_items_tabs_ul" class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#item_tab" aria-controls="item_form" role="tab" data-toggle="tab"> Item</a>
+        </li>
+        <li role="presentation">
+            <a href="#financecodes_tab" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a>
+        </li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="item_tab_div"><br />{% crispy form %}</div>
-        <div role="tabpanel" class="tab-pane" id="financecodes_tab_div">
+        <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy form %}</div>
+        <div role="tabpanel" class="tab-pane" id="financecodes_tab">
             <div class = "table-responsive">
                 <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
                     <tr>
@@ -53,3 +57,14 @@
             {% crispy finance_codes_form %}
     </div>
 </div>
+{% block extra_js %}
+<script type = "text/javascript">
+    $('#pr_items_tabs_ul a[href="#item_tab"]').on('shown.bs.tab', function (e) {
+        $("#id_quantity_requested").focus();
+    });
+
+    $('#pr_items_tabs_ul a[href="#financecodes_tab"]').on('shown.bs.tab', function (e) {
+        $("#id_gl_account").focus();
+    });
+</script>
+{% endblock extra_js %}
