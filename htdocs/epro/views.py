@@ -87,6 +87,10 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         return super(PurchaseRequestItemCreateView, self).form_valid(form)
 
     def get_initial(self):
+        """
+        For seting up the form_action in the ItemForm as well as providing initial value
+        to purchase_request field in the Item Form.
+        """
         return {'purchase_request': self.kwargs.get('pr', None)}
 
     def get_context_data(self, **kwargs):
@@ -108,6 +112,7 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
     success_message = "Item updated successfully."
 
     def get_initial(self):
+        """ Used in the ItemForm to set the form_action """
         return {'pk': self.object.pk}
 
     def form_valid(self, form):
@@ -116,7 +121,10 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestItemUpdateView, self).get_context_data(**kwargs)
-        context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new',})
+        context['finance_codes_form'] = FinanceCodesForm(initial={
+            'form_action': 'financecodes_new',
+            'item_id': self.object.pk,
+        })
         return context
 
     def get_success_message(self, cleaned_data):

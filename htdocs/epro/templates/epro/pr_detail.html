@@ -148,61 +148,68 @@
 {% block extra_js %}
 <script type = "text/javascript">
 
-    $(document).ready(function() { 
-        //$('#pritems_tabs_ul a[href="#financecodes_tab_div"]').hide();
-
+    // When the modal loads, apply select2 to the dropdowns in the financecodes form.
+    $('#pritem_modal_div').on('shown.bs.modal', function (e) {
         $("#id_fund_code").select2();
         $("#id_dept_code").select2();
         $("#id_office_code").select2();
     });
 
+
+    // When the Edit Item Button is clicked, load the ItemUpdateViewForm in a modal.
     $('#pr_items_table').on('click', '#edit_item_link', function(e) {
         e.preventDefault();
-        $("#pr_items_modal_content_div").load($(this).attr("href"), "#item_edit_div");
+        $("#pr_items_modal_content_div").load($(this).attr("href"));
         $('#pritem_modal_div').modal('show');
     });
 
+
+    // When the Add Item Button is clicked, load the ItemCreateViewForm in a modal.
     $('#pr_panel_footer_div').on('click', '#add_item_link', function(e) {
         e.preventDefault();
-        $("#pr_items_modal_content_div").load($(this).attr("href"), "#item_edit_div");
+        $("#pr_items_modal_content_div").load($(this).attr("href"), function(response, status, xhr) {
+            //console.log(xhr.status + " " + xhr.statusText + " " +  status);
+            $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').hide();
+        });
         $('#pritem_modal_div').modal('show');
     });
-    
 
-    // Stop HTTP Posting of Item form; submit it via AJAX
+
+    // Submit ItemForm via AJAX for adding and editing of items to a PR.
     $('#pritem_modal_div').on('submit', '#id_pr_item_form', function(e) {
         e.preventDefault();
-        var url = $(this).attr('action');
-        var data = $(this).serialize();
-        
-        $.ajax({
-            method: 'POST',
-            url: url,
-            data: data,
-            global: false,
-            })
+        var form_url = $(this).attr('action');
+        var form_data = $(this).serialize();
+        $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
-                item = data['object'][0];
-                // Show the Finance Codes tab now that an item has been saved.
+                // var item = data['object'][0];
+                // Show the Finance Codes tab now and switch to it.
                 $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').show();
                 $('#pritems_tabs_ul a[href="#financecodes_tab_div"]').trigger('click');
                 
+                // Show django messages that may have been set in the View.
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
             });
-        
-        /*
-        $.post(url, data)
-            .done(function(data, textStatus, jqXHR) {
-                item = data['object'][0];
-                // Show the Finance Codes tab now that an item has been saved.
-            
-                $('#pritems_tabs a[href="#finance_codes_tab"]').show();
-                $('#pritems_tabs a[href="#finance_codes_tab"]').trigger('click');
-            }); */
     });
-    $('#pritem_modal_div').on('hidden.bs.modal', function (e) {
-        $("#pr_items_modal_content_div").empty();
+
+
+    // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
+    $('#pritem_modal_div').on('submit', '#id_finance_codes_form', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('action');
+        var data = $(this).serialize();
+        console.log("finance codes form prevented: " + url );
+        console.log(data);
+        /*
+        $.ajax( {method: 'POST', rl: url, data: data,  global: false, } )
+            .done(function(data, textStatus, jqXHR) {
+                
+
+                // Show django messages that may have been set in the View.
+                var json = $.parseJSON(jqXHR.responseText);
+                show_django_ajax_messages(json, "#modal_messages");
+            });*/
     });
 </script>
 {% endblock extra_js %}
