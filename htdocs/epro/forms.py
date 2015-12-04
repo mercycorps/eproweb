@@ -92,8 +92,6 @@ class FinanceCodesForm(forms.ModelForm):
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'
-        self.helper.add_input(Submit('submit', 'Save Finance Codes', css_class='btn-sm btn-primary'))
-        self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.helper.layout = Layout(
             Div(
                 Column(
@@ -110,7 +108,16 @@ class FinanceCodesForm(forms.ModelForm):
                     css_class="col-sm-6",
                 ),
                 css_class="row",
-            )
+            ), Div(
+                Column(
+                    FormActions(
+                        Submit('save', 'Save changes', css_class='btn-sm btn-primary'),
+                        Reset('reset', 'Cancel', css_class='btn-sm btn-warning')
+                    ),
+                    css_class="col-sm-12",
+                ),
+                css_class="row",
+            ),
         )
 
 

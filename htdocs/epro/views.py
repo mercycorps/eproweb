@@ -151,18 +151,15 @@ class FinanceCodesUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     model = FinanceCodes
     form_class = FinanceCodesForm
     context_object_name = 'finance_codes'
-    success_message = "Finance Codes, updated %(description_pr)s successfully."
+    success_message = "Finance Codes, updated %(fundcode)s successfully."
 
     def get_initial(self):
         return { 'form_action': 'financecodes_update', 'pk': self.object.pk, }
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user.userprofile
-        self.object = form.save()
-        item = Item.objects.get(pk=form.cleaned_data['item_id'])
-        item.finance_codes.add(self.object)
-        return super(FinanceCodesCreateView, self).form_valid(form)
+        form.instance.updated_by = self.request.user.userprofile
+        return super(FinanceCodesUpdateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, description_pr=self.object.fund_code)
+        return self.success_message % dict(cleaned_data, fundcode=self.object.fund_code)
 
