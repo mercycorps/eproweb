@@ -20,7 +20,7 @@
         <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy form %}</div>
         <div role="tabpanel" class="tab-pane" id="financecodes_tab">
             <div class = "table-responsive">
-                <table id="pr_items" class="table table-bordered table-striped table-hover table-condensed">
+                <table id="finance_codes_table" class="table table-bordered table-striped table-hover table-condensed">
                     <tr>
                         <th style="display:none;">item_id</th>
                         <th style="display:none;">finance_codes_id</th>
@@ -47,8 +47,8 @@
                             <td> {{ fc.employee_id }} </td>
                             <td> {{ fc.allocation_percent }} </td>
                             <td>
-                                <a href="#"><span class="glyphicon glyphicon-edit"></span></a>
-                                <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                                <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -59,12 +59,22 @@
 </div>
 {% block extra_js %}
 <script type = "text/javascript">
+
+    // Upon activating the Item tab, set the quantity field on focus.
     $('#pr_items_tabs_ul a[href="#item_tab"]').on('shown.bs.tab', function (e) {
         $("#id_quantity_requested").focus();
     });
 
+    // Upon activating the FinanceCodes tab, set the GL_Account field on focus.
     $('#pr_items_tabs_ul a[href="#financecodes_tab"]').on('shown.bs.tab', function (e) {
         $("#id_gl_account").focus();
+    });
+
+    // Upon clicking the EDIT button FinanceCodes, update the FinanceCodes action url
+    $('#finance_codes_table').on('click', 'a.edit', function(e) {
+        e.preventDefault();
+        //var finance_codes_pk = $(this).data("financeCodesId");
+        $("#id_finance_codes_form").attr("action",  $(this).attr('href'));
     });
 </script>
 {% endblock extra_js %}
