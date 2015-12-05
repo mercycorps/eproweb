@@ -75,6 +75,15 @@
         e.preventDefault();
         //var finance_codes_pk = $(this).data("financeCodesId");
         $("#id_finance_codes_form").attr("action",  $(this).attr('href'));
+
+        // ToDo: Populate the form with values from the table row above.
     });
+
+    // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
+    $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
+        $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
+        // ToDo: Empty the form
+    });
+
 </script>
 {% endblock extra_js %}

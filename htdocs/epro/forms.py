@@ -78,6 +78,10 @@ class PurchaseRequestItemForm(forms.ModelForm):
 
 
 class FinanceCodesForm(forms.ModelForm):
+    """
+    To add entries, this form has to be instantiated with initial values of item_id and form_action
+    To edit entries, this form has to be instantiated with initial value of form_action.
+    """
     item_id = forms.IntegerField(widget=forms.HiddenInput())
     class Meta:
         model = FinanceCodes
@@ -86,15 +90,15 @@ class FinanceCodesForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
-        form_action = kwargs['initial'].pop('form_action')
         self.helper = setup_boostrap_helpers(formtag=True)
+        print(type(kwargs['initial']))
+        form_action = kwargs['initial'].pop('form_action')
         try:
             item_id = kwargs['initial']['item_id']
             self.helper.form_action = reverse_lazy(form_action, kwargs={'item_id': item_id})
         except Exception as e:
-            pass
-        #self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_new')
-
+            # TODO: this event
+            self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_edit')
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'
@@ -118,7 +122,7 @@ class FinanceCodesForm(forms.ModelForm):
                 Column(
                     FormActions(
                         Submit('save', 'Save changes', css_class='btn-sm btn-primary'),
-                        Reset('reset', 'Cancel', css_class='btn-sm btn-warning')
+                        Reset('reset', 'Cancel', css_id='id_cancel_finance_codes_btn', css_class='btn-sm btn-warning')
                     ),
                     css_class="col-sm-12",
                 ),
