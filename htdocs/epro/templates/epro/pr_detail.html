@@ -203,14 +203,14 @@
         event.preventDefault();
         var form_url = $(this).attr('action');
         var form_data = $(this).serialize();
-        /*
+        
         $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
 
                 // Show django messages that may have been set in the View.
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
-            }); */
+            });
     });
 </script>
 {% endblock extra_js %}

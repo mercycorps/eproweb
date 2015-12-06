@@ -23,10 +23,12 @@
                 <table id="finance_codes_table" class="table table-bordered table-striped table-hover table-condensed">
                     <tr>
                         <th style="display:none;">item_id</th>
-                        <th style="display:none;">finance_codes_id</th>
                         <th>GL</th>
+                        <th style="display:none;">FundId</th>
                         <th>Fund</th>
+                        <th style="display:none;">DeptId</th>
                         <th>Dept</th>
+                        <th style="display:none;">OfficeId</th>
                         <th>Office</th>
                         <th>LIN</th>
                         <th>Activity</th>
@@ -37,10 +39,12 @@
                     {% for fc in item.finance_codes.all %}
                         <tr>
                             <td style="display:none;"> {{ item.pk }} </td>
-                            <td style="display:none;"> {{ fc.pk }} </td>
                             <td> {{ fc.gl_account }} </td>
+                            <td style="display:none;"> {{ fc.fund_code.pk }} </td>
                             <td> {{ fc.fund_code }} </td>
+                            <td style="display:none;"> {{ fc.dept_code.pk }} </td>
                             <td> {{ fc.dept_code }} </td>
+                            <td style="display:none;"> {{ fc.office_code.pk }} </td>
                             <td> {{ fc.office_code }} </td>
                             <td> {{ fc.lin_code }} </td>
                             <td> {{ fc.activity_code }} </td>
@@ -73,16 +77,32 @@
     // Upon clicking the EDIT button FinanceCodes, update the FinanceCodes action url
     $('#finance_codes_table').on('click', 'a.edit', function(e) {
         e.preventDefault();
+
         //var finance_codes_pk = $(this).data("financeCodesId");
         $("#id_finance_codes_form").attr("action",  $(this).attr('href'));
 
-        // ToDo: Populate the form with values from the table row above.
+        // Get all of the td elements and extract its values to populate the form
+        var tds = $(this).closest("tr").children(); //$(tds[1]).text()        
+        $("#id_gl_account").val(parseInt($(tds[1]).text()));
+        $("#id_fund_code").select2().val( parseInt($(tds[2]).text()) ).trigger("change");
+        $("#id_dept_code").select2().val( parseInt($(tds[4]).text()) ).trigger("change");
+        $("#id_office_code").select2().val( parseInt($(tds[6]).text()) ).trigger("change");
+        $("#id_lin_code").val( $(tds[8]).text() );
+        $("#id_activity_code").val( $(tds[9]).text() );
+        $("#id_employee_id").val( parseInt($(tds[10]).text()) );
+        $("#id_allocation_percent").val( parseInt($(tds[11]).text()) );
     });
 
     // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
     $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
+
+        // reset the form action to add finance codes not edit.
         $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
-        // ToDo: Empty the form
+
+        // reset the dropdowns with select2 manually b/c reset button cannot reset them.
+        $("#id_fund_code").select2().val("").trigger("change");
+        $("#id_dept_code").select2().val("").trigger("change");
+        $("#id_office_code").select2().val("").trigger("change");
     });
 
 </script>
