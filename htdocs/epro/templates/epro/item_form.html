@@ -22,7 +22,8 @@
             <div class = "table-responsive">
                 <table id="finance_codes_table" class="table table-bordered table-striped table-hover table-condensed">
                     <tr>
-                        <th style="display:none;">item_id</th>
+                        <th style="display:none;">ItemId</th>
+                        <th style="display:none;">FinanceCodesId</th>
                         <th>GL</th>
                         <th style="display:none;">FundId</th>
                         <th>Fund</th>
@@ -38,18 +39,19 @@
                     </tr>
                     {% for fc in item.finance_codes.all %}
                         <tr>
-                            <td style="display:none;"> {{ item.pk }} </td>
-                            <td> {{ fc.gl_account }} </td>
-                            <td style="display:none;"> {{ fc.fund_code.pk }} </td>
-                            <td> {{ fc.fund_code }} </td>
-                            <td style="display:none;"> {{ fc.dept_code.pk }} </td>
-                            <td> {{ fc.dept_code }} </td>
-                            <td style="display:none;"> {{ fc.office_code.pk }} </td>
-                            <td> {{ fc.office_code }} </td>
-                            <td> {{ fc.lin_code }} </td>
-                            <td> {{ fc.activity_code }} </td>
-                            <td> {{ fc.employee_id }} </td>
-                            <td> {{ fc.allocation_percent }} </td>
+                            <td style="display:none;">{{ item.pk }}</td>
+                            <td style="display:none;">{{ fc.pk }}</td>
+                            <td>{{ fc.gl_account }}</td>
+                            <td style="display:none;">{{ fc.fund_code.pk }}</td>
+                            <td>{{ fc.fund_code }}</td>
+                            <td style="display:none;">{{ fc.dept_code.pk }}</td>
+                            <td>{{ fc.dept_code }}</td>
+                            <td style="display:none;">{{ fc.office_code.pk }}</td>
+                            <td>{{ fc.office_code }}</td>
+                            <td>{{ fc.lin_code }}</td>
+                            <td>{{ fc.activity_code }}</td>
+                            <td>{{ fc.employee_id }}</td>
+                            <td>{{ fc.allocation_percent }}</td>
                             <td>
                                 <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
                                 <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
@@ -78,19 +80,28 @@
     $('#finance_codes_table').on('click', 'a.edit', function(e) {
         e.preventDefault();
 
-        //var finance_codes_pk = $(this).data("financeCodesId");
+        // Set the FinanceCodes form action url to be that of the clicked edit button.
         $("#id_finance_codes_form").attr("action",  $(this).attr('href'));
 
+        // Get the FinanceCodes ID from the edit button that was clicked.
+        var finance_codes_pk = $(this).data("financeCodesId");
+        
+        // Set the financeCodesId value as HTML5 data attribute on the form submit button,
+        // which is later used in the form submit event to determine what row in the table 
+        // above the form to update.
+        $("#id_submit_finance_codes_btn").data('fcid', finance_codes_pk);
+
         // Get all of the td elements and extract its values to populate the form
-        var tds = $(this).closest("tr").children(); //$(tds[1]).text()        
-        $("#id_gl_account").val(parseInt($(tds[1]).text()));
-        $("#id_fund_code").select2().val( parseInt($(tds[2]).text()) ).trigger("change");
-        $("#id_dept_code").select2().val( parseInt($(tds[4]).text()) ).trigger("change");
-        $("#id_office_code").select2().val( parseInt($(tds[6]).text()) ).trigger("change");
-        $("#id_lin_code").val( $(tds[8]).text() );
-        $("#id_activity_code").val( $(tds[9]).text() );
-        $("#id_employee_id").val( parseInt($(tds[10]).text()) );
-        $("#id_allocation_percent").val( parseInt($(tds[11]).text()) );
+        var tds = $(this).closest("tr").children();      
+        $("#id_gl_account").val(parseInt($(tds[2]).text()));
+        $("#id_fund_code").select2().val( parseInt($(tds[3]).text()) ).trigger("change");
+        $("#id_dept_code").select2().val( parseInt($(tds[5]).text()) ).trigger("change");
+        $("#id_office_code").select2().val( parseInt($(tds[7]).text()) ).trigger("change");
+        $("#id_lin_code").val( $.trim($(tds[9]).text()) );
+        $("#id_activity_code").val( $.trim($(tds[10]).text()) );
+        $("#id_employee_id").val( parseInt($.trim($(tds[11]).text())) );
+        $("#id_allocation_percent").val( parseInt($.trim($(tds[12]).text())) );
+
     });
 
     // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add

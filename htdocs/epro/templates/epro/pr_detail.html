@@ -203,14 +203,39 @@
         event.preventDefault();
         var form_url = $(this).attr('action');
         var form_data = $(this).serialize();
-        
+
+        var fcid_editted = $("#id_submit_finance_codes_btn").data()['fcid'];
+        // if fcid is set, it's an update so find & update a row in the table instead of appending it.
+        if (fcid_editted != undefined) {
+            $("#finance_codes_table").find('tr').each(function (i, el) {
+                var $tds = $(this).find('td'), fcid = $tds.eq(1).text(); 
+                if (fcid_editted == fcid) {
+                    $tds.eq(2).html($("#id_gl_account").val());  // GL Account
+                    $tds.eq(3).html($("#id_fund_code").val()); // FundCodeId
+                    $tds.eq(4).html($( "#id_fund_code option:selected" ).text()); // FundCode
+                    $tds.eq(5).html($("#id_dept_code").val()); // DeptCodeId
+                    $tds.eq(6).html($( "#id_dept_code option:selected" ).text()); // DeptCode
+                    $tds.eq(7).html($("#id_office_code").val()); // OfficeCodeId
+                    $tds.eq(8).html($( "#id_office_code option:selected" ).text()); // OfficeCode
+                    $tds.eq(9).html($("#id_lin_code").val()); // LINCode
+                    $tds.eq(10).html($("#id_activity_code").val()); // ActivityCode
+                    $tds.eq(11).html($("#id_employee_id").val()); // EmployeeId
+                    $tds.eq(12).html($("#id_allocation_percent").val()); //AllocationPercent
+                }
+            });
+        } else {
+            // append the new finance codes to the table.
+            
+        }
+
+        /*
         $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
 
                 // Show django messages that may have been set in the View.
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
-            });
+            }); */
     });
 </script>
 {% endblock extra_js %}

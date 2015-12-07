@@ -33,3 +33,11 @@ html {
 .alert {
     margin-bottom: 5px;
 }
+
+.close {
+    color: red;
+}
+
+.close:hover {
+    color: red;
+}

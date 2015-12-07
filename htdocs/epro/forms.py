@@ -121,7 +121,7 @@ class FinanceCodesForm(forms.ModelForm):
             ), Div(
                 Column(
                     FormActions(
-                        Submit('save', 'Save changes', css_class='btn-sm btn-primary'),
+                        Submit('save', 'Save changes', css_id='id_submit_finance_codes_btn', css_class='btn-sm btn-primary'),
                         Reset('reset', 'Cancel', css_id='id_cancel_finance_codes_btn', css_class='btn-sm btn-warning')
                     ),
                     css_class="col-sm-12",
