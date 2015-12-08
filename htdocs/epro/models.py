@@ -176,7 +176,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
 
     def get_absolute_url(self):
         # Redirect to this URl after an object is created using CreateView
-        return reverse_lazy('pr_detail', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        return reverse_lazy('pr_view', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
     def clean(self):
         # Don't allow draft purchase_requests to have a submission_date
@@ -230,7 +230,7 @@ class FinanceCodes(CommonBaseAbstractModel):
         return "%s-%s" % (self.gl_account, str(self.fund_code))
 
     def get_absolute_url(self):
-        return reverse_lazy('pr_detail', kwargs={'pk': 1})
+        return reverse_lazy('pr_view', kwargs={'pk': 1})
 
 class Item(CommonBaseAbstractModel):
     purchase_request = models.ForeignKey(PurchaseRequest,
@@ -270,7 +270,7 @@ class Item(CommonBaseAbstractModel):
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse_lazy('pr_detail', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
+        return reverse_lazy('pr_view', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
 
     class Meta(object):
         verbose_name = 'Item'

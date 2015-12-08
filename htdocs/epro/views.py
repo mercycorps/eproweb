@@ -61,7 +61,7 @@ class PurchaseRequestDetailView(DetailView):
     PR Detail View
     """
     model = PurchaseRequest
-    template_name = 'epro/pr_detail.html'
+    template_name = 'epro/pr_view.html'
     context_object_name = 'pr'
 
     def get_context_data(self, **kwargs):
