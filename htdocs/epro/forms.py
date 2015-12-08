@@ -91,7 +91,6 @@ class FinanceCodesForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
-        print(type(kwargs['initial']))
         form_action = kwargs['initial'].pop('form_action')
         try:
             item_id = kwargs['initial']['item_id']
