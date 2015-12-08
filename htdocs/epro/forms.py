@@ -98,7 +98,7 @@ class FinanceCodesForm(forms.ModelForm):
             self.helper.form_action = reverse_lazy(form_action, kwargs={'item_id': item_id})
         except Exception as e:
             # TODO: this event
-            self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_edit')
+            self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_edit', kwargs={'item_id': 0})
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'

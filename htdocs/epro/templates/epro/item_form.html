@@ -107,9 +107,12 @@
     // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
     $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
 
-        // reset the form action to add finance codes not edit.
-        $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
-
+        {% if item.pk %}
+            // reset the form action to add finance codes not edit.
+            $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
+        {% else %}
+            $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' 0 %}");
+        {% endif %}
         // reset the dropdowns with select2 manually b/c reset button cannot reset them.
         $("#id_fund_code").select2().val("").trigger("change");
         $("#id_dept_code").select2().val("").trigger("change");
