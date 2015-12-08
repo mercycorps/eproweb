@@ -13,10 +13,9 @@ urlpatterns = [
     url(r'^feedback/$', FeedbackCreateView.as_view(), name='feedback'),
 
     url(r'^pr/add/$', PurchaseRequestCreateView.as_view(), name='pr_new'),
-    #url(r'^pr/edit/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_edit')
+    url(r'^pr/edit/(?P<pk>\d+)/$', PurchaseRequestUpdateView.as_view(), name='pr_edit'),
     url(r'^pr/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_view'),
-    #url(r'^pr/del/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_del'),
-
+    #url(r'^pr/del/(?P<pk>\d+)/$', PurchaseRequestDeleteView.as_view(), name='pr_del'),
 
     url(r'^item/add/(?P<pr>\d+)/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
     url(r'^item/edit/(?P<pk>\d+)/$', PurchaseRequestItemUpdateView.as_view(), name='item_edit'),

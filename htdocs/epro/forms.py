@@ -48,9 +48,10 @@ class PurchaseRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.attrs = {'id': 'id_prform', }
+        #self.helper.form_action = reverse_lazy()
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
-        self.helper.attrs = {'id': 'id_prform', }
 
 
 class PurchaseRequestItemForm(forms.ModelForm):

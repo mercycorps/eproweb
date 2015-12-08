@@ -28,12 +28,10 @@ class FeedbackCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessa
 
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
-    """
-    PR Create View
-    """
+    """ PR Create View """
     model = PurchaseRequest
     form_class = PurchaseRequestForm
-    template_name = 'epro/new_pr.html'
+    template_name = 'epro/pr_form.html'
     context_object_name = 'pr'
     success_message = "PR for %(project_reference)s created successfully. You may not add items and submit it."
 
@@ -54,6 +52,22 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFor
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
+
+
+class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, UpdateView):
+    """ PR Update View """
+    model = PurchaseRequest
+    form_class = PurchaseRequestForm
+    template_name = 'epro/pr_form2.html'
+    context_object_name = 'pr'
+    #success_message = "PR for %(project_reference)s updated successfully."
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user.userprofile
+        return super(PurchaseRequestUpdateView, self).form_valid(form)
+
+    #def get_success_message(self, cleaned_data):
+    #    return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
 
 
 class PurchaseRequestDetailView(DetailView):

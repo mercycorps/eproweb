@@ -18,7 +18,7 @@
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#"><span class="glyphicon glyphicon-send"></span> Submit</a></li>
                 <li><a href="#"><span class="glyphicon glyphicon-print"></span> Print</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+                <li><a href="{% url 'pr_edit' pr.pk %}" id="pr_edit_btn" class="text-muted" data-toggle="modal" data-target="#form_modal"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
                 <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span> Cancel</a></li>
                 <li class="divider"></li>
                 <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
