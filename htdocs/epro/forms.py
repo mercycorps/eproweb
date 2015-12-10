@@ -66,11 +66,14 @@ class PurchaseRequestItemForm(forms.ModelForm):
         self.fields['description_pr'].widget.attrs['rows'] = 3
         self.helper = setup_boostrap_helpers(formtag=True)
 
-        try:
-            self.helper.form_action = reverse_lazy('item_edit', kwargs={'pk':item_id})
-        except Exception as e:
-            self.helper.form_action = reverse_lazy('item_new', kwargs={'pr':pr_id})
+        if item_id:
+            url = 'item_edit'
+            url_params = {'pk': item_id}
+        else:
+            url = 'item_new'
+            url_params = {'pr': kwargs['initial']['purchase_request']}
 
+        self.helper.form_action = reverse_lazy(url, kwargs=url_params)
         self.helper.form_id = 'id_pr_item_form'
         self.helper.add_input(Submit('submit', 'Save', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
