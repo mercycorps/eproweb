@@ -57,8 +57,10 @@ function update_office_select(country_id) {
             options += '<option value="' + offices[i].id + '">' + offices[i].name + '</option>';
         }
         $("select#id_office").html(options);
-        $("select#id_office option:first").attr('selected', 'selected'); 
+        //$("select#id_office option:first").attr('selected', 'selected');
+        $("select#id_office").val('').trigger("change");
     });
+    return true;
 }
 
 
@@ -74,8 +76,10 @@ function update_currency_select(country_id) {
             options += '<option value="' + currencies[i].id + '">' + currencies[i].code + '</option>';
         }
         $("select#id_currency").html(options);
-        $("select#id_currency option:first").attr('selected', 'selected'); 
+        //$("select#id_currency option:first").attr('selected', 'selected');
+        $("select#id_currency").val('').trigger("change");
     });
+    return true;
 }
 
 

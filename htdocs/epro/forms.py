@@ -13,7 +13,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Reset, Button, HTML, Layout, Field, Div, Column
 from crispy_forms.bootstrap import FormActions, AppendedText
 
-from .models import PurchaseRequest, Item, FinanceCodes, Feedback
+from .models import Country, Office, Currency, PurchaseRequest, Item, FinanceCodes, Feedback
 
 
 """
@@ -46,12 +46,16 @@ class PurchaseRequestForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        pr_pk = kwargs.pop('pk', None)
+        country_id = kwargs.pop('country_id', None)
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
         self.helper.attrs = {'id': 'id_prform', }
-        #self.helper.form_action = reverse_lazy()
+        self.helper.form_action = reverse_lazy('pr_edit' if pr_pk else 'pr_new', kwargs = {'pk': pr_pk} if pr_pk else None)
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
+        self.fields['office'].queryset = Office.objects.filter(country=country_id)
+        self.fields['currency'].queryset = Office.objects.filter(country=country_id)
 
 
 class PurchaseRequestItemForm(forms.ModelForm):

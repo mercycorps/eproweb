@@ -18,7 +18,7 @@
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#"><span class="glyphicon glyphicon-send"></span> Submit</a></li>
                 <li><a href="#"><span class="glyphicon glyphicon-print"></span> Print</a></li>
-                <li><a href="{% url 'pr_edit' pr.pk %}" id="pr_edit_btn" class="text-muted" data-toggle="modal" data-target="#form_modal"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+                <li><a href="{% url 'pr_edit' pr.pk %}" id="pr_edit_btn" class="text-muted" data-toggle="modal" data-target="#pr_form_modal_div"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
                 <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span> Cancel</a></li>
                 <li class="divider"></li>
                 <li><a href="#" style="color: #FF0000 !important;"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
@@ -135,6 +135,14 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="pr_form_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content"> 
+            <!-- form will be inserted here -->
+        </div> <!-- END modal-content -->
+    </div><!-- END modal-dialog -->
+</div> <!-- END modal fade -->
 
 <div class="modal fade" id="pr_items_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-md">

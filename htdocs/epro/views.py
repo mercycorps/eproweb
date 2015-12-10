@@ -42,6 +42,12 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFor
         }
         return init_data
 
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword arguments."""
+        kwargs = super(PurchaseRequestCreateView, self).get_form_kwargs()
+        kwargs['country_id'] = self.request.user.userprofile.country
+        return kwargs
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
         form.instance.originator = self.request.user.userprofile
@@ -66,6 +72,12 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, Updat
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile
         return super(PurchaseRequestUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword arguments."""
+        kwargs = super(PurchaseRequestUpdateView, self).get_form_kwargs()
+        kwargs['pk'] = self.object.pk
+        return kwargs
 
     def get_template_names(self):
         if self.request.is_ajax():
