@@ -58,13 +58,19 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, Updat
     """ PR Update View """
     model = PurchaseRequest
     form_class = PurchaseRequestForm
-    template_name = 'epro/pr_form2.html'
+    template_name = 'epro/pr_form.html'
+    template_name_ajax = 'epro/pr_form_ajax.html'
     context_object_name = 'pr'
     #success_message = "PR for %(project_reference)s updated successfully."
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile
         return super(PurchaseRequestUpdateView, self).form_valid(form)
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return [self.template_name_ajax]
+        return [self.template_name]
 
     #def get_success_message(self, cleaned_data):
     #    return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
@@ -102,8 +108,8 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
     def get_initial(self):
         """
-        For seting up the form_action in the ItemForm as well as providing initial value
-        to purchase_request field in the Item Form.
+        For seting up the form_action in the ItemForm AS WELL AS providing initial value
+        to purchase_request field in the Item Form!!!
         """
         return {'purchase_request': self.kwargs.get('pr', None)}
 
@@ -122,9 +128,11 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
     context_object_name = 'item'
     success_message = "Item updated successfully."
 
-    def get_initial(self):
-        """ Used in the ItemForm to set the form_action """
-        return {'pk': self.object.pk}
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword arguments."""
+        kwargs = super(PurchaseRequestItemUpdateView, self).get_form_kwargs()
+        kwargs['pk'] = self.object.pk
+        return kwargs
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile

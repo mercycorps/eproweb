@@ -61,15 +61,14 @@ class PurchaseRequestItemForm(forms.ModelForm):
         widgets = {'purchase_request': forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
+        item_id = kwargs.pop('pk', None)
         super(PurchaseRequestItemForm, self).__init__(*args, **kwargs)
         self.fields['description_pr'].widget.attrs['rows'] = 3
         self.helper = setup_boostrap_helpers(formtag=True)
 
         try:
-            item_id = kwargs['initial'].pop('pk')
             self.helper.form_action = reverse_lazy('item_edit', kwargs={'pk':item_id})
         except Exception as e:
-            pr_id = kwargs['initial']['purchase_request']
             self.helper.form_action = reverse_lazy('item_new', kwargs={'pr':pr_id})
 
         self.helper.form_id = 'id_pr_item_form'
