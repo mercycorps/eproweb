@@ -76,6 +76,7 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, Updat
     def get_form_kwargs(self):
         """This method is what injects forms with their keyword arguments."""
         kwargs = super(PurchaseRequestUpdateView, self).get_form_kwargs()
+        kwargs['country_id'] = self.request.user.userprofile.country
         kwargs['pk'] = self.object.pk
         return kwargs
 
