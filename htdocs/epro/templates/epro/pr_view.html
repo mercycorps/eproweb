@@ -113,7 +113,7 @@
                     <td> {{ item.price_estimated_usd }} </td>
                     <td> {{ item.price_estimated_usd_subtotal }} </td>
                     <td>
-                        <a href="{% url 'item_edit' item.pk %}" id='edit_item_link'><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="{% url 'item_edit' item.pk %}" data-item-id={{ item.pk }} id='edit_item_link'><span class="glyphicon glyphicon-edit"></span></a>
                         <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                     </td>
                 </tr>
@@ -168,6 +168,8 @@
     // When the Edit Item Button is clicked, load the ItemUpdateViewForm in a modal.
     $('#pr_items_table').on('click', '#edit_item_link', function(e) {
         e.preventDefault();
+        var item_id = $(this).data("itemId");
+        $("#id_finance_codes_form #id_item_id").val(item_id);
         $("#pr_items_modal_content_div").load($(this).attr("href"));
         $('#pr_items_modal_div').modal('show');
     });
@@ -268,6 +270,7 @@
                             </td>";
                     $("#finance_codes_table").append(tr);
                 }
+                $("#id_cancel_finance_codes_btn").trigger("click");
             });
     });
 </script>

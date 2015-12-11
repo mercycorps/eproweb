@@ -99,12 +99,11 @@ class FinanceCodesForm(forms.ModelForm):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
         form_action = kwargs['initial'].pop('form_action')
-        try:
-            item_id = kwargs['initial']['item_id']
-            self.helper.form_action = reverse_lazy(form_action, kwargs={'item_id': item_id})
-        except Exception as e:
-            # TODO: this event
-            self.helper.form_action = reverse_lazy(form_action if form_action else 'financecodes_edit', kwargs={'item_id': 0})
+        params = {}
+        params['item_id'] = kwargs['initial'].get('item_id', None)
+        if params['item_id'] is None:
+            params['pk'] = kwargs['initial'].get('pk', None)
+        self.helper.form_action = reverse_lazy(form_action, kwargs=params)
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'

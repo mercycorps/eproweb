@@ -128,7 +128,7 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestItemCreateView, self).get_context_data(**kwargs)
-        context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new',})
+        context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new', 'item_id': 0})
         return context
 
 
@@ -168,7 +168,7 @@ class FinanceCodesCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     success_message = "Finance Codes, added to PR %(description_pr)s successfully."
 
     def get_initial(self):
-        return { 'form_action': 'financecodes_new', }
+        return { 'form_action': 'financecodes_new', 'item_id': self.kwargs['item_id']}
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
@@ -189,7 +189,7 @@ class FinanceCodesUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     success_message = "Finance Codes, updated %(fundcode)s successfully."
 
     def get_initial(self):
-        return { 'form_action': 'financecodes_update', 'pk': self.object.pk, }
+        return { 'form_action': 'financecodes_edit', 'pk': self.object.pk, }
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile
