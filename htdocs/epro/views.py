@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.shortcuts import render
-from django.views.generic import TemplateView, FormView, View
+from django.views.generic import TemplateView, FormView, View, DeleteView
 from django.views.generic.detail import DetailView
 
 from django.utils import timezone
@@ -198,3 +198,6 @@ class FinanceCodesUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(cleaned_data, fundcode=self.object.fund_code)
 
+
+class FinanceCodesDeleteView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, DeleteView):
+    model = FinanceCodes
