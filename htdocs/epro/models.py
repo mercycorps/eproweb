@@ -46,9 +46,8 @@ class CommonBaseAbstractModel(models.Model):
 
 
 class Currency(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, blank=False, null=False, on_delete=models.CASCADE, related_name="currencies")
     code = models.CharField(unique=True, max_length=3, null=False, blank=False)
-    country = models.ForeignKey(Country, blank=False, null=False,
-                                on_delete=models.CASCADE, related_name="currencies")
     name = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
@@ -63,6 +62,7 @@ class Currency(CommonBaseAbstractModel):
 
 
 class FundCode(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, related_name='fund_codes', blank=False, null=False, on_delete=models.CASCADE)
     code = models.CharField(unique=True, max_length=5, null=False, blank=False, db_index=True)
 
     def __unicode__(self):
@@ -77,6 +77,7 @@ class FundCode(CommonBaseAbstractModel):
 
 
 class DeptCode(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, related_name='dept_codes', blank=False, null=False, on_delete=models.CASCADE)
     code = models.CharField(unique=True, max_length=5, null=False, blank=False, db_index=True)
 
     def __unicode__(self):
@@ -88,6 +89,39 @@ class DeptCode(CommonBaseAbstractModel):
     class Meta(object):
         verbose_name = 'Department Code'
         ordering = ['code']
+
+
+class LinCode(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, related_name='lin_codes', blank=False, null=False, on_delete=models.CASCADE)
+    lin_code = models.CharField(unique=True, max_length=5, null=True, blank=True)
+
+    def __unicode__(self):
+        return u'%s' % self.lin_code
+
+    def __str__(self):
+        return u'%' % self.lin_code
+
+
+class ActivityCode(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, related_name='activity_codes', blank=False, null=False, on_delete=models.CASCADE)
+    activity_code = models.CharField(unique=True, max_length=5, null=True, blank=True)
+
+    def __unicode__(self):
+        return u'%s' % self.activity_code
+
+    def __str__(self):
+        return u'%' % self.activity_code
+
+
+class PurchaseRequestStatus(CommonBaseAbstractModel):
+    status = models.CharField(max_length=50, null=False, blank=False)
+
+    def __unicode__(self):
+        return u'%s' % self.status
+
+    def __str__(self):
+        return u'%s' % self.status
+
 
 class PurchaseRequestManager(models.Manager):
     @property
@@ -141,30 +175,32 @@ class PurchaseRequest(CommonBaseAbstractModel):
     def is_canceled(self):
         return self.status == STATUS_CANCELED
 
-    #pr_number = models.PositiveIntegerField(validators=[validate_positive,])
     country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
     office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING)
     currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
     delivery_address = models.CharField(max_length=100, blank=False, null=False)
     project_reference = models.CharField(max_length=250, null=False, blank=False)
-    originator = models.ForeignKey(UserProfile, related_name='prs')
+    originator = models.ForeignKey(UserProfile, related_name='prs', on_delete=models.DO_NOTHING)
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1')
+    procurement_verification = models.ForeignKey(UserProfile, related_name='pr_procurement_verifier', on_delete=models.DO_NOTHING)
+    produrement_verification_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1', on_delete=models.DO_NOTHING)
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2')
+    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2', on_delete=models.SET_NULL)
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer')
+    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer', on_delete=models.SET_NULL)
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    status = models.CharField(max_length=50, choices=PR_STATUS_CHOICES, default=STATUS_ONGOING, blank=True, null=True)
+    status = models.ForeignKey(PurchaseRequestStatus, blank=False, null=False, on_delete=models.DO_NOTHING)
     pr_type = models.CharField(max_length=50, choices=PR_TYPE_CHOICES, default=TYPE_GOODS, null=True, blank=True)
     expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
-    processing_office = models.ForeignKey(Office, related_name='pr_processing_office', blank=True, null=True)
-    assignedTo = models.ForeignKey(UserProfile, blank=True, null=True, related_name='assignee')
+    processing_office = models.ForeignKey(Office, related_name='pr_processing_office', blank=True, null=True, on_delete=models.SET_NULL)
+    assignedTo = models.ForeignKey(UserProfile, blank=True, null=True, related_name='assignee', on_delete=models.SET_NULL)
     notes = models.TextField(max_length=255, null=True, blank=True)
     preferred_supplier = models.BooleanField(default=False)
+    cancelled_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name='pr_cancelled_by', on_delete=models.SET_NULL)
     cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     objects = PurchaseRequestManager() # Changing the default manager
 
@@ -215,8 +251,8 @@ class FinanceCodes(CommonBaseAbstractModel):
     fund_code = models.ForeignKey(FundCode, null=False, blank=False)
     dept_code = models.ForeignKey(DeptCode, null=False, blank=False)
     office_code = models.ForeignKey(Office, null=False, blank=False)
-    lin_code = models.CharField(max_length=9, blank=True, null=True)
-    activity_code = models.CharField(max_length=9, blank=True, null=True)
+    lin_code = models.ForeignKey(LinCode, blank=True, null=True)
+    activity_code = models.ForeignKey(ActivityCode, blank=True, null=True)
     employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=True, blank=True)
     allocation_percent = models.DecimalField(max_digits=5, decimal_places=2,
                                 validators=[MaxValueValidator(100.00), MinValueValidator(1.00) ],
@@ -233,6 +269,7 @@ class FinanceCodes(CommonBaseAbstractModel):
         return reverse_lazy('pr_view', kwargs={'pk': 1})
 
 class Item(CommonBaseAbstractModel):
+    item_sno = models.PositiveIntegerField(verbose_name='SNo')
     purchase_request = models.ForeignKey(PurchaseRequest,
                                             related_name='items',
                                             on_delete=models.CASCADE)
@@ -267,6 +304,9 @@ class Item(CommonBaseAbstractModel):
         self.price_estimated_local_subtotal = round(self.price_estimated_local * self.quantity_requested,2)
         self.price_estimated_usd = round(self.price_estimated_local / self.purchase_request.dollar_exchange_rate, 2)
         self.price_estimated_usd_subtotal = round(self.price_estimated_usd * self.quantity_requested, 2)
+
+        # increase the item serial number by one
+        self.item_sno = Item.objects.all().aggregate(Max('item_sno'))['item_sno__max'] + 1
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

@@ -55,7 +55,7 @@ class PurchaseRequestForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.fields['office'].queryset = Office.objects.filter(country=country_id)
-        self.fields['currency'].queryset = Office.objects.filter(country=country_id)
+        self.fields['currency'].queryset = Currency.objects.filter(country=country_id)
 
 
 class PurchaseRequestItemForm(forms.ModelForm):
