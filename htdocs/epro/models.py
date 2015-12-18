@@ -185,7 +185,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    procurement_verification = models.ForeignKey(UserProfile, related_name='pr_procurement_verifier', on_delete=models.DO_NOTHING)
+    procurement_verification = models.ForeignKey(UserProfile, related_name='pr_procurement_verifier', blank=True, null=True, on_delete=models.DO_NOTHING)
     produrement_verification_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1', on_delete=models.DO_NOTHING)
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
@@ -214,10 +214,16 @@ class PurchaseRequest(CommonBaseAbstractModel):
         # Redirect to this URl after an object is created using CreateView
         return reverse_lazy('pr_view', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
+
     def clean(self):
         # Don't allow draft purchase_requests to have a submission_date
-        if self.status == 'draft' and self.submission_date is not None:
-            raise ValidationError(_('Draft Purchase Requests may not have a submission date.'))
+        if self.pk and self.status == 'draft' and self.submission_date is not None:
+                raise ValidationError(_('Draft Purchase Requests may not have a submission date.'))
+
+    def save(self, *args, **kwargs):
+        status = PurchaseRequestStatus.objects.get(status='Draft')
+        self.status = status
+        super(PurchaseRequest, self).save(*args, **kwargs)
 
     class Meta(object):
         verbose_name = 'Purchase Request'
@@ -305,8 +311,12 @@ class Item(CommonBaseAbstractModel):
         self.price_estimated_usd = round(self.price_estimated_local / self.purchase_request.dollar_exchange_rate, 2)
         self.price_estimated_usd_subtotal = round(self.price_estimated_usd * self.quantity_requested, 2)
 
-        # increase the item serial number by one
-        self.item_sno = Item.objects.all().aggregate(Max('item_sno'))['item_sno__max'] + 1
+        # increase the item serial number by one for the current Purchase Request
+        items_count_by_pr = Item.objects.filter(purchase_request=self.purchase_request.pk).aggregate(Max('item_sno'))['item_sno__max']
+        if items_count_by_pr is None:
+            items_count_by_pr = 0
+        items_count_by_pr = items_count_by_pr + 1
+        self.item_sno = items_count_by_pr
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
