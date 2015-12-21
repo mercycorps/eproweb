@@ -41,3 +41,84 @@ html {
 .close:hover {
     color: red;
 }
+
+/*
+.table-responsive > .table > tbody > tr > td {
+    white-space: normal;
+}
+*/
+
+/* new 
+http://codepen.io/sahapramesh/pen/pjdjjz
+*/
+
+.orderStatus { 
+    padding: 10px; overflow: hidden; 
+}
+.orderStatus .row {
+    padding: 0; margin: 0; display: flex; padding: 5px; width: 100%; 
+}
+.orderStatus .row .col {
+    display: block; 
+    flex: 1 1 0; 
+    padding: 5px; 
+    width: 100%; 
+    line-height: 15px; 
+    position: relative; 
+    text-align: center; 
+    padding-top: 15px; 
+    color: #aaa;
+    font-size: 13px;
+}
+.orderStatus .row .col:before {
+    content: ''; 
+    width: 100%; 
+    height: 5px; 
+    background: #ccc; 
+    top: 0px; 
+    left: 0; 
+    position: absolute; 
+    margin: 0 0 0 -50%;
+}
+.orderStatus .row .col.done:before {
+    background: #56B500;
+}
+.orderStatus .row .col:first-child:before {
+    background: none;
+}
+.orderStatus .row .col:after {
+    position: absolute; 
+    width: 20px; 
+    height: 20px; 
+    content: "\2713"; 
+    color: #eee; 
+    font-size: 16px; 
+    line-height: 20px;
+    background: #ccc; 
+    left: 50%;
+    top: 0; 
+    z-index: 999; 
+    border-radius: 50%;
+    margin: -8px 0 0 -10px;
+}
+.orderStatus .row .col.done:after {
+    position: absolute; 
+    width: 20px; 
+    height: 20px; 
+    content: "\2713"; 
+    color: #fff; 
+    font-size: 16px; 
+    line-height: 20px; 
+    background: #56B500; 
+    left: 50%; 
+    top: 0; 
+    z-index: 999; 
+    border-radius: 50%; 
+    margin: -8px 0 0 -10px; 
+}
+/*
+.orderStatus .row .col.done {
+    color: #3d8f10;
+}
+*/
+/* 337AB7 = blue, green = 3d8f10, bg_green = 56B500 */

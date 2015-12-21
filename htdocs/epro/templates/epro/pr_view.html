@@ -27,65 +27,55 @@
     </div>
 
     <div class="clearfix"></div>
+
+
+
+
+
+<div class="clearfix"></div>
+
     <div class="table-responsive">
         <table class = "table table-bordered table-condensed">
-        <tr>
-            <td colspan="4">
-                <span class="label label-default">Delivery Address</span>
-                <span class="label label-primary">{{ pr.delivery_address }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Required Date</span>
-                <span class="label label-danger">{{ pr.required_date|date }} &nbsp; ({{ pr.required_date|get_due_date_string }})</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="label label-default">Country</span>
-                <span class="label label-primary">{{ pr.country }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Office</span>
-                <span class="label label-primary">{{ pr.office|default_if_none:"not specified" }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Currency</span>
-                <span class="label label-primary">{{ pr.currency }}</span>
-            </td>
-            <td>
-                <span class="label label-default">USD Exchange Rate</span>
-                <span class="label label-primary">{{ pr.dollar_exchange_rate }}</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="label label-default">Originator</span>
-                <span class="label label-primary">{{ pr.originator }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Date Originated</span>
-                <span class="label label-primary">{{ pr.origination_date|date }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Date Submitted</span>
-                <span class="label label-primary">{{ pr.submission_date|date }}</span>
-            </td>
-            <td>
-                <span class="label label-default">Approver 1</span>
-                <span class="label label-primary">{{ pr.approver1|default_if_none:"" }} approved on {{ pr.approval1_date|date }} </span>
-            </td>
-            <td>
-                <span class="label label-default">Approver 2</span>
-                <span class="label label-primary">{{ pr.approver2|default_if_none:"" }} approved on {{ pr.approval2_date|date }}</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="label label-default">Fin. Review</span>
-                <span class="label label-primary">{{ pr.finance_reviewer|default_if_none:"" }} reviewed on {{ finance_review_date|date }} </span>
-            </td>
-        </tr>
-    </table>
+            <tr style="white-space:normal;">
+                <td colspan="5" style="white-space: normal;">
+                    <div class="orderStatus">
+                        <ul class="row">
+                            <li class="col done">Originated on {{ pr.origination_date|date }} by {{ pr.originator }}</li>
+                            <li class="col done">Procurement Review Requested {% if pr.procurement_review_requested_date %} on {{ pr.procurement_review_requested_date|date }} {% else %} Pending {% endif %}</li>
+                            <li class="col done">Procurement Review  {% if pr.procurement_review_date %} Completed on {{ pr.procurement_review_date|date }} by {{ pr.procurement_review_done_by }} {% else %} Pending {% endif %}</li>
+                            <li class="col">Fund Approval 1 Requested</li>
+                            <li class="col">Fund Approval 1 Completed</li>
+                            <li class="col">Fund Approval 2 Requested</li>
+                            <li class="col">Fund Approval 2 Completed</li>
+                            <li class="col">Financial Review Requested</li>
+                            <li class="col">Financial Review Completed</li>
+                            <li class="col">PR Submitted on {{ pr.submission_date|date }}. Processing</li>
+                            <li class="col">Completed </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <span class="label label-default">Delivery Address</span>
+                    <span class="label label-primary">{{ pr.delivery_address|default_if_none:"not specified" }}</span>
+                </td>
+                <td>
+                    <span class="label label-default">Required Date</span>
+                    <span class="label label-danger">{{ pr.required_date|date }} &nbsp; ({{ pr.required_date|get_due_date_string }})</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label label-default">Currency</span>
+                    <span class="label label-primary">{{ pr.currency }}</span>
+                </td>
+                <td>
+                    <span class="label label-default">USD Exchange Rate</span>
+                    <span class="label label-primary">{{ pr.dollar_exchange_rate }}</span>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="panel-body">
@@ -94,6 +84,7 @@
     <div class = "table-responsive">
         <table id="pr_items_table" class="table table-bordered table-striped table-hover table-condensed">
             <tr>
+                <th>SNo</th>
                 <th>Qty</th>
                 <th>Unit</th>
                 <th>Description</th>
@@ -105,6 +96,7 @@
             </tr>
             {% for item in pr.items.all %}
                 <tr>
+                    <td> <span class="glyphicon glyphicon-exclamation-sign" style="color:red;"></span> {{ item.item_sno }} <span class="glyphicon glyphicon-ok" style="color:green;"></span></td>
                     <td> {{ item.quantity_requested }} </td>
                     <td> {{ item.unit }} </td>
                     <td> {{ item.description_pr|urlizetrunc:15|url_target_blank|safe }} </td>
@@ -120,7 +112,7 @@
             {% endfor %}
             <tfoot>
                 <tr class="info">
-                    <td colspan="4"></td>
+                    <td colspan="5"></td>
                     <td>{{ total_usd }}</td>
                     <td></td>
                     <td colspan=2>{{ total_local }}</td>
