@@ -49,6 +49,15 @@ class PurchaseRequestForm(forms.ModelForm):
         pr_pk = kwargs.pop('pk', None)
         country_id = kwargs.pop('country_id', None)
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
+        self.fields['country'].empty_label = ''
+        self.fields['office'].empty_label = ''
+        self.fields['project_reference'].widget.attrs['placeholder'] = _('Project Reference')
+        self.fields['delivery_address'].widget.attrs['placeholder'] = _('Delivery Address')
+        self.fields['currency'].empty_label = ''
+        self.fields['dollar_exchange_rate'].widget.attrs['placeholder'] = _('USD Exchange Rate')
+        self.fields['required_date'].widget.attrs['placeholder'] = _('Required Date')
+        self.fields['approver1'].empty_label = ''
+        self.fields['approver2'].empty_label = ''
         self.helper = setup_boostrap_helpers(formtag=True)
         #self.helper.form_class = 'form-inline'
         self.helper.attrs = {'id': 'id_prform', }
@@ -57,7 +66,7 @@ class PurchaseRequestForm(forms.ModelForm):
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.fields['office'].queryset = Office.objects.filter(country=country_id)
         self.fields['currency'].queryset = Currency.objects.filter(country=country_id)
-        self.helper.form_show_labels = True
+        self.helper.form_show_labels = False
         self.helper.label_class = 'col-sm-0'
         self.helper.field_class = 'col-xs-12'
         self.helper.layout = Layout(

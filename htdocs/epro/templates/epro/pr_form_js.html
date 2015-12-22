@@ -1,21 +1,11 @@
 <script type = "text/javascript">
     $(document).ready(function() { 
 
-        $("#id_country").select2({ allowClear: true, });
-        $("#id_office").select2({ allowClear: true, });
-        $("#id_currency").select2({ allowClear: true, });
-        $("#id_approver1").select2({ 
-            allowClear: true, 
-            language: {
-             noResults: function() {
-                 return "<a href='http://google.com'>Add</a>";
-            }
-             },
-            escapeMarkup: function (markup) {
-                return markup;
-            }
-        });
-        $("#id_approver2").select2({ allowClear: true, });
+        $("#id_country").select2({ placeholder: 'Country', allowClear: true, });
+        $("#id_office").select2({ placeholder: "Office", allowClear: true, });
+        $("#id_currency").select2({placeholder: "PR Currency", allowClear: true, });
+        $("#id_approver1").select2({placeholder: "Approver 1", allowClear: true, });
+        $("#id_approver2").select2({placeholder: "Approver 2", allowClear: true, });
 
         $("#id_approver1").append($('<option>', {value: -10, text: 'Fetch more data'}));
 
