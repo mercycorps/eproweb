@@ -50,13 +50,70 @@ class PurchaseRequestForm(forms.ModelForm):
         country_id = kwargs.pop('country_id', None)
         super(PurchaseRequestForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
+        #self.helper.form_class = 'form-inline'
         self.helper.attrs = {'id': 'id_prform', }
         self.helper.form_action = reverse_lazy('pr_edit' if pr_pk else 'pr_new', kwargs = {'pk': pr_pk} if pr_pk else None)
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.add_input(Reset('reset', 'Reset', css_class='btn-sm btn-warning'))
         self.fields['office'].queryset = Office.objects.filter(country=country_id)
         self.fields['currency'].queryset = Currency.objects.filter(country=country_id)
-
+        self.helper.form_show_labels = True
+        self.helper.label_class = 'col-sm-0'
+        self.helper.field_class = 'col-xs-12'
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    Column(
+                        Field('country',),
+                        css_class="col-sm-6",
+                    ),
+                    Column(
+                        Field('office',),
+                        css_class="col-sm-6",
+                    ),
+                    css_class="row",
+                ),
+                Div(
+                    Column(
+                        Field('project_reference',),
+                        css_class="col-sm-12",
+                    ),
+                    css_class="row",
+                ),
+                Div(
+                    Column(
+                        Field('delivery_address',),
+                        css_class="col-sm-6",
+                    ),
+                    Column(
+                        Field('required_date',),
+                        css_class="col-sm-6",
+                    ),
+                    css_class="row",
+                ),
+                Div(
+                    Column(
+                        Field('currency',),
+                        css_class="col-xs-6",
+                    ), Column(
+                        Field('dollar_exchange_rate',),
+                        css_class="col-xs-6",
+                    ),
+                    css_class="row",
+                ),
+                Div(
+                    Column(
+                        Field('approver1',),
+                        css_class="col-sm-6",
+                    ), Column(
+                        Field('approver2',),
+                        css_class="col-sm-6",
+                    ),
+                    css_class="row",
+                ),
+                css_class="col-xs-12",
+            ),
+        )
 
 class PurchaseRequestItemForm(forms.ModelForm):
     class Meta:

@@ -175,23 +175,23 @@ class PurchaseRequest(CommonBaseAbstractModel):
     def is_canceled(self):
         return self.status == STATUS_CANCELED
 
-    country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
-    office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING)
-    currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE)
-    dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False)
-    delivery_address = models.CharField(max_length=100, blank=False, null=False)
-    project_reference = models.CharField(max_length=250, null=False, blank=False)
-    required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False)
+    country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="The country in which this PR is originated")
+    office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING, help_text="The Office in which this PR is originated")
+    currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="The PR Currency in which the transaction occurs.")
+    dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False, help_text="This exchange rate may be different on the PR submission day.")
+    delivery_address = models.CharField(max_length=100, blank=False, null=False, help_text="The address sould be as specific as possible.")
+    project_reference = models.CharField(max_length=250, null=False, blank=False, help_text="A brief summary of the purpose of this PR")
+    required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False, help_text="The date by which this PR should be fullfilled.")
     originator = models.ForeignKey(UserProfile, related_name='prs', on_delete=models.DO_NOTHING)
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
     procurement_review_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     procurement_review_done_by = models.ForeignKey(UserProfile, related_name='pr_procurement_verifier', blank=True, null=True, on_delete=models.DO_NOTHING)
     procurement_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     approval1_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1', on_delete=models.DO_NOTHING)
+    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1', on_delete=models.DO_NOTHING, help_text="This is the person who manages the Fund")
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     approval2_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2', on_delete=models.SET_NULL)
+    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2', on_delete=models.SET_NULL, help_text="Refer to your <abbr title='Approval Authority Matrix'>AAM</abbr>  to determine if you need to specify a second approval.")
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     finance_review_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer', on_delete=models.SET_NULL)
@@ -317,12 +317,13 @@ class Item(CommonBaseAbstractModel):
         self.price_estimated_usd = round(self.price_estimated_local / self.purchase_request.dollar_exchange_rate, 2)
         self.price_estimated_usd_subtotal = round(self.price_estimated_usd * self.quantity_requested, 2)
 
-        # increase the item serial number by one for the current Purchase Request
-        items_count_by_pr = Item.objects.filter(purchase_request=self.purchase_request.pk).aggregate(Max('item_sno'))['item_sno__max']
-        if items_count_by_pr is None:
-            items_count_by_pr = 0
-        items_count_by_pr = items_count_by_pr + 1
-        self.item_sno = items_count_by_pr
+        if not self.id:
+            # increase the item serial number by one for the current Purchase Request
+            items_count_by_pr = Item.objects.filter(purchase_request=self.purchase_request.pk).aggregate(Max('item_sno'))['item_sno__max']
+            if items_count_by_pr is None:
+                items_count_by_pr = 0
+            items_count_by_pr = items_count_by_pr + 1
+            self.item_sno = items_count_by_pr
         super(Item, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

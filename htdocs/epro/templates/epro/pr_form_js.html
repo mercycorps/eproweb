@@ -4,9 +4,29 @@
         $("#id_country").select2({ allowClear: true, });
         $("#id_office").select2({ allowClear: true, });
         $("#id_currency").select2({ allowClear: true, });
-        $("#id_approver1").select2({ allowClear: true, });
+        $("#id_approver1").select2({ 
+            allowClear: true, 
+            language: {
+             noResults: function() {
+                 return "<a href='http://google.com'>Add</a>";
+            }
+             },
+            escapeMarkup: function (markup) {
+                return markup;
+            }
+        });
         $("#id_approver2").select2({ allowClear: true, });
 
+        $("#id_approver1").append($('<option>', {value: -10, text: 'Fetch more data'}));
+
+        $('body').on('change', 'select#id_approver1', function(e) {
+            console.log($(this).val());
+            if ($(this).val() == -10 ) {
+                // make an ajax request to fetch additional data and populate it with
+                console.log("select2:select", e);
+            }
+        });
+        
         // if there is only a single currency for this country, then select it by default
         var num_currencies = $('#id_currency > option').length;
         if (num_currencies == 2) {
