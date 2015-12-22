@@ -3,6 +3,7 @@ from datetime import date
 from django.shortcuts import render
 from django.views.generic import TemplateView, FormView, View, DeleteView
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from django.utils import timezone
 
@@ -103,6 +104,15 @@ class PurchaseRequestDetailView(DetailView):
         context['total_usd'] = item_totals['total_local']
         context['total_local'] = item_totals['total_usd']
         return context
+
+
+class PurchaseRequestListView(ListView):
+    """
+    PR List View
+    """
+    model = PurchaseRequest
+    template_name = 'epro/pr_list.html'
+    context_object_name = 'prs'
 
 
 class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):

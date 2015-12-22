@@ -1,3 +1,4 @@
+import datetime, time, logging
 from decimal import Decimal
 
 from django.core.urlresolvers import reverse_lazy
@@ -15,8 +16,7 @@ from django.contrib.auth.models import User
 from djangocosign.models import UserProfile, Region, Country, Office
 
 from .fields import USDCurrencyField
-from django.utils.timezone import utc
-import datetime, time, logging
+
 
 def validate_even(value):
     if value % 2 != 0:
@@ -58,6 +58,7 @@ class Currency(CommonBaseAbstractModel):
 
     class Meta(object):
         verbose_name = 'Currency'
+        verbose_name_plural = "Currencies"
         ordering = ['country', 'code']
 
 
@@ -84,7 +85,7 @@ class DeptCode(CommonBaseAbstractModel):
         return u'%s' % self.code
 
     def __str__(self):
-        return u'%s' % self.code
+        return '%s' % self.code
 
     class Meta(object):
         verbose_name = 'Department Code'
@@ -93,24 +94,32 @@ class DeptCode(CommonBaseAbstractModel):
 
 class LinCode(CommonBaseAbstractModel):
     country = models.ForeignKey(Country, related_name='lin_codes', blank=False, null=False, on_delete=models.CASCADE)
-    lin_code = models.CharField(unique=True, max_length=5, null=True, blank=True)
+    lin_code = models.CharField(unique=True, max_length=9, null=True, blank=True)
 
     def __unicode__(self):
         return u'%s' % self.lin_code
 
     def __str__(self):
-        return u'%' % self.lin_code
+        return '%s' % self.lin_code
+
+    class Meta(object):
+        verbose_name = 'LIN Code'
+        ordering = ['lin_code']
 
 
 class ActivityCode(CommonBaseAbstractModel):
     country = models.ForeignKey(Country, related_name='activity_codes', blank=False, null=False, on_delete=models.CASCADE)
-    activity_code = models.CharField(unique=True, max_length=5, null=True, blank=True)
+    activity_code = models.CharField(unique=True, max_length=9, null=True, blank=True)
 
     def __unicode__(self):
         return u'%s' % self.activity_code
 
     def __str__(self):
-        return u'%' % self.activity_code
+        return '%s' % self.activity_code
+
+    class Meta(object):
+        verbose_name = 'Activity Code'
+        ordering = ['activity_code']
 
 
 class PurchaseRequestStatus(CommonBaseAbstractModel):
@@ -120,7 +129,12 @@ class PurchaseRequestStatus(CommonBaseAbstractModel):
         return u'%s' % self.status
 
     def __str__(self):
-        return u'%s' % self.status
+        return '%s' % self.status
+
+    class Meta(object):
+        verbose_name = 'Purchase Request Status'
+        verbose_name_plural = "Status"
+        ordering = ['status']
 
 
 class PurchaseRequestManager(models.Manager):
@@ -163,7 +177,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
     )
 
     EXPENSE_TYPE_PROGRAM = 'program'
-    EXPENSE_TYPE_OPERATIONAL = 'operationa'
+    EXPENSE_TYPE_OPERATIONAL = 'operational'
     EXPENSE_TYPE_CHOICES = (
         (EXPENSE_TYPE_PROGRAM, 'Program'),
         (EXPENSE_TYPE_OPERATIONAL, 'Operational'),
@@ -177,10 +191,11 @@ class PurchaseRequest(CommonBaseAbstractModel):
 
     country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="<span style='color:red'>*</span> The country in which this PR is originated")
     office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING, help_text="<span style='color:red'>*</span> The Office in which this PR is originated")
+    sno = models.PositiveIntegerField(verbose_name='SNo', null=False, blank=False)
     currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="<span style='color:red'>*</span> The PR Currency in which the transaction occurs.")
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False, help_text="<span style='color:red'>*</span> This exchange rate may be different on the PR submission day.")
     delivery_address = models.CharField(max_length=100, blank=False, null=False, help_text="<span style='color:red'>*</span> The delivery address sould be as specific as possible.")
-    project_reference = models.CharField(max_length=250, null=False, blank=False, help_text="<span style='color:red'>*</span> Project Reference is a brief summary of the purpose of this PR")
+    project_reference = models.CharField(max_length=140, null=False, blank=False, help_text="<span style='color:red'>*</span> Project Reference is a brief summary of the purpose of this PR")
     required_date = models.DateField(auto_now=False, auto_now_add=False, null=False, blank=False, help_text="<span style='color:red'>*</span> The required date by which this PR should be fullfilled.")
     originator = models.ForeignKey(UserProfile, related_name='prs', on_delete=models.DO_NOTHING)
     origination_date = models.DateField(auto_now=False, auto_now_add=True)
@@ -201,7 +216,9 @@ class PurchaseRequest(CommonBaseAbstractModel):
     pr_type = models.CharField(max_length=50, choices=PR_TYPE_CHOICES, default=TYPE_GOODS, null=True, blank=True)
     expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPE_CHOICES, null=True, blank=True)
     processing_office = models.ForeignKey(Office, related_name='pr_processing_office', blank=True, null=True, on_delete=models.SET_NULL)
+    assignedBy = models.ForeignKey(UserProfile, blank=True, null=True, related_name='assigner', on_delete=models.SET_NULL)
     assignedTo = models.ForeignKey(UserProfile, blank=True, null=True, related_name='assignee', on_delete=models.SET_NULL)
+    assigned_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     notes = models.TextField(max_length=255, null=True, blank=True)
     preferred_supplier = models.BooleanField(default=False)
     cancellation_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
@@ -211,10 +228,10 @@ class PurchaseRequest(CommonBaseAbstractModel):
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
-        return '%s-%s: %s' % (self.office.name, self.pk, self.project_reference)
+        return '%s-%s: %s' % (self.office.name, self.sno, self.project_reference)
 
     def __str__(self):
-        return '%s-%s: %s' % (self.office.name, self.pk, self.project_reference)
+        return '%s-%s: %s' % (self.office.name, self.sno, self.project_reference)
 
     def get_absolute_url(self):
         # Redirect to this URl after an object is created using CreateView
@@ -227,17 +244,38 @@ class PurchaseRequest(CommonBaseAbstractModel):
             raise ValidationError(_('Draft Purchase Requests may not have a submission date.'))
 
     def save(self, *args, **kwargs):
-        status = PurchaseRequestStatus.objects.get(status='Draft')
-        self.status = status
+        if not self.id:
+            status = PurchaseRequestStatus.objects.get(status='Draft')
+            self.status = status
+
+            # increase the PR serial number by one for by office
+            pr_count_by_office = PurchaseRequest.objects.filter(office=self.office.pk).aggregate(Max('sno'))['sno__max']
+            if pr_count_by_office is None:
+                pr_count_by_office = 0
+            pr_count_by_office = pr_count_by_office + 1
+            self.sno = pr_count_by_office
+
         super(PurchaseRequest, self).save(*args, **kwargs)
 
     class Meta(object):
         verbose_name = 'Purchase Request'
+        verbose_name_plural = "Purchase Requests"
         ordering = ['country', 'office']
         get_latest_by = "submission_date"
 
 
+class PurchaseRequestLog(CommonBaseAbstractModel):
+    pr = models.ForeignKey(PurchaseRequest, related_name='log_entries', on_delete=models.CASCADE)
+    reference = models.CharField(max_length=255, null=True, blank=True)
+    old_value = models.CharField(max_length=255, null=True, blank=True)
+    new_value = models.CharField(max_length=255, null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    manual_entry = models.BooleanField(default=False)
+    changed_by = models.ForeignKey(UserProfile, null=True, blank=False, related_name='log_entries', on_delete=models.DO_NOTHING)
+
+
 class Vendor(CommonBaseAbstractModel):
+    country = models.ForeignKey(Country, related_name='vendors', null=True, blank=False, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100, null=False, blank=False)
     description = models.CharField(max_length=255, null=True, blank=True)
     contact_person = models.CharField(max_length=100, null=True, blank=True)
@@ -256,6 +294,9 @@ class Vendor(CommonBaseAbstractModel):
 
     def get_absolute_url(self):
         return reverse_lazy('vendor', kwargs={'pk': self.pk}) #args=[str(self.id)])
+
+    class Meta(object):
+        verbose_name = 'Vendor'
 
 
 class FinanceCodes(CommonBaseAbstractModel):
@@ -333,6 +374,7 @@ class Item(CommonBaseAbstractModel):
         verbose_name = 'Item'
         ordering = ['purchase_request']
         order_with_respect_to = 'purchase_request'
+
 
 class QuotationAnalysis(CommonBaseAbstractModel):
     analysis_date = models.DateField(null=True, blank=True, auto_now=False, auto_now_add=False)
