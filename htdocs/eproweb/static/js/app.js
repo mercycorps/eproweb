@@ -49,10 +49,10 @@ $('body').on('change', 'select#id_country', function(e) {
  * Show relevant offices for the selected country dropdown.
  */
 function update_office_select(country_id) {
-    $("#div_id_office").find("span#select2-chosen-2").filter(':visible:first').text("---------");
+    //$("#div_id_office").find("span#select2-chosen-2").filter(':visible:first').text("---------");
     var url = '/api/v1/offices/?country=' + country_id;
     $.getJSON(url, function(offices) {
-        var options = "<option value=''>---------</option>";
+        var options = "<option value=''></option>"; //"<option value=''>---------</option>";
         for (var i = 0; i < offices.length; i++) {
             options += '<option value="' + offices[i].id + '">' + offices[i].name + '</option>';
         }
@@ -68,10 +68,10 @@ function update_office_select(country_id) {
  * Show relevant currencies for the selected country dropdown.
  */
 function update_currency_select(country_id) {
-    $("#div_id_currency").find("span#select2-chosen-2").filter(':visible:first').text("---------");
+    //$("#div_id_currency").find("span#select2-chosen-2").filter(':visible:first').text("---------");
     var url = '/api/v1/currencies/?country=' + country_id;
     $.getJSON(url, function(currencies) {
-        var options = "<option value=''>---------</option>";
+        var options = "<option value=''></option>"; //"<option value=''>---------</option>";
         for (var i = 0; i < currencies.length; i++) {
             options += '<option value="' + currencies[i].id + '">' + currencies[i].code + '</option>';
         }
