@@ -35,6 +35,7 @@
                         <th>Activity</th>
                         <th>Emp ID</th>
                         <th>% Alloc</th>
+                        <th style="display:none;"></th>
                         <th></th>
                     </tr>
                     {% for fc in item.finance_codes.all %}
@@ -52,6 +53,7 @@
                             <td>{{ fc.activity_code }}</td>
                             <td>{{ fc.employee_id }}</td>
                             <td>{{ fc.allocation_percent }}</td>
+                            <td style="display:none;">{{ fc.default_for_new_items }}</td>
                             <td>
                                 <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
                                 <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
@@ -101,7 +103,7 @@
         $("#id_activity_code").val( $.trim($(tds[10]).text()) );
         $("#id_employee_id").val( parseInt($.trim($(tds[11]).text())) );
         $("#id_allocation_percent").val( parseInt($.trim($(tds[12]).text())) );
-
+        $("#id_default_for_new_items").prop('checked', Boolean($.trim($(tds[13]).text()) == 'True' ));
     });
 
     // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
