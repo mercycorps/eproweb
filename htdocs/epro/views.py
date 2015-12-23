@@ -101,8 +101,8 @@ class PurchaseRequestDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestDetailView, self).get_context_data(**kwargs)
         item_totals = Item.objects.filter(purchase_request=self.object.pk).aggregate(total_usd = Sum('price_estimated_usd_subtotal'), total_local = Sum('price_estimated_local_subtotal'))
-        context['total_usd'] = item_totals['total_local']
-        context['total_local'] = item_totals['total_usd']
+        context['total_local'] = item_totals['total_local']
+        context['total_usd'] = item_totals['total_usd']
         return context
 
 
@@ -127,6 +127,18 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
         form.instance.originator = self.request.user.userprofile
+        self.object = form.save()
+
+        try:
+            finance_codes = FinanceCodes.objects.get(items__purchase_request__pk=self.object.purchase_request.id, default_for_new_items=True)
+            finance_codes.pk = None
+            finance_codes.default_for_new_items = False
+            finance_codes.save()
+            self.object.finance_codes.add(finance_codes)
+        except FinanceCodes.ObjectDoesNotExist as e:
+            print("there is no default finance codes for this PR to be used for new items")
+        except FinanceCodes.MultipleObjectsReturned as e:
+            print("this should never happen")
         return super(PurchaseRequestItemCreateView, self).form_valid(form)
 
     def get_initial(self):

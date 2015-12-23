@@ -311,6 +311,8 @@ class FinanceCodes(CommonBaseAbstractModel):
                                 validators=[MaxValueValidator(100.00), MinValueValidator(1.00) ],
                                 blank=False, null=False,
                                 default=Decimal("100.00"))
+    default_for_new_items = models.BooleanField(default=False,
+            help_text='Set as default so that all new items for this PR will get the same Finance Codes')
 
     def __unicode__(self):
         return "%s-%s" % (self.gl_account, str(self.fund_code))
