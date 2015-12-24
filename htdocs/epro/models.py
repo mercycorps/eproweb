@@ -169,8 +169,8 @@ class PurchaseRequest(CommonBaseAbstractModel):
         (STATUS_CANCELED, 'Canceled'),
     )
 
-    TYPE_GOODS = 'goods'
-    TYPE_SERVICES = 'services'
+    TYPE_GOODS = '0'
+    TYPE_SERVICES = '1'
     PR_TYPE_CHOICES = (
         (TYPE_GOODS, 'Goods'),
         (TYPE_SERVICES, 'Services'),
@@ -190,9 +190,9 @@ class PurchaseRequest(CommonBaseAbstractModel):
         return self.status == STATUS_CANCELED
 
     country = models.ForeignKey(Country, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="<span style='color:red'>*</span> The country in which this PR is originated")
-    office = models.ForeignKey(Office, related_name='prs', null=False, blank=False, on_delete=models.DO_NOTHING, help_text="<span style='color:red'>*</span> The Office in which this PR is originated")
+    office = models.ForeignKey(Office, related_name='prs', null=True, blank=True, on_delete=models.DO_NOTHING, help_text="<span style='color:red'>*</span> The Office in which this PR is originated")
     sno = models.PositiveIntegerField(verbose_name='SNo', null=False, blank=False)
-    currency = models.ForeignKey(Currency, related_name='prs', null=False, blank=False, on_delete=models.CASCADE, help_text="<span style='color:red'>*</span> The PR Currency in which the transaction occurs.")
+    currency = models.ForeignKey(Currency, related_name='prs', null=True, blank=True, on_delete=models.CASCADE, help_text="<span style='color:red'>*</span> This the currency in which the transaction occurs.")
     dollar_exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)], null=False, blank=False, help_text="<span style='color:red'>*</span> This exchange rate may be different on the PR submission day.")
     delivery_address = models.CharField(max_length=100, blank=False, null=False, help_text="<span style='color:red'>*</span> The delivery address sould be as specific as possible.")
     project_reference = models.CharField(max_length=140, null=False, blank=False, help_text="<span style='color:red'>*</span> Project Reference is a brief summary of the purpose of this PR")
@@ -203,13 +203,18 @@ class PurchaseRequest(CommonBaseAbstractModel):
     procurement_review_done_by = models.ForeignKey(UserProfile, related_name='pr_procurement_verifier', blank=True, null=True, on_delete=models.DO_NOTHING)
     procurement_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     approval1_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver1 = models.ForeignKey(UserProfile, related_name='pr_approvers1', on_delete=models.DO_NOTHING, help_text="<span style='color:red'>*</span> This is the person who manages the Fund")
+    approver1 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approvers1',
+        on_delete=models.SET_NULL,
+        help_text="<span style='color:red'>*</span> This is the person who manages the Fund")
     approval1_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     approval2_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2', on_delete=models.SET_NULL, help_text="Refer to your <abbr title='Approval Authority Matrix'>AAM</abbr>  to determine if you need to specify a second approval.")
+    approver2 = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_approver2',
+        on_delete=models.SET_NULL,
+        help_text="Refer to your <abbr title='Approval Authority Matrix'>AAM</abbr> to determine if you need to specify a second approval.")
     approval2_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     finance_review_requested_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer', on_delete=models.SET_NULL)
+    finance_reviewer = models.ForeignKey(UserProfile, blank=True, null=True, related_name='pr_reviewer',
+        on_delete=models.SET_NULL)
     finance_review_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     submission_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
     status = models.ForeignKey(PurchaseRequestStatus, blank=False, null=False, on_delete=models.DO_NOTHING)
@@ -247,7 +252,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
         if not self.id:
             status = PurchaseRequestStatus.objects.get(status='Draft')
             self.status = status
-
+            self.type = PurchaseRequest.TYPE_GOODS
             # increase the PR serial number by one for by office
             pr_count_by_office = PurchaseRequest.objects.filter(office=self.office.pk).aggregate(Max('sno'))['sno__max']
             if pr_count_by_office is None:

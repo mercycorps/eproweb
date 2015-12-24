@@ -1,5 +1,6 @@
-from django.core.serializers.python import Serializer
-from django.utils.encoding import smart_text
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.serializers.python import Serializer as PythonSerializer
 
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -8,18 +9,35 @@ from djangocosign.models import Region, Country, Office
 from .models import *
 
 
-
-class JsonSerializer(Serializer):
+class FlatJsonSerializer(PythonSerializer):
     """
-    Overrides django's JSON serialzer so that the JSON output is more flat.
+    Take a look at the django implementation as a reference if you need further customization:
+    https://github.com/django/django/blob/master/django/core/serializers/json.py#L21-62
     Usage:
-        serializer = JsonSerializer()
-        data = serializer.serialize(<queryset>, <optional>fields=('field1', 'field2'))
+        serializer = FlatJsonSerializer()
+        json_data = serializer.serialize(<queryset>, <optional>fields=('field1', 'field2'))
     """
-    def end_object( self, obj ):
-        #self._current['id'] = obj._get_pk_val()
-        self._current['id'] = smart_text(obj._get_pk_val(), strings_only=True)
-        self.objects.append( self._current )
+    def get_dump_object(self, obj):
+        data = self._current
+        if not self.selected_fields or 'id' in self.selected_fields:
+            data['id'] = obj.id
+        return data
+
+    def end_object(self, obj):
+        if not self.first:
+            self.stream.write(', ')
+        json.dump(self.get_dump_object(obj), self.stream,
+                  cls=DjangoJSONEncoder)
+        self._current = None
+
+    def start_serialization(self):
+        self.stream.write("[")
+
+    def end_serialization(self):
+        self.stream.write("]")
+
+    def getvalue(self):
+        return super(PythonSerializer, self).getvalue()
 
 
 class CurrencySerializer(serializers.ModelSerializer):

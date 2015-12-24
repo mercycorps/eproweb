@@ -1,34 +1,106 @@
 <script type = "text/javascript">
     $(document).ready(function() { 
+        $("#id_country").select2({ placeholder: 'Originating Country', allowClear: true, });
 
-        $("#id_country").select2({ placeholder: 'Country', allowClear: true, });
-        $("#id_office").select2({ placeholder: "Office", allowClear: true, });
-        $("#id_currency").select2({placeholder: "PR Currency", allowClear: true, });
-        $("#id_approver1").select2({placeholder: "Approver 1", allowClear: true, });
-        $("#id_approver2").select2({placeholder: "Approver 2", allowClear: true, });
-
-        $("#id_approver1").append($('<option>', {value: -10, text: 'Fetch more data'}));
-
-        $('body').on('change', 'select#id_approver1', function(e) {
-            console.log($(this).val());
-            if ($(this).val() == -10 ) {
-                // make an ajax request to fetch additional data and populate it with
-                console.log("select2:select", e);
-            }
+        /*
+        office_dropdown = $("#id_office");
+        office_dropdown.empty();
+        office_dropdown.append("<option value=''></option>");
+        var offices = $.parseJSON(`{{offices|safe}}`);
+        $.each(offices, function(index, office) {
+            office_dropdown.append($('<option>', {value: office.id, text: office.name}));
         });
-        
-        // if there is only a single currency for this country, then select it by default
-        var num_currencies = $('#id_currency > option').length;
-        if (num_currencies == 2) {
-            $("#id_currency").val($("#id_currency option:eq(1)").val()).trigger('change');
-        }
 
         // if there is only a single office for this country, then select it by default
         var num_offices = $('#id_office > option').length;
-        if (num_currencies == 2) {
+        if (num_offices == 2) {
             $("#id_office").val($("#id_office option:eq(1)").val()).trigger('change');
         }
+        office_dropdown.select2({ placeholder: "Originating Office", allowClear: true, });
 
+        */
+
+        var offices = $.parseJSON(`{{offices|safe}}`);
+        $("#id_originating_office").select2({
+            data: offices,
+            placeholder: "Originating Office", 
+            allowClear: true,
+        });
+        if (offices.length == 2) {
+            $("#id_originating_office").select2('val', offices[0].id);
+        }
+        /*
+            //set select2 to item with id=3.
+            $("#id_originating_office").select2('val', 3); 
+            
+            // Get the id of the current selected item.
+            console.log($("#id_originating_office").val()); 
+            
+            // Get the text of the current selected item.
+            console.log($("#id_originating_office").select2('data').text);
+        */
+
+        var currencies = $.parseJSON(`{{currencies|safe}}`);
+        $("#id_pr_currency").select2({
+            data: currencies,
+            placeholder: 'PR Currency',
+            allowClear: true,
+        });
+        if (currencies.length == 1) {
+            $("#id_pr_currency").select2('val', currencies[0].id);
+        }
+
+        var users = $.parseJSON(`{{users|safe}}`);
+        $("#id_approverOne").select2({
+            data: users,
+            placeholder: "Fund Approver1", 
+            allowClear: true,
+            selectOnBlur: true,
+
+            formatNoMatches: function(term) {
+                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverOneNotFoundLink' class='btn btn-default btn-xs' data-approver-one-not-found=" + term + " onclick='searchForApproverOne();'> <span class='glyphicon glyphicon-search'></span> Search</a>";
+            },
+            /*
+            //Allow manually entered text in drop down.
+            createSearchChoice:function(term, data) {
+                if ( $(data).filter( function() {
+                    return this.text.localeCompare(term)===0;
+                }).length===0) {
+                    return {id:term, text:term};
+                }
+            },
+            */
+        });
+
+        $("#id_approverTwo").select2({
+            data: users,
+            placeholder: "Fund Approve2", 
+            allowClear: true,
+
+            formatNoMatches: function(term) {
+                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverOneNotFoundLink' class='btn btn-default btn-xs' data-approver-one-not-found=" + term + " onclick='searchForApproverOne();'> <span class='glyphicon glyphicon-search'></span> Search</a>";
+            },
+        });
         $("#id_project_reference").focus();
+    });
+
+    function searchForApproverOne() {
+        var email = ($("#approverOneNotFoundLink").data("approverOneNotFound"));
+        var url = '/api/v1/users/?email=' + $.trim(email);
+        $.getJSON(url, function(user) {
+            if (user.length == 0) {
+                console.log("no user found");
+            } else {
+                console.log(user[0]);
+                alert(user[0].username);
+            }
+        });
+    }
+    $('body').on('change', 'select#id_approver1', function(e) {
+        console.log($(this).val());
+        if ($(this).val() == -10 ) {
+            // make an ajax request to fetch additional data and populate it with
+            console.log("select2:select", e);
+        }
     });
 </script>

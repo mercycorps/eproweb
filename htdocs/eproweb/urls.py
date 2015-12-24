@@ -31,7 +31,8 @@ admin.autodiscover()
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'users', UserViewSet, base_name='user')
+router.register(r'usersprofile', UserProfileViewSet, base_name='usersprofile')
 router.register(r'regions', RegionViewSet, base_name='region')
 router.register(r'countries', CountryViewSet, base_name='country')
 router.register(r'offices', OfficeViewSet, base_name='office')
