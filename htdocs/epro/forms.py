@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.exceptions import ValidationError
 
 from django import forms
 from django.forms import ModelForm, inlineformset_factory, HiddenInput, Textarea
@@ -35,7 +36,7 @@ def setup_boostrap_helpers(formtag=False):
 
 
 class PurchaseRequestForm(forms.ModelForm):
-    approverOne = forms.CharField(label=_('Approver1'), max_length=100, required=True,
+    approverOne = forms.CharField(label=_('Approver1'), max_length=100, required=False,
          help_text="<span style='color:red'>*</span> This is the person who manages the Fund")
     approverTwo = forms.CharField(label=_('Approver2'), max_length=100, required=False,
         help_text="Refer to your <abbr title='Approval Authority Matrix'>AAM</abbr> to determine if you need to specify a second approval.")
@@ -53,6 +54,24 @@ class PurchaseRequestForm(forms.ModelForm):
             'office': _('Originating Office'),
             'dollar_exchange_rate': _('USD Exchange rate'),
         }
+
+    def clean_approverOne(self):
+        approverOne = self.cleaned_data.get('approverOne', None)
+        if not approverOne:
+            raise ValidationError("ApproverOne is required.")
+        return approverOne
+
+    def clean_originating_office(self):
+        originating_office = self.cleaned_data.get('originating_office', None)
+        if not originating_office:
+            raise ValidationError("Originating Office is required.")
+        return originating_office
+
+    def clean_pr_currency(self):
+        pr_currency = self.cleaned_data.get('pr_currency', None)
+        if not pr_currency:
+            raise ValidationError("PR Currency is required")
+        return pr_currency
 
     def __init__(self, *args, **kwargs):
         pr_pk = kwargs.pop('pk', None)

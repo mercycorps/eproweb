@@ -1,4 +1,8 @@
 <script type = "text/javascript">
+    "use strict";
+    var users;
+    var approverOne
+
     $(document).ready(function() { 
         $("#id_country").select2({ placeholder: 'Originating Country', allowClear: true, });
 
@@ -29,6 +33,7 @@
         if (offices.length == 2) {
             $("#id_originating_office").select2('val', offices[0].id);
         }
+        offices.push({'id': 100, text: 'myself'});
         /*
             //set select2 to item with id=3.
             $("#id_originating_office").select2('val', 3); 
@@ -50,8 +55,8 @@
             $("#id_pr_currency").select2('val', currencies[0].id);
         }
 
-        var users = $.parseJSON(`{{users|safe}}`);
-        $("#id_approverOne").select2({
+        users = $.parseJSON(`{{users|safe}}`);
+        approverOne = $("#id_approverOne").select2({
             data: users,
             placeholder: "Fund Approver1", 
             allowClear: true,
@@ -73,7 +78,10 @@
         });
 
         $("#id_approverTwo").select2({
-            data: users,
+            //data: users,
+            query: function(query) {
+                query.callback({results: data});
+            },
             placeholder: "Fund Approve2", 
             allowClear: true,
 
@@ -82,25 +90,33 @@
             },
         });
         $("#id_project_reference").focus();
+        
     });
 
     function searchForApproverOne() {
+        
         var email = ($("#approverOneNotFoundLink").data("approverOneNotFound"));
         var url = '/api/v1/users/?email=' + $.trim(email);
         $.getJSON(url, function(user) {
-            if (user.length == 0) {
-                console.log("no user found");
+            if (user.length > 0) {
+                var new_user = {'id': user[0].id, 'text': user[0].userprofile.name};                
+                users.push(new_user);
+
+                // Create the custom event object
+                var evt = $.Event("select2-selecting", {
+                    val: new_user.id,
+                    data: new_user
+                });
+
+                // Fire the custom even to update the dropdown.
+                approverOne.select2("data", new_user).trigger(evt);
+
+                // make the new user to be the selected option
+                approverOne.select2('val', new_user.id);
+                approverOne.select2('close');
             } else {
-                console.log(user[0]);
-                alert(user[0].username);
+                console.log("no one found with email, " + email);
             }
         });
     }
-    $('body').on('change', 'select#id_approver1', function(e) {
-        console.log($(this).val());
-        if ($(this).val() == -10 ) {
-            // make an ajax request to fetch additional data and populate it with
-            console.log("select2:select", e);
-        }
-    });
 </script>

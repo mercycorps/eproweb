@@ -8,7 +8,7 @@ from rest_framework import routers, serializers, viewsets
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ('title', 'name', 'employee_number', 'country', 'user',)
+        fields = ('id', 'title', 'name', 'employee_number', 'country', 'user',)
 
 # ViewSets define the view behavior.
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     userprofile = UserProfileSerializer(many=False)
     class Meta:
         model = User
-        fields = ('userprofile', 'url', 'username', 'email', 'is_staff')
+        fields = ('id', 'userprofile', 'url', 'username', 'email', 'is_staff')
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):

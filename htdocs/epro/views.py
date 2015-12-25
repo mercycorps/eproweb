@@ -56,10 +56,7 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFor
         form.instance.created_by = self.request.user.userprofile
         form.instance.originator = self.request.user.userprofile
         form.instance.origination_date = date.today()
-        form.instance.approver1  = self.request.user.userprofile
-        #print(self.request.POST.get('approver', "no approver"))
         return super(PurchaseRequestCreateView, self).form_valid(form)
-
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
@@ -77,19 +74,17 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, Purch
 
     def get_initial(self):
         country_id = self.request.user.userprofile.country.pk
-        print(self.object.office.pk)
         init_data = {
             'country': self.object.country.pk,
             'originating_office': self.object.office.pk,
-            'id_approverOne': self.object.approver1.pk,
-            'id_approverTwo': self.object.approver2.pk if self.object.approver2 else None,
+            'pr_currency': self.object.currency.pk,
+            'approverOne': self.object.approver1.pk,
+            'approverTwo': self.object.approver2.pk if self.object.approver2 else None,
         }
         return init_data
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile
-        #print(self.request.POST.get('approver', "no approver"))
-        print("form_valid_in PR UPDATE VIEW")
         return super(PurchaseRequestUpdateView, self).form_valid(form)
 
     def get_form_kwargs(self):
