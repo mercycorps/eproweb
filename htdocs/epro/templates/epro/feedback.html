@@ -18,7 +18,7 @@
 {% block extra_js %}
 <script type = "text/javascript">
 
-    $('#form_modal').on('shown.bs.modal', function (e) {
+    $('#app_modal_div').on('shown.bs.modal', function (e) {
         $("#id_reporter_role").select2('focus');
     });
 
@@ -34,7 +34,7 @@
         $.post(form_url, form_data)
             .done(function(data, textStatus, jqXHR) {
                 //console.log(JSON.stringify(data));
-                $('#form_modal').modal('hide');
+                $('#app_modal_div').modal('hide');
             });
     });
 </script>

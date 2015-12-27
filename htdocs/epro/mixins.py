@@ -7,7 +7,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from .serializers import FlatJsonSerializer
-from .models import Country, Office, UserProfile, Currency
+from .models import Country, Office, UserProfile, Currency, PurchaseRequest
+from .forms import PurchaseRequestForm
+
 
 class LoginRequiredMixin(View):
     """
@@ -26,9 +28,8 @@ class AjaxFormResponseMixin(object):
     def form_invalid(self, form):
         response = super(AjaxFormResponseMixin, self).form_invalid(form)
         if self.request.is_ajax():
-            return JsonResponse(form.errors, status=400)
-        else:
-            return response
+            response['error'] = True
+        return response
 
     def form_valid(self, form):
         response = super(AjaxFormResponseMixin, self).form_valid(form)
@@ -42,18 +43,20 @@ class AjaxFormResponseMixin(object):
 
 
 class PurchaseRequestMixin(object):
+    model = PurchaseRequest
+    form_class = PurchaseRequestForm
+    context_object_name = 'pr'
+    template_name = 'epro/pr_form.html'
+    template_name_ajax = 'epro/pr_form_ajax.html'
+
     """
     Common code between PurchaseRequestCreateView and PurchaseRequestUpdateView is absracted
     into this Mixin
     """
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestMixin, self).get_context_data(**kwargs)
-        if self.object:
-            country_id = self.object.country.pk
-        else:
-            country_id = self.request.user.userprofile.country.pk
-
-        serializer = FlatJsonSerializer()
+        country_id = self.object.country.pk if self.object else self.request.user.userprofile.country.pk
+        #serializer = FlatJsonSerializer()
         #context['offices'] = serializer.serialize(Office.objects.filter(country=country_id), fields=('id', 'name'))
         #context['currencies'] = serializer.serialize(Currency.objects.filter(country=country_id), fields=('id', 'code'))
 
@@ -78,17 +81,39 @@ class PurchaseRequestMixin(object):
 
         return context
 
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword arguments."""
+        kwargs = super(PurchaseRequestMixin, self).get_form_kwargs()
+        kwargs['country_id'] = self.request.user.userprofile.country
+        return kwargs
+
     def form_valid(self, form):
         approverOne = self.request.POST.get('approverOne', None)
-        form.instance.approver1 = approverOne
+        if approverOne:
+            approver1= UserProfile.objects.get(pk=approverOne)
+            form.instance.approver1 = approver1
 
         approverTwo = self.request.POST.get('approverTwo', None)
-        form.instance.approver2 = approverTwo
+        if approverTwo:
+            approver2 = UserProfile.objects.get(pk=approverTwo)
+            form.instance.approver2 = approver2
 
         originating_office = self.request.POST.get('originating_office', None)
-        form.instance.office = originating_office
+        if originating_office:
+            office = Office.objects.get(pk=originating_office)
+            form.instance.office = office
 
         pr_currency = self.request.POST.get('pr_currency', None)
-        form.instance.currency = pr_currency
+        if pr_currency:
+            currency = Currency.objects.get(pk=pr_currency)
+            form.instance.currency = currency
 
         return super(PurchaseRequestMixin, self).form_valid(form)
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return [self.template_name_ajax]
+        return [self.template_name]
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)

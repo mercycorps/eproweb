@@ -138,7 +138,7 @@
                     <td> {{ item.price_estimated_usd_subtotal }} </td>
                     <td>
                         <a href="{% url 'item_edit' item.pk %}" data-item-id={{ item.pk }} id='edit_item_link'><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                        <a href="#" data-href="/item/delete/1/" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -167,15 +167,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="pr_form_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content"> 
-            <!-- form will be inserted here -->
-        </div> <!-- END modal-content -->
-    </div><!-- END modal-dialog -->
-</div> <!-- END modal fade -->
-
-<div class="modal fade" id="pr_items_modal_div" tabindex="-1" role="dialog" aria-labelledby="form_modal_label" aria-hidden="true">
+<div class="modal fade" id="pr_items_modal_div" tabindex="-1" role="dialog" aria-labelledby="pr_items_modal_div_label" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content" id="pr_items_modal_content_div">
 

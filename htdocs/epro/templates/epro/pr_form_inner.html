@@ -1,14 +1,10 @@
 {% load crispy_forms_tags %}
-
-<div id = "new_pr_form_div" class="row">
-    <div class="col-md-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title"> {% if pr.pk %} Update {% else %} New {% endif %} Purchase Request Form for Goods </h3>
-            </div>
-            <div class="panel-body">
-                {% crispy form %}
-            </div>
-        </div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"> {% if pr.pk %} Update {% else %} New {% endif %} Purchase Request Form for Goods <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">&times;</button></h3>
+    </div>
+    <div class="clearfix"> </div>
+    <div class="panel-body">
+        {% crispy form %}
     </div>
 </div>

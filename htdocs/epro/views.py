@@ -30,13 +30,10 @@ class FeedbackCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessa
         return self.success_message % dict(cleaned_data, summary=self.object.summary)
 
 
-class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, PurchaseRequestMixin, CreateView):
+class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin,
+            AjaxFormResponseMixin, PurchaseRequestMixin, CreateView):
     """ PR Create View """
-    model = PurchaseRequest
-    form_class = PurchaseRequestForm
-    template_name = 'epro/pr_form.html'
-    context_object_name = 'pr'
-    success_message = "PR for %(project_reference)s created successfully. You may not add items and submit it."
+    success_message = "PR for %(project_reference)s created successfully."
 
     def get_initial(self):
         country_id = self.request.user.userprofile.country.pk
@@ -46,34 +43,19 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFor
         }
         return init_data
 
-    def get_form_kwargs(self):
-        """This method is what injects forms with their keyword arguments."""
-        kwargs = super(PurchaseRequestCreateView, self).get_form_kwargs()
-        kwargs['country_id'] = self.request.user.userprofile.country
-        return kwargs
-
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
         form.instance.originator = self.request.user.userprofile
         form.instance.origination_date = date.today()
         return super(PurchaseRequestCreateView, self).form_valid(form)
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
 
-
-class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, PurchaseRequestMixin, UpdateView):
+class PurchaseRequestUpdateView(LoginRequiredMixin, SuccessMessageMixin,
+        AjaxFormResponseMixin, PurchaseRequestMixin, UpdateView):
     """ PR Update View """
-    model = PurchaseRequest
-    form_class = PurchaseRequestForm
-    template_name = 'epro/pr_form.html'
-    template_name_ajax = 'epro/pr_form_ajax.html'
-    context_object_name = 'pr'
-    #success_message = "PR for %(project_reference)s updated successfully."
-
+    success_message = "PR for %(project_reference)s updated successfully."
 
     def get_initial(self):
-        country_id = self.request.user.userprofile.country.pk
         init_data = {
             'country': self.object.country.pk,
             'originating_office': self.object.office.pk,
@@ -90,23 +72,12 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, AjaxFormResponseMixin, Purch
     def get_form_kwargs(self):
         """This method is what injects forms with their keyword arguments."""
         kwargs = super(PurchaseRequestUpdateView, self).get_form_kwargs()
-        kwargs['country_id'] = self.request.user.userprofile.country
         kwargs['pk'] = self.object.pk
         return kwargs
 
-    def get_template_names(self):
-        if self.request.is_ajax():
-            return [self.template_name_ajax]
-        return [self.template_name]
-
-    #def get_success_message(self, cleaned_data):
-    #    return self.success_message % dict(cleaned_data, project_reference=self.object.project_reference)
-
 
 class PurchaseRequestDetailView(DetailView):
-    """
-    PR Detail View
-    """
+    """ PR Detail View """
     model = PurchaseRequest
     template_name = 'epro/pr_view.html'
     context_object_name = 'pr'

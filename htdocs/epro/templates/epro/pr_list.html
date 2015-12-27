@@ -6,7 +6,7 @@
         <h3 class="panel-title">Purchase Request List</h3>
     </div>
     <div class="panel-body">
-        <div class="table-responsive container-fluid">
+        <div class="table-responsive">
             <table id="prs_table" class="table table-bordered table-striped table-hover table-condensed">
                 <thead>
                     <tr>
@@ -42,8 +42,8 @@
                             <td>{{ pr.approver2 }}</td>
                         {% endif %}
                         <td>
-                            <a href="{% url 'pr_view' pr.pk %}" data-item-id={{ pr.pk }} id='edit_pr_link'><span class="glyphicon glyphicon-edit"></span></a>
-                            <a href="#" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                            <a href="{% url 'pr_edit' pr.pk %}" id='edit_pr_link'><span class="glyphicon glyphicon-edit"></span></a>
+                            <a href="#" data-href="/pr/delete/1/" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                         </td>
                     </tr>
                 {% empty %}
@@ -67,5 +67,12 @@
         }, 3000); 
         */
     });
+
+    $('body').on('click', 'a#edit_pr_link', function(e) {
+        e.preventDefault();
+        $("#app_modal_div_content_div").load($(this).attr("href"));
+        $('#app_modal_div').modal('show');
+    });
+
 </script>
 {% endblock extra_js %}

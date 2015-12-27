@@ -31,7 +31,6 @@ def setup_boostrap_helpers(formtag=False):
     helper.help_text_inline = True
     helper.form_show_errors = True
     helper.form_tag = formtag
-
     return helper
 
 
@@ -40,7 +39,7 @@ class PurchaseRequestForm(forms.ModelForm):
          help_text="<span style='color:red'>*</span> This is the person who manages the Fund")
     approverTwo = forms.CharField(label=_('Approver2'), max_length=100, required=False,
         help_text="Refer to your <abbr title='Approval Authority Matrix'>AAM</abbr> to determine if you need to specify a second approval.")
-    originating_office = forms.CharField(label=_("Originating Office"), max_length=100, required=True,
+    originating_office = forms.CharField(label=_("Originating Office"), max_length=100, required=False,
         help_text="<span style='color:red'>*</span> The Office in which this PR is originated")
     pr_currency = forms.CharField(label=_("PR Currency"), max_length=100, required=True,
         help_text="<span style='color:red'>*</span> This the currency in which the transaction occurs.")

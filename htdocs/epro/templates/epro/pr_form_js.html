@@ -1,7 +1,8 @@
 <script type = "text/javascript">
     "use strict";
     var users;
-    var approverOne
+    var approverOne;
+    var approverTwo;
 
     $(document).ready(function() { 
         $("#id_country").select2({ placeholder: 'Originating Country', allowClear: true, });
@@ -61,9 +62,8 @@
             placeholder: "Fund Approver1", 
             allowClear: true,
             selectOnBlur: true,
-
             formatNoMatches: function(term) {
-                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverOneNotFoundLink' class='btn btn-default btn-xs' data-approver-one-not-found=" + term + " onclick='searchForApproverOne();'> <span class='glyphicon glyphicon-search'></span> Search</a>";
+                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverOneNotFoundLink' class='btn btn-default btn-xs' data-approver-not-found=" + term + " onclick='searchForApprover(1);'> <span class='glyphicon glyphicon-search'></span> Search</a>";
             },
             /*
             //Allow manually entered text in drop down.
@@ -77,46 +77,62 @@
             */
         });
 
-        $("#id_approverTwo").select2({
-            //data: users,
-            query: function(query) {
-                query.callback({results: data});
-            },
+        approverTwo = $("#id_approverTwo").select2({
+            data: users,
             placeholder: "Fund Approve2", 
             allowClear: true,
-
             formatNoMatches: function(term) {
-                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverOneNotFoundLink' class='btn btn-default btn-xs' data-approver-one-not-found=" + term + " onclick='searchForApproverOne();'> <span class='glyphicon glyphicon-search'></span> Search</a>";
+                return "No matches found! Write the complete email address of the person you are searching for and then click on the Search button. <a href='#' id='approverTwoNotFoundLink' class='btn btn-default btn-xs' data-approver-not-found=" + term + " onclick='searchForApprover(2);'> <span class='glyphicon glyphicon-search'></span> Search</a>";
             },
         });
         $("#id_project_reference").focus();
-        
     });
 
-    function searchForApproverOne() {
-        
-        var email = ($("#approverOneNotFoundLink").data("approverOneNotFound"));
+    function searchForApprover(approver_number) {
+        var email;
+        var new_user_already_exist = false;
+        if (approver_number == 1) {
+            email = ($("#approverOneNotFoundLink").data("approverNotFound"));
+        } else {
+            email = ($("#approverTwoNotFoundLink").data("approverNotFound"));
+        }
         var url = '/api/v1/users/?email=' + $.trim(email);
         $.getJSON(url, function(user) {
             if (user.length > 0) {
-                var new_user = {'id': user[0].id, 'text': user[0].userprofile.name};                
-                users.push(new_user);
+                var new_user = {'id': user[0].id, 'text': user[0].userprofile.name};    
+                $.each(users, function(k,v) {
+                    if (new_user['id'] == v['id']) {
+                        new_user_already_exist = true;
+                    }
+                });
+                if (new_user_already_exist == false) {
+                    users.push(new_user);
+                }
 
                 // Create the custom event object
                 var evt = $.Event("select2-selecting", {
                     val: new_user.id,
                     data: new_user
                 });
+                if (approver_number == 1) {
+                    // Fire the custom even to update the dropdown.
+                    approverOne.select2("data", new_user).trigger(evt);
 
-                // Fire the custom even to update the dropdown.
-                approverOne.select2("data", new_user).trigger(evt);
+                    // make the new user to be the selected option
+                    approverOne.select2('val', new_user.id);
+                    approverOne.select2('close');
+                } else {
+                    // Fire the custom even to update the dropdown.
+                    approverTwo.select2("data", new_user).trigger(evt);
 
-                // make the new user to be the selected option
-                approverOne.select2('val', new_user.id);
-                approverOne.select2('close');
+                    // make the new user to be the selected option
+                    approverTwo.select2('val', new_user.id);
+                    approverTwo.select2('close');
+                }
             } else {
                 console.log("no one found with email, " + email);
             }
         });
     }
+
 </script>
