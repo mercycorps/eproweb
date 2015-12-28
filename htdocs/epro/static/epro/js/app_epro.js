@@ -1,6 +1,6 @@
 
 $(document).ready(function() { 
-    alert("OK");
+    console.log("eProApp loaded");
 });
 
 
