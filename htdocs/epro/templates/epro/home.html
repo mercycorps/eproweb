@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{%load humanize %}
+{% load customtags %}
+
+{% block extra-css %}
+    <!-- Custom Application css -->
+    <link href="{% static 'epro/css/epro_app.css' %}" rel="stylesheet" type="text/css">
+{% endblock extra-css %}
+
+{% block eProAppMenu %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">ePro<b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        <li><a href="{% url 'pr_new' %}" id='add_new_pr_link'><span class="glyphicon glyphicon-plus"></span> New PR for Goods</a></li>
+        <li><a class="{{ prs_monthly_tab }}" href="#"><span class="glyphicon glyphicon-file"></span> New PR for Services</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#"><span class="glyphicon glyphicon-list"></span> My PRs</a></li>
+    </ul>
+</li>
+{% endblock eProAppMenu %}
+
+{% block content %}
+    <h4>eProApp</h4>
+    
+    {% block epro_content %}
+
+    {% endblock epro_content %}
+
+{% endblock content %}
+
+{% block extra_js %}
+    <script type="text/javascript" src="{% static 'epro/js/app_epro.js' %}"></script>
+    {% block epro_extra_js %}
+
+    {% endblock epro_extra_js %}
+{% endblock extra_js %}

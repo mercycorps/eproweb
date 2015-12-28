@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'epro/home.html' %}
 {% load staticfiles %}
-{% block content %}
+{% block epro_content %}
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">Purchase Request List</h3>
@@ -54,9 +54,9 @@
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock epro_content %}
 
-{% block extra_js %}
+{% block epro_extra_js %}
 <script type="text/javascript">
 "use strict";
     $(document).ready(function() {
@@ -75,4 +75,4 @@
     });
 
 </script>
-{% endblock extra_js %}
+{% endblock epro_extra_js %}

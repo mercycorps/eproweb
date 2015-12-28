@@ -1,10 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'epro/home.html' %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
 {%load humanize %}
 {% load customtags %}
 
-{% block content %}
+{% block epro_content %}
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -175,9 +175,9 @@
     </div>
 </div>
 
-{% endblock content %}
+{% endblock epro_content %}
 <!-- http://damienfremont.com/2014/12/19/how-to-expandcollapse-table-rows-with-bootstrap/ -->
-{% block extra_js %}
+{% block epro_extra_js %}
 <script type = "text/javascript">
 
     $(function () {
@@ -301,4 +301,4 @@
             });
     });
 </script>
-{% endblock extra_js %}
+{% endblock epro_extra_js %}

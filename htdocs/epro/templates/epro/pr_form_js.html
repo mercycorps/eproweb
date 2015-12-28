@@ -7,24 +7,6 @@
     $(document).ready(function() { 
         $("#id_country").select2({ placeholder: 'Originating Country', allowClear: true, });
 
-        /*
-        office_dropdown = $("#id_office");
-        office_dropdown.empty();
-        office_dropdown.append("<option value=''></option>");
-        var offices = $.parseJSON(`{{offices|safe}}`);
-        $.each(offices, function(index, office) {
-            office_dropdown.append($('<option>', {value: office.id, text: office.name}));
-        });
-
-        // if there is only a single office for this country, then select it by default
-        var num_offices = $('#id_office > option').length;
-        if (num_offices == 2) {
-            $("#id_office").val($("#id_office option:eq(1)").val()).trigger('change');
-        }
-        office_dropdown.select2({ placeholder: "Originating Office", allowClear: true, });
-
-        */
-
         var offices = $.parseJSON(`{{offices|safe}}`);
         $("#id_originating_office").select2({
             data: offices,
