@@ -40,8 +40,10 @@ function show_django_ajax_messages(json, whereToAppend) {
  * Every time the Country dropdown changes, update the Office dropdown options
  */
 $('body').on('change', 'select#id_country', function(e) {
-    update_office_select($(this).val());
-    update_currency_select($(this).val());
+    //update_office_select($(this).val());
+    //update_currency_select($(this).val());
+    update_originating_office($(this).val());
+    update_pr_currency($(this).val());
 });
 
 
@@ -80,6 +82,40 @@ function update_currency_select(country_id) {
         $("select#id_currency").val('').trigger("change");
     });
     return true;
+}
+
+
+function update_originating_office(country_id) {
+    var url = '/api/v1/offices/?country=' + country_id;
+    var office_dropdown = $("#id_originating_office").select2('data', '').trigger('change');
+    $.getJSON(url, function(offices) {
+        office_dropdown.select2({
+            data: offices,
+            placeholder: "Originating Office", 
+            allowClear: true,
+        });
+        if (offices.length == 1) {
+            office_dropdown.select2('val', offices[0].id);
+        }
+    });
+    
+}
+
+
+function update_pr_currency(country_id) {
+    var url = '/api/v1/currencies/?country=' + country_id;
+    var currency_dropdown= $("#id_pr_currency").select2('data', '').trigger('change');
+    $.getJSON(url, function(currencies) {
+        currency_dropdown.select2({
+            data: currencies,
+            placeholder: "PR Currency", 
+            allowClear: true,
+        });
+        if (currencies.length == 1) {
+            currency_dropdown.select2('val', currencies[0].id);
+        }
+    });
+    
 }
 
 

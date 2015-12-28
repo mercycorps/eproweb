@@ -53,8 +53,10 @@ class PurchaseRequestMixin(object):
     Common code between PurchaseRequestCreateView and PurchaseRequestUpdateView is absracted
     into this Mixin
     """
+
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestMixin, self).get_context_data(**kwargs)
+        #html_from_view = OfficeViewSet.as_view({'get': 'list'})(self.request).render().content
         country_id = self.object.country.pk if self.object else self.request.user.userprofile.country.pk
         #serializer = FlatJsonSerializer()
         #context['offices'] = serializer.serialize(Office.objects.filter(country=country_id), fields=('id', 'name'))

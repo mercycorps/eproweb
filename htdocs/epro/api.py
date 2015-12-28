@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
-
+from django.db.models import F
 from epro.models import Country, Region
 from epro.serializers import *
 
@@ -34,7 +34,7 @@ class OfficeViewSet(viewsets.ModelViewSet):
     serializer_class = OfficeSerializer
 
     def get_queryset(self):
-        queryset = Office.objects.all()
+        queryset = Office.objects.all().annotate(text=F('name')).values('id', 'text')
         country_id = self.request.query_params.get('country', None)
         if country_id:
             queryset = queryset.filter(country=country_id)
@@ -49,7 +49,7 @@ class CurrencyViewSet(viewsets.ModelViewSet):
     serializer_class = CurrencySerializer
 
     def get_queryset(self):
-        queryset = Currency.objects.all()
+        queryset = Currency.objects.all().annotate(text=F('code')).values('id', 'text')
         country_id = self.request.query_params.get('country', None)
         if country_id:
             queryset = queryset.filter(country=country_id)

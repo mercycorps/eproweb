@@ -41,19 +41,38 @@ class FlatJsonSerializer(PythonSerializer):
 
 
 class CurrencySerializer(serializers.ModelSerializer):
+    text = serializers.SerializerMethodField('get_alternate_name')
+
     class Meta:
         model = Currency
-        fields = ('id', 'name', 'code', 'country', 'created_by', 'updated_by')
+        #fields = ('id', 'name', 'code', 'country', 'created_by', 'updated_by')
+        fields = ('id', 'text')
+
+    def get_alternate_name(self, obj):
+        return obj['text']
 
 
 class OfficeSerializer(serializers.ModelSerializer):
+    text = serializers.SerializerMethodField('get_alternate_name')
+
+    class Meta:
+        model = Office
+        fields = ('id', 'text')
+
+    def get_alternate_name(self, obj):
+        return obj['text']
+
+
+
+
+class OfficeSerializer2(serializers.ModelSerializer):
     class Meta:
         model = Office
         fields = ('id', 'name', 'long_name', 'country')
 
 
 class CountrySerializer(serializers.ModelSerializer):
-    offices = OfficeSerializer(many=True)
+    offices = OfficeSerializer2(many=True)
 
     class Meta:
         model = Country
