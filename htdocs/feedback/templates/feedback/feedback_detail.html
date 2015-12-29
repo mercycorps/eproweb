@@ -1,0 +1,15 @@
+{% extends 'feedback/home.html' %}
+{% load staticfiles %}
+
+{% block feedback_page_header %}
+
+{% endblock %}
+
+{% block feedback_content %}
+
+<blockquote>
+    <h3>{{ feedback.summary }}</h3>
+    <p>{{ feedback.description }}</p>
+    <p><small>{{ feedback.reporter }} on {{ feedback.created }}</small></p>
+</blockquote>
+{% endblock feedback_content %}

@@ -35,4 +35,4 @@ class FeedbackCreateView(SuccessMessageMixin, CreateView):
 
 class FeedbackDetailView(DetailView):
     model = Feedback
-    template_name = "feedback/feedback_list.html"
+    template_name = "feedback/feedback_detail.html"

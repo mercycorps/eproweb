@@ -5,17 +5,26 @@
 {% load customtags %}
 
 {% block extra-css %}
-    <!-- Custom Application css 
-    <link href="{% static 'feedback/css/app_feedback.css' %}" rel="stylesheet" type="text/css">-->
+    <!-- Custom Application css -->
+    <link href="{% static 'feedback/css/app_feedback.css' %}" rel="stylesheet" type="text/css">
 {% endblock extra-css %}
 
 {% block content %}
     <!-- <h4>FeedbackApp</h4> -->
+    {% block feedback_page_header %}
+        
+    {% endblock feedback_page_header %}
 
-    {% block feedback_content %}
+    <div class="row">
+        <div class="col-sm-9" style="border-right:0.5px solid #ccc">
+            {% block feedback_content %}
 
-    {% endblock feedback_content %}
-
+            {% endblock feedback_content %}
+        </div>
+        <div class="col-sm-3">
+            <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default btn-sm">Report New Issue</a>
+        </div>
+    </div>
 {% endblock content %}
 
 {% block extra_js %}

@@ -1,17 +1,16 @@
 {% extends 'feedback/home.html' %}
 {% load staticfiles %}
-{% block feedback_content %}
 
+{% block feedback_page_header %}
     <div class="page-header" align="center" style="margin-top: 5px;">
         <h4>Recent Reported Issues
             <small><p>
             Before creating a new issue, search through the issues that are already reported issues
             </p></small>
         </h4>
-        
     </div>
-    <div class="row">
-        <div class="col-sm-9" style="border-right:0.5px solid #ccc">
+{% endblock %}
+{% block feedback_content %}
             {% for f in feedback %}
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -23,7 +22,7 @@
                     <div class="panel-body">
                         {{ f.description|truncatechars_html:250 }}
                     </div>
-                    <div class="panel-footer"><small><strong>Tags:</strong>
+                    <div class="panel-footer"><small><strong><span class="glyphicon glyphicon-tags"></span> Tags:</strong>
                         {% for t in f.tags.all %}
                             <a href="/search/?q={{ t.name }}"> {{ t.name }}</a> {% if not forloop.last %} ,  {% endif %}
                         {% endfor %}
@@ -34,11 +33,9 @@
                     <h3>No issues reported yet.</h3>
                     <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default">Report Issue</a>
                 {% endfor %}
-        </div>
-        <div class="col-sm-3">
-            <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default btn-sm">Report Issue</a>
-        </div>
-    </div>
+
+        
+
 
 
 {% endblock feedback_content %}
