@@ -15,6 +15,22 @@ from crispy_forms.bootstrap import FormActions, AppendedText
 from .models import Country, Office, UserProfile, Feedback
 
 
+"""
+A generic method used for setting up similar bootstrap properties on crispy forms
+"""
+def setup_boostrap_helpers(formtag=False):
+    helper = FormHelper()
+    helper.form_class = 'form-horizontal'
+    helper.label_class = 'col-sm-2'
+    helper.field_class = 'col-sm-10'
+    helper.html5_required = True
+    helper.form_show_labels = True
+    helper.error_text_inline = True
+    helper.help_text_inline = True
+    helper.form_show_errors = True
+    helper.form_tag = formtag
+    return helper
+
 
 class FeedbackForm(forms.ModelForm):
     class Meta:

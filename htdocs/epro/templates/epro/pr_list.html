@@ -67,19 +67,26 @@
         </div>
     </div>
 </div>
+
 {% endblock epro_content %}
 
 {% block epro_extra_js %}
 <script type="text/javascript">
 "use strict";
     $(document).ready(function() {
-        $("#prs_table").DataTable();
+        var table = $("#prs_table").DataTable({
+            "oLanguage": {
+                "sSearch": '',
+                "sSearchPlaceholder": "Search ",
+            }
+        });
         /*
         setTimeout(function(){
             $("#prs_table").DataTable();
         }, 3000); 
         */
     });
+    
 
     $('body').on('click', 'a#edit_pr_link', function(e) {
         e.preventDefault();

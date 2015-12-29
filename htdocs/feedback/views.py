@@ -22,16 +22,17 @@ class FeedbackListView(ListView):
     context_object_name = 'feedback'
 
 
-class FeedbackCreateView(CreateView):
+class FeedbackCreateView(SuccessMessageMixin, CreateView):
     model = Feedback
     form_class = FeedbackForm
-    template_name = 'epro/feedback.html'
-    success_message = "Your request: %(summary)s is sent."
+    template_name = 'feedback/feedback.html'
+    success_message = "Thank you for providing feedback."
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
         return super(FeedbackCreateView, self).form_valid(form)
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, summary=self.object.summary)
 
+class FeedbackDetailView(DetailView):
+    model = Feedback
+    template_name = "feedback/feedback_list.html"

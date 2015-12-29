@@ -1,19 +1,58 @@
 {% extends 'feedback/home.html' %}
 {% load staticfiles %}
 {% block feedback_content %}
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">Feedback List</h3>
-    </div>
-    
-    <div class="panel-body">
-        <div class="table-responsive">
 
+    <div class="page-header" align="center" style="margin-top: 5px;">
+        <h4>Recent Reported Issues
+            <small><p>
+            Before creating a new issue, search through the issues that are already reported issues
+            </p></small>
+        </h4>
+        
+    </div>
+    <div class="row">
+        <div class="col-sm-9" style="border-right:0.5px solid #ccc">
+            {% for f in feedback %}
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            {{ f.summary }}
+                        </h4>
+                        <small>Reported on {{ f.created }} bu {{ f.reporter }}</small>
+                    </div>
+                    <div class="panel-body">
+                        {{ f.description|truncatechars_html:250 }}
+                    </div>
+                    <div class="panel-footer"><small><strong>Tags:</strong>
+                        {% for t in f.tags.all %}
+                            <a href="/search/?q={{ t.name }}"> {{ t.name }}</a> {% if not forloop.last %} ,  {% endif %}
+                        {% endfor %}
+                        <a class="pull-right" href="{{ f.get_absolute_url }}">Continue reading...</a></small>
+                    </div>
+                </div>
+                {% empty %}
+                    <h3>No issues reported yet.</h3>
+                    <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default">Report Issue</a>
+                {% endfor %}
+        </div>
+        <div class="col-sm-3">
+            <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default btn-sm">Report Issue</a>
         </div>
     </div>
-</div>
+
+
 {% endblock feedback_content %}
 
 {% block feedback_extra_js %}
-
+    <!-- any js that is is specific to this page goes here.. -->
+<script type="text/javascript">
+"use strict";
+$('body').on('click', 'a#id_add_feedback_link', function(e) {
+    e.preventDefault();
+    $("#app_modal_div_content_div").load($(this).attr("href"));
+    $('#app_modal_div').modal('show');
+});
+</script>
 {% endblock feedback_extra_js %}
+
+
