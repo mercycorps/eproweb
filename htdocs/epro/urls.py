@@ -9,7 +9,7 @@ from epro.views import *
 
 
 urlpatterns = [
-    url(r'^$', PurchaseRequestListView.as_view(), name='pr_ist'),
+    url(r'^$', PurchaseRequestListView.as_view(), name='pr_list'),
 
     url(r'^pr/add/$', PurchaseRequestCreateView.as_view(), name='pr_new'),
     url(r'^pr/edit/(?P<pk>\d+)/$', PurchaseRequestUpdateView.as_view(), name='pr_edit'),

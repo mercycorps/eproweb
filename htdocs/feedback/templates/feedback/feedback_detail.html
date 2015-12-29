@@ -6,10 +6,19 @@
 {% endblock %}
 
 {% block feedback_content %}
-
+<nav>
+  <ul class="pager">
+    <li class="previous"><a href="{% url 'feedback_ist' %}"><span aria-hidden="true">&larr;</span> Back to Issues List</a></li>
+    <!--<li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>-->
+  </ul>
+</nav>
 <blockquote>
     <h3>{{ feedback.summary }}</h3>
     <p>{{ feedback.description }}</p>
+    {% if feedback.reference %}
+        <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
+    {% endif %}
     <p><small>{{ feedback.reporter }} on {{ feedback.created }}</small></p>
 </blockquote>
+
 {% endblock feedback_content %}

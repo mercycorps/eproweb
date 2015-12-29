@@ -11,32 +11,28 @@
     </div>
 {% endblock %}
 {% block feedback_content %}
-            {% for f in feedback %}
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            {{ f.summary }}
-                        </h4>
-                        <small>Reported on {{ f.created }} bu {{ f.reporter }}</small>
-                    </div>
-                    <div class="panel-body">
-                        {{ f.description|truncatechars_html:250 }}
-                    </div>
-                    <div class="panel-footer"><small><strong><span class="glyphicon glyphicon-tags"></span> Tags:</strong>
-                        {% for t in f.tags.all %}
-                            <a href="/search/?q={{ t.name }}"> {{ t.name }}</a> {% if not forloop.last %} ,  {% endif %}
-                        {% endfor %}
-                        <a class="pull-right" href="{{ f.get_absolute_url }}">Continue reading...</a></small>
-                    </div>
-                </div>
-                {% empty %}
-                    <h3>No issues reported yet.</h3>
-                    <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default">Report Issue</a>
+    {% for f in feedback %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    {{ f.summary }}
+                </h4>
+                <small>Reported on {{ f.created }} by {{ f.reporter }}</small>
+            </div>
+            <div class="panel-body">
+                {{ f.description|truncatechars_html:250 }}
+            </div>
+            <div class="panel-footer"><small><strong><span class="glyphicon glyphicon-tags"></span> Tags:</strong>
+                {% for t in f.tags.all %}
+                    <a href="/search/?q={{ t.name }}"> {{ t.name }}</a> {% if not forloop.last %} ,  {% endif %}
                 {% endfor %}
-
-        
-
-
+                <a class="pull-right" href="{{ f.get_absolute_url }}">More...</a></small>
+            </div>
+        </div>
+    {% empty %}
+        <h3>No issues reported yet.</h3>
+        <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-default">Report Issue</a>
+    {% endfor %}
 
 {% endblock feedback_content %}
 

@@ -1,3 +1,6 @@
+.pager {
+    margin: 0px;
+}
 .orderStatus { 
     padding: 10px; overflow: hidden; 
 }
