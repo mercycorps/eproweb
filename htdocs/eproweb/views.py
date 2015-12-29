@@ -12,8 +12,13 @@ class HomeView(TemplateView):
     template_name='index.html'
 
     def get(self, request, *args, **kwargs):
-        messages.success(self.request, "Hey, I'm Okay.")
+        #messages.success(self.request, "Hey, I'm Okay.")
         return super(HomeView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(HomeView, self).get_context_data(**kwargs)
+        context['home'] = 'active_tab'
+        return context
 
 
 def handler404(request):

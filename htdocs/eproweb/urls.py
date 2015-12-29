@@ -40,7 +40,8 @@ router.register(r'currencies', CurrencyViewSet, base_name='currency')
 
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
+    #url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
+    url(r'^$', HomeView.as_view(), name='home'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r'^api/v1/', include(router.urls)),
@@ -49,6 +50,7 @@ urlpatterns = [
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout', kwargs={'next_page': '/'}),
     url(r'^health/$', 'eproweb.views.health_view', name='health'),
     url(r'^epro/', include('epro.urls')),
+    url(r'^feedback/', include('feedback.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

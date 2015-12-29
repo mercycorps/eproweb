@@ -14,7 +14,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Reset, Button, HTML, Layout, Field, Div, Column
 from crispy_forms.bootstrap import FormActions, AppendedText
 
-from .models import Country, Office, Currency, UserProfile, PurchaseRequest, Item, FinanceCodes, Feedback
+from .models import Country, Office, Currency, UserProfile, PurchaseRequest, Item, FinanceCodes
 
 
 """
@@ -229,19 +229,3 @@ class FinanceCodesForm(forms.ModelForm):
                 css_class="row",
             ),
         )
-
-
-class FeedbackForm(forms.ModelForm):
-    class Meta:
-        model = Feedback
-        fields = ['reporter_role', 'issue_type', 'summary', 'description', 'reference']
-        widgets = {'description': Textarea(attrs={'cols': 30, 'rows': 3}),}
-
-    def __init__(self, *args, **kwargs):
-        super(FeedbackForm, self).__init__(*args, **kwargs)
-        self.helper = setup_boostrap_helpers(formtag=True)
-        self.helper.form_id = 'id_feedback_form'
-        self.helper.form_action = reverse_lazy('feedback')
-        self.helper.label_class = 'col-sm-3'
-        self.helper.field_class = 'col-sm-9'
-        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))

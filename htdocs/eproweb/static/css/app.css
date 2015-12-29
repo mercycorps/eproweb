@@ -72,3 +72,7 @@ body.loading {
 body.loading .ajax_loading {
     display: block;
 }
+
+.active_tab {
+    background-color: #e6e6e6;
+}

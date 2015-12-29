@@ -13,25 +13,12 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import *
 from .forms import *
-from .mixins import AjaxFormResponseMixin, LoginRequiredMixin, PurchaseRequestMixin
+from .mixins import AjaxFormResponseMixin, LoginRequiredMixin, PurchaseRequestMixin, PurchaseRequestActiveTabMixin
 from .serializers import FlatJsonSerializer
-
-class FeedbackCreateView(LoginRequiredMixin, AjaxFormResponseMixin, SuccessMessageMixin, CreateView):
-    model = Feedback
-    form_class = FeedbackForm
-    template_name = 'epro/feedback.html'
-    success_message = "Your request: %(summary)s is sent."
-
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user.userprofile
-        return super(FeedbackCreateView, self).form_valid(form)
-
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data, summary=self.object.summary)
 
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin,
-            AjaxFormResponseMixin, PurchaseRequestMixin, CreateView):
+            AjaxFormResponseMixin, PurchaseRequestActiveTabMixin, PurchaseRequestMixin, CreateView):
     """ PR Create View """
     success_message = "PR for %(project_reference)s created successfully."
 
@@ -51,7 +38,7 @@ class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin,
 
 
 class PurchaseRequestUpdateView(LoginRequiredMixin, SuccessMessageMixin,
-        AjaxFormResponseMixin, PurchaseRequestMixin, UpdateView):
+        AjaxFormResponseMixin, PurchaseRequestActiveTabMixin, PurchaseRequestMixin, UpdateView):
     """ PR Update View """
     success_message = "PR for %(project_reference)s updated successfully."
 
@@ -76,7 +63,7 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, SuccessMessageMixin,
         return kwargs
 
 
-class PurchaseRequestDetailView(DetailView):
+class PurchaseRequestDetailView(PurchaseRequestActiveTabMixin, DetailView):
     """ PR Detail View """
     model = PurchaseRequest
     template_name = 'epro/pr_view.html'
@@ -90,7 +77,7 @@ class PurchaseRequestDetailView(DetailView):
         return context
 
 
-class PurchaseRequestListView(ListView):
+class PurchaseRequestListView(PurchaseRequestActiveTabMixin, ListView):
     """
     PR List View
     """

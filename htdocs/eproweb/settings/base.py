@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'djangocosign',
     'epro',
+    'feedback',
 )
 
 MIDDLEWARE_CLASSES = (

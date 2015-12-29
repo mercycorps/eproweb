@@ -526,34 +526,3 @@ class PurchaseRecord(CommonBaseAbstractModel):
     # tender_yes_no
     #
     pass
-
-
-class Feedback(CommonBaseAbstractModel):
-    ISSUE_BUG = 'bug'
-    TYPE_FEATURE = 'feature'
-    TYPE_GENERAL = 'general'
-    ISSUE_TYPE_CHOICES = (
-        (TYPE_GENERAL, 'General Feedback'),
-        (TYPE_FEATURE, 'Feature Request'),
-        (ISSUE_BUG, 'Bug'),
-    )
-    REPORTER_ROLE_CHOICES = (
-        ('originator', 'Originator'),
-        ('procurement_manager', 'Procurement Manager'),
-        ('procurement', 'Procurement'),
-        ('finance', 'Finance'),
-        ('approving_manager', 'Approving Manager'),
-    )
-    reporter_role = models.CharField(max_length=50, choices=REPORTER_ROLE_CHOICES, null=False, blank=False, verbose_name='Your Role')
-    issue_type = models.CharField(max_length=50, choices=ISSUE_TYPE_CHOICES, null=False, blank=False)
-    summary = models.CharField(max_length=80, null=False, blank=False, help_text="Provide a one sentence summary of the issue")
-    description = models.CharField(max_length=500, null=False, blank=False,
-        help_text="Provide detail description of the problem/bug including steps to replicate it; if it is a feature request, describe how the feature should work and what probelm will it solve")
-    reference = models.URLField(null=True, blank=True,
-        help_text="Include the link to the page, where the bug/problem occurs or if applicable where the feature should be implemented")
-
-    def get_absolute_url(self):
-        return reverse_lazy('pr_view', kwargs={'pk': 1})
-
-    class Meta:
-        verbose_name = 'User Feedback'

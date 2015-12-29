@@ -56,8 +56,12 @@
                     <div class="navbar-collapse collapse" role=navigation">
                         <!-- LOGO AND APP MENU OPTIONS -->
                         <ul class="nav navbar-nav">
-                            <li class="{{ home_tab }}"><a href="{% url 'pr_ist' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                            {% block eProAppMenu %} {% endblock %}
+                            <li class="{{ home }}">
+                                <a href="{% url 'home' %}"><span class="glyphicon glyphicon-home"></span> Home</a>
+                            </li>
+                            <li class="{{ procurement }}">
+                                <a href="{% url 'pr_ist' %}"><span class="glyphicon glyphicon-list {{ is_active_tab }}"></span> Procurement</a>
+                            </li>
                         </ul>
                         <!-- END OF LOGO AND APP MENU OPTIONS -->
 
@@ -144,15 +148,6 @@
         </div> <!-- END modal fade -->
 
 
-        <div class="modal fade" id="feedback_form_modal_div" tabindex="-1" role="dialog" aria-labelledby="feedback_form_modal_div_label" aria-hidden="true">
-            <div class="modal-dialog modal-md">
-                <div class="modal-content"> 
-                
-                    <!-- feedback form will be inserted here -->
-                </div> <!-- END modal-content -->
-            </div><!-- END modal-dialog -->
-        </div> <!-- END modal fade -->
-
         <!-- modal for delete confirmation -->
         <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmDelete" aria-hidden="true">
             <div class="modal-dialog">
@@ -183,7 +178,7 @@
                     Mercy Corps {% now "Y" %}
                 </span>
                 <span style="float:right; padding: 20px; " class="text-muted">
-                    <a href="{% url 'feedback' %}" id="feedback_btn" class="text-muted" data-toggle="modal" data-target="#feedback_form_modal_div">Feedback</a>
+                    <a href="{% url 'feedback_ist' %}" id="feedback_btn" class="text-muted">Feedback</a>
                 </span>
             </div>
         </footer>

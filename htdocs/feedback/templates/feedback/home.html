@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{%load humanize %}
+{% load customtags %}
+
+{% block extra-css %}
+    <!-- Custom Application css 
+    <link href="{% static 'feedback/css/app_feedback.css' %}" rel="stylesheet" type="text/css">-->
+{% endblock extra-css %}
+
+{% block feedback_app_menu %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Feedback<b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        <li><a href="{% url 'feedback_add' %}" id='add_new_feedback'><span class="glyphicon glyphicon-plus"></span> New Feedback</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#"><span class="glyphicon glyphicon-list"></span> View Existing Feedback</a></li>
+    </ul>
+</li>
+{% endblock feedback_app_menu %}
+
+{% block content %}
+    <h4>FeedbackApp</h4>
+    
+    {% block feedback_content %}
+
+    {% endblock feedback_content %}
+
+{% endblock content %}
+
+{% block extra_js %}
+
+    {% block feedback_extra_js %}
+
+    {% endblock feedback_extra_js %}
+{% endblock extra_js %}

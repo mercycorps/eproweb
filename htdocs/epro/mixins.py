@@ -41,6 +41,12 @@ class AjaxFormResponseMixin(object):
         else:
             return response
 
+class PurchaseRequestActiveTabMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(PurchaseRequestActiveTabMixin, self).get_context_data(**kwargs)
+        context['procurement'] = "active_tab"
+        return context
+
 
 class PurchaseRequestMixin(object):
     model = PurchaseRequest

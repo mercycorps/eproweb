@@ -3,8 +3,21 @@
 {% block epro_content %}
 <div class="panel panel-primary">
     <div class="panel-heading">
+        <div role="group" class="btn-group btn-group-xs pull-right">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class= "glyphicon glyphicon-menu-hamburger"> </span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'pr_new' %}" id='add_new_pr_link' class="text-muted" style="color: #006400 !important;"><span class="glyphicon glyphicon-plus"></span> New PR for Goods</a></li>
+                <li class="divider"></li>
+                <li><a href="#" id="pr_cancel_btn" class="text-muted" style="color: #b30000 !important;"><span class="glyphicon glyphicon-exclamation-sign"></span> Cancel</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title">Purchase Request List</h3>
+        <div class="clearfix"></div>
     </div>
+    
     <div class="panel-body">
         <div class="table-responsive">
             <table id="prs_table" class="table table-bordered table-striped table-hover table-condensed">
