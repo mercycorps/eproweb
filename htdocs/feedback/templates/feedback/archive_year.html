@@ -1,0 +1,19 @@
+{% extends 'feedback/feedback_list.html' %}
+
+{% block feedback_page_header %}
+    <div class="page-header" align="center" style="margin-top: 5px;">
+        <h4>Issues by Year
+            <small><p>
+            A list of all issues reported by the selected year.
+            </p></small>
+        </h4>
+    </div>
+    <nav>
+        <ul class="pager">
+            <li class="previous"><a href="{% url 'feedback_list' %}"><span aria-hidden="true">&larr;</span> Back to Issues List</a></li>
+            <!--<li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>-->
+        </ul>
+    </nav>
+{% endblock %}
+
+

@@ -22,15 +22,86 @@
             {% endblock feedback_content %}
         </div>
         <div class="col-sm-3">
-            <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus
-glyphicon"></span> Report New Issue</a>
+            <div class="input-group">
+                <input name="q" value="" placeholder="Search" class="form-control" type="search">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit" id="filter-clear">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </span>
+            </div>
+            <br />
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-info"><strong>Issues</strong>
+                    <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-primary btn-xs pull-right"><span class="glyphicon glyphicon-plus"></span> New Issue</a>
+                    <div class="clearfix"></div>
+                </li>
+                <a href="{% url 'feedback_filter' %}?created_by={{ user.userprofile.pk }}" class="list-group-item"><span class="badge">{{my_issues_count}}</span> My Issues</a>
+            </ul>
+
+            <div class="list-group">
+                <span href="#" class="list-group-item list-group-item-info"><strong>Issues by Year/Month</strong></span>
+                <ul class="list-group">
+                {% for year, months in archive_data.items %}
+                    {% if year %}
+                        <li class="tree-toggler list-group-item">
+                            <span class="glyphicon glyphicon-plus" style="cursor:pointer"></span>&nbsp; &nbsp;<a href="{% url 'yearly' year %}">{{ year }}</a><span class="badge pull-right">{{ months.0 }}</span>
+                            <ul class = "tree" style="display: none;">
+                            {% for month in months.1 %}
+                                <a href="{% url 'monthly' year month.0 %}" class="list-group-item">  {{month.0}}<span class="badge pull-right"> {{month.1}} </span></a>
+                            {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            </div>
+
+            <div class="list-group">
+                <span href="#" class="list-group-item list-group-item-info"><strong>Filter Issues by Type</strong></span>
+                {% for t in issue_types %}
+                    <a href="{% url 'feedback_filter' %}?type={{t.id}}" class="list-group-item"> 
+                        {{ t.issue_type }}<span class="badge pull-right"> {{t.frequency}} </span></a>
+                {% endfor %}
+            </div>
+
+            <div class="list-group">
+                <span href="#" class="list-group-item list-group-item-info"><strong>Filter Issues by Status</strong></span>
+                {% for s in issues_by_status %}
+                    <a href="{% url 'feedback_filter' %}?status={{s.id}}" class="list-group-item"> 
+                        {{ s.status }}<span class="badge pull-right"> {{s.frequency}} </span></a>
+                {% endfor %}
+            </div>
+
+            <div id="tag_cloud" class="panel panel-info">
+                <div class="panel-heading"><strong>Filter Issues by Tag</strong></div>
+                <div class="panel-body">
+                    {% for t in tags %}
+                        <a href="{% url 'feedback_filter' %}?tag={{t.id}}" style="font-size: {{ t.fontsize }}em" title="# of issues using this tag: {{ t.frequency }}"><font color="{{ t.color }}">{{ t.tag }}</font></a>
+                    {% endfor %}
+                </div>
+            </div>
+
         </div>
     </div>
+    
 {% endblock content %}
 
+
 {% block extra_js %}
-
+    <!--<script type="text/javascript" src="{% static 'feedback/js/app_feedback.js' %}"></script>-->
+    <script type = "text/javascript">
+    "use strict";
+    $(document).ready(function() { 
+        /* Register click event on the category tree and toggle its visibility */
+        $('li.tree-toggler').click(function () {
+            //$(this).parent().children('ul.tree').toggle(300);
+            $(this).children('ul.tree').toggle(300);
+            $(this).children('span').eq(0).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+        });
+    });
+    </script>
     {% block feedback_extra_js %}
-
+        
     {% endblock feedback_extra_js %}
 {% endblock extra_js %}

@@ -24,7 +24,7 @@
             </div>
             <div class="panel-footer"><small><strong><span class="glyphicon glyphicon-tags"></span> Tags:</strong>
                 {% for t in f.tags.all %}
-                    <a href="/search/?q={{ t.name }}"> {{ t.name }}</a> {% if not forloop.last %} ,  {% endif %}
+                    <a href="{% url 'feedback_filter' %}?tag={{t.id}}"><span class="label label-success"> {{ t.tag }}</span></a>
                 {% endfor %}
                 <a class="pull-right" href="{{ f.get_absolute_url }}">More...</a></small>
             </div>
