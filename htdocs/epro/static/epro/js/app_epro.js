@@ -49,7 +49,7 @@ function update_pr_currency(country_id) {
 }
 
 
-$('body').on('click', 'a#add_new_pr_link, a#pr_edit_btn', function(e) {
+$('body').on('click', 'a.add_new_pr_link, a#pr_edit_btn', function(e) {
     e.preventDefault();
     $("#app_modal_div_content_div").load($(this).attr("href"));
     $('#app_modal_div').modal('show');

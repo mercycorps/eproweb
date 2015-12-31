@@ -84,7 +84,6 @@ class Tag(CommonBaseAbstractModel):
 
 
 class Feedback(CommonBaseAbstractModel):
-    reporter = models.ForeignKey(UserProfile, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE)
     reporter_role = models.ForeignKey(ReporterRole, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE)
     issue_type = models.ForeignKey(IssueType, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE)
     summary = models.CharField(max_length=80, null=False, blank=False, help_text="Provide a one sentence summary of the issue")
@@ -98,9 +97,7 @@ class Feedback(CommonBaseAbstractModel):
     annotation = models.CharField(max_length=250, null=True, blank=True, help_text="Notes for the person working on resolving this issue.")
     votes_up = models.PositiveIntegerField(default=0, blank=True, null=True)
     votes_dn = models.PositiveIntegerField(default=0, blank=True, null=True)
-
-    def get_absolute_url(self):
-        return reverse_lazy('feedback', kwargs={'pk': self.pk})
+    #TODO: Allow attachments to be uploaded to Google Drive
 
     def __unicode__(self):
         return u'%s' % self.summary
@@ -116,3 +113,15 @@ class Feedback(CommonBaseAbstractModel):
         Used when we need to link to a specific feedback entry.
         """
         return reverse_lazy('feedback_view', kwargs={'pk': self.pk}) #args=[str(self.id)])
+
+
+class FeedbackVotesByUser(CommonBaseAbstractModel):
+    """
+    This model keeps track of users votes per issue/feedback to make sure someone does not vote more than once
+    """
+    voter = models.ForeignKey(UserProfile, blank=True, null=True, related_name="votes")
+    feedback = models.ForeignKey(Feedback, blank=True, null=True, related_name="votes")
+    voted = models.BooleanField(null=False, blank=False)
+
+    class Meta:
+        unique_together = (("voter", "feedback"),)

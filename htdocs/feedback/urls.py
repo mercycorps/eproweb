@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^archive/recent/$', FeedbackArchiveIndexView.as_view(), name='recent'),
     url(r'^archive/monthly/(?P<year>\d{4})/(?P<month>[a-z, A-Z]{3})/$', FeedbackMonthArchiveView.as_view(), name="monthly"),
     url(r'^archive/yearly/(?P<year>\d{4})/$', FeedbackYearArchiveView.as_view(), name="yearly"),
+
+    url(r'^vote/$', FeedbackVotesByUserView.as_view(), name='vote'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

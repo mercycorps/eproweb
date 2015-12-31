@@ -9,7 +9,7 @@
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="{% url 'pr_new' %}" id='add_new_pr_link' class="text-muted" style="color: #006400 !important;"><span class="glyphicon glyphicon-plus"></span> New PR for Goods</a></li>
+                <li><a href="{% url 'pr_new' %}" class="text-muted add_new_pr_link" style="color: #006400 !important;"><span class="glyphicon glyphicon-plus"></span> New PR for Goods</a></li>
                 <li class="divider"></li>
                 <li><a href="#" id="pr_cancel_btn" class="text-muted" style="color: #b30000 !important;"><span class="glyphicon glyphicon-exclamation-sign"></span> Cancel</a></li>
             </ul>
@@ -65,6 +65,14 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="panel-footer" id="pr_panel_footer_div">
+        <nav>
+            <ul class="pager">
+                <li class="next"><a href="{% url 'pr_new' %}" type="button" class="btn btn-default add_new_pr_link"><span class="glyphicon glyphicon-plus"> </span> Create New PR</a></li>
+            </ul>
+        </nav>
+        
     </div>
 </div>
 

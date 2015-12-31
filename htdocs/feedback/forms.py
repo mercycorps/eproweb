@@ -35,7 +35,7 @@ def setup_boostrap_helpers(formtag=False):
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
-        fields = ['reporter', 'reporter_role', 'issue_type', 'summary', 'description', 'reference']
+        fields = ['reporter_role', 'issue_type', 'summary', 'description', 'reference']
         widgets = {'description': Textarea(attrs={'cols': 30, 'rows': 3}),}
 
     def __init__(self, *args, **kwargs):

@@ -1,15 +1,15 @@
 from django.shortcuts import render
-
+from django.http import JsonResponse
 from django.views.generic import TemplateView, FormView, View, DeleteView, CreateView
 from django.views.generic.dates import ArchiveIndexView, MonthArchiveView, YearArchiveView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-
 from django.utils import timezone
 
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 
-from .models import Feedback
+from .models import Feedback, FeedbackVotesByUser
 from .forms import *
 from .mixins import FeedbackMixin
 from .utils import prepare_query_params
@@ -26,7 +26,6 @@ class FeedbackListView(FeedbackMixin, ListView):
     def get_queryset(self):
         kwargs = prepare_query_params(self.request.GET)
         qs = Feedback.objects.filter(**kwargs)
-        print(kwargs)
         return qs
 
 class FeedbackCreateView(SuccessMessageMixin, CreateView):
@@ -80,3 +79,53 @@ class FeedbackMonthArchiveView(FeedbackMixin, MonthArchiveView):
     template_name = "feedback/archive_month.html"
     context_object_name = 'feedback'
 
+
+class FeedbackVotesByUserView(View):
+
+    def dispatch(self, *args, **kwargs):
+        is_vote_change = False
+        feedback_id = self.request.GET.get("feedback_id", None)
+        if feedback_id is None:
+            messages.error(self.request, "Nothing to vote on")
+            return JsonResponse({"error": "Nothing to vote on"})
+
+        feedback = Feedback.objects.get(pk=feedback_id)
+        vote_value = self.request.GET.get("voted", None)
+        if vote_value == "None" or vote_value == "false" or vote_value == 0:
+            voted = False
+        else:
+            voted = True
+        user_vote, created = FeedbackVotesByUser.objects.get_or_create(
+            voter=self.request.user.userprofile, feedback=feedback, defaults={'voted': voted})
+
+        if not created:
+            # Do Not allow double voting for the same feedback_id and same user_id
+            if voted and user_vote.voted or not voted and not user_vote.voted:
+                messages.error(self.request, "You can change your vote but cannot double it.")
+                return JsonResponse({"error": "You can change your vote but cannot double it."})
+
+            # If the db value for voted is not the same as the voted values just received from browser then it is a vote change so allow it.
+            is_vote_change = True
+            user_vote.voted = voted
+            user_vote.updated_by = self.request.user.userprofile
+            user_vote.save()
+
+        if is_vote_change:
+            if voted:
+                # reduce the count by one for undoing previous vote
+                feedback.votes_dn = int(feedback.votes_dn) - 1
+            else:
+                # reduce the count by one for undoing previous vote
+                feedback.votes_up = int(feedback.votes_up) - 1
+
+        # now bump up the the value for this new change/addition
+        if voted:
+            feedback.votes_up = int(feedback.votes_up) + 1
+        else:
+            feedback.votes_dn = int(feedback.votes_dn) + 1
+
+        # Finally save it.
+        feedback.save()
+        messages.success(self.request, "Your vote has been saved")
+
+        return JsonResponse({"votes_up_count": feedback.votes_up, "votes_dn_count": feedback.votes_dn})

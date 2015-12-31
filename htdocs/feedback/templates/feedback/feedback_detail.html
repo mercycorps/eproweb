@@ -18,7 +18,45 @@
     {% if feedback.reference %}
         <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
     {% endif %}
-    <p><small>{{ feedback.reporter }} on {{ feedback.created }}</small></p>
+    <p class="pull-right">
+        <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote up">
+            <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=true" id="vote_up_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;</a>
+            <span id="votes_up_count">{{ feedback.votes_up }}</span>
+        </span>
+        &nbsp;
+        <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote down">
+            <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=false" id="vote_dn_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;</a>
+            <span id="votes_dn_count">{{ feedback.votes_dn }}</span>
+        </span>
+    </p>
+    <div class="clearfix"></div>
+    <p><small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small></p>
 </blockquote>
 
 {% endblock feedback_content %}
+
+
+{% block feedback_extra_js %}
+<script type = "text/javascript">
+    "use strict";
+
+    $('blockquote').on('click', '#vote_up_link', function(e) {
+        e.preventDefault();
+        $.post($(this).attr('href'))
+            .done(function(data, textStatus, jqXHR) {
+                $("#votes_dn_count").text(data['votes_dn_count']);
+                $("#votes_up_count").text(data['votes_up_count']);
+            });
+        
+    });
+
+    $('blockquote').on('click', '#vote_dn_link', function(e) {
+        e.preventDefault();
+        $.post($(this).attr('href'))
+            .done(function(data, textStatus, jqXHR) {
+                $("#votes_dn_count").text(data['votes_dn_count']);
+                $("#votes_up_count").text(data['votes_up_count']);
+            });
+    });
+</script>
+{% endblock feedback_extra_js %}

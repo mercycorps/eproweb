@@ -93,6 +93,9 @@
     <script type = "text/javascript">
     "use strict";
     $(document).ready(function() { 
+        //initialize all tooltips.
+        $('[data-toggle="tooltip"]').tooltip();
+
         /* Register click event on the category tree and toggle its visibility */
         $('li.tree-toggler').click(function () {
             //$(this).parent().children('ul.tree').toggle(300);
