@@ -33,7 +33,7 @@
             <br />
             <ul class="list-group">
                 <li class="list-group-item list-group-item-info"><strong>Issues</strong>
-                    <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-primary btn-xs pull-right"><span class="glyphicon glyphicon-plus"></span> New Issue</a>
+                    <a href="{% url 'feedback_add' %}" id="id_add_feedback_link"class="btn btn-warning btn-xs pull-right"><span class="glyphicon glyphicon-plus"></span> New Issue</a>
                     <div class="clearfix"></div>
                 </li>
                 <a href="{% url 'feedback_filter' %}?created_by={{ user.userprofile.pk }}" class="list-group-item"><span class="badge">{{my_issues_count}}</span> My Issues</a>

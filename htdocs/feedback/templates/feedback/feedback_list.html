@@ -17,7 +17,7 @@
                 <h4 class="panel-title">
                     {{ f.summary }}
                 </h4>
-                <small>Reported on {{ f.created }} by {{ f.reporter }}</small>
+                <small>Reported on {{ f.created }} by {{ f.created_by }}</small>
             </div>
             <div class="panel-body">
                 {{ f.description|truncatechars_html:250 }}
