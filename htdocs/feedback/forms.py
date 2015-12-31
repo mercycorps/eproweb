@@ -55,7 +55,10 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['feedback'].widget = forms.HiddenInput()
         self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper.form_show_labels = False
+        self.helper.field_class = 'col-sm-12'
         self.helper.form_id = 'id_comment_form'
         self.helper.form_action = reverse_lazy('comment_add')
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
@@ -63,3 +66,4 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("feedback", "content", )
+        widgets = {'content': forms.Textarea(attrs={'rows': 3, 'placeholder': "Type your comment here"})}

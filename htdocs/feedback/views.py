@@ -46,7 +46,7 @@ class FeedbackDetailView(FeedbackMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(FeedbackDetailView, self).get_context_data(**kwargs)
         context['comment_tree'] = Comment.objects.filter(feedback=self.object.pk).order_by('-path')
-        context['form'] = CommentForm
+        context['form'] = CommentForm(initial={'feedback': self.object})
         return context
 
 class FeedbackArchiveIndexView(FeedbackMixin, ArchiveIndexView):
@@ -88,11 +88,12 @@ class FeedbackMonthArchiveView(FeedbackMixin, MonthArchiveView):
 class CommentCreateView(FeedbackMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = "feedbac/comment_create.html"
+    template_name = "feedback/feedback_detail.html"
     context_object_name = "comment"
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
+        print("feedback: %s" % form.cleaned_data['feedback'])
         temp = form.save(commit=False)
         parent = form['parent'].value()
         if parent == '':
@@ -111,6 +112,7 @@ class CommentCreateView(FeedbackMixin, CreateView):
             temp.path.append(temp.id)
         #Final save for parents and children
         temp.save()
+
         return super(CommentCreateView, self).form_valid(form)
 
 

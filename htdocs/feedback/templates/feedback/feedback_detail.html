@@ -37,13 +37,13 @@
 
 
 
-<h1>Threaded Comments</h1>
+<h3>Threaded Comments</h3>
     {% crispy form %}
     <ul id="commenters">
-    {% for c in comment_tree %}     
-        <li id="{{c.id}}" class="c" style="margin-left:{{c.depth|add:c.depth}}em;">
-            <p class="poster">Anonymous - {{c.date|naturaltime}}</p>
-            <p>{{c.content}}</p>
+    {% for comment in comment_tree %}     
+        <li id="{{comment.id}}" class="comment" style="margin-left:{{comment.depth|add:comment.depth}}em;">
+            <p class="poster">{{ comment.created_by }} - {{comment.created|naturaltime}}</p>
+            <p>{{comment.content}}</p>
             <p><a href="" class="reply">reply</a></p>
         </li>
     {% empty %}
@@ -81,6 +81,8 @@
         $("#commenters").on("click", ".reply", function(event){
             event.preventDefault();
             var form = $("#id_comment_form").clone(true);
+            
+            // set the parent text box value
             form.find('.parent').val($(this).parent().parent().attr('id'));
             $(this).parent().append(form);
         });

@@ -142,8 +142,11 @@ class Comment(CommonBaseAbstractModel):
         func = lambda x: int(x)
         self.path = smart_list(self.path, func=func)
 
-
-
+    def get_absolute_url(self):
+        """
+        Used when we need to link to a specific feedback entry.
+        """
+        return reverse_lazy('feedback_view', kwargs={'pk': self.feedback.pk})
 
 
 class FeedbackVotesByUser(CommonBaseAbstractModel):
