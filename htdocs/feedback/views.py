@@ -9,8 +9,8 @@ from django.utils import timezone
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
-from .models import Feedback, FeedbackVotesByUser
-from .forms import *
+from .models import Feedback, FeedbackVotesByUser, Comment
+from .forms import FeedbackForm, CommentForm
 from .mixins import FeedbackMixin
 from .utils import prepare_query_params
 
@@ -43,6 +43,11 @@ class FeedbackDetailView(FeedbackMixin, DetailView):
     model = Feedback
     template_name = "feedback/feedback_detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(FeedbackDetailView, self).get_context_data(**kwargs)
+        context['comment_tree'] = Comment.objects.filter(feedback=self.object.pk).order_by('-path')
+        context['form'] = CommentForm
+        return context
 
 class FeedbackArchiveIndexView(FeedbackMixin, ArchiveIndexView):
     """
@@ -78,6 +83,35 @@ class FeedbackMonthArchiveView(FeedbackMixin, MonthArchiveView):
     #month_format='%m' # month number
     template_name = "feedback/archive_month.html"
     context_object_name = 'feedback'
+
+
+class CommentCreateView(FeedbackMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "feedbac/comment_create.html"
+    context_object_name = "comment"
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user.userprofile
+        temp = form.save(commit=False)
+        parent = form['parent'].value()
+        if parent == '':
+            #Set a blank path then save it to get an ID
+            temp.path = []
+            temp.save()
+            temp.path = [temp.id]
+        else:
+            #Get the parent node
+            node = Comment.objects.get(id=parent)
+            temp.depth = node.depth + 1
+            temp.path = eval(str(node.path))
+
+            #Store parents path then apply comment ID
+            temp.save()
+            temp.path.append(temp.id)
+        #Final save for parents and children
+        temp.save()
+        return super(CommentCreateView, self).form_valid(form)
 
 
 class FeedbackVotesByUserView(View):
@@ -126,6 +160,6 @@ class FeedbackVotesByUserView(View):
 
         # Finally save it.
         feedback.save()
-        messages.success(self.request, "Your vote has been saved")
+        #messages.success(self.request, "Your vote has been saved")
 
         return JsonResponse({"votes_up_count": feedback.votes_up, "votes_dn_count": feedback.votes_dn})

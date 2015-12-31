@@ -8,6 +8,10 @@ from django.utils.timezone import utc
 
 from djangocosign.models import Country, Office, UserProfile
 
+from .utils import smart_list
+
+
+
 class CommonBaseAbstractModel(models.Model):
     created_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_created")
     updated_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_updated")
@@ -115,6 +119,33 @@ class Feedback(CommonBaseAbstractModel):
         return reverse_lazy('feedback_view', kwargs={'pk': self.pk}) #args=[str(self.id)])
 
 
+class Comment(CommonBaseAbstractModel):
+    feedback = models.ForeignKey(Feedback, related_name="comments", null=False, blank=False, on_delete=models.CASCADE)
+    content = models.CharField(max_length=254, null=False, blank=False)
+    path = models.CommaSeparatedIntegerField(max_length=250, null=False, blank=False, editable=False)
+    depth = models.PositiveIntegerField(default=0)
+
+    def __unicode__(self):
+        return u'%s' % self.content
+
+    def __str__(self):
+        return '%s' % self.content
+
+    class Meta:
+        verbose_name = 'Comment'
+
+    def clean_csv_fields(self):
+        """Convert all the CommaSeparatedIntegerField values to lists."""
+        # this function is applied to each element in the list
+        # in this case just cast it to an integer, ensuring that
+        # we get a list of ints back out
+        func = lambda x: int(x)
+        self.path = smart_list(self.path, func=func)
+
+
+
+
+
 class FeedbackVotesByUser(CommonBaseAbstractModel):
     """
     This model keeps track of users votes per issue/feedback to make sure someone does not vote more than once
@@ -125,3 +156,4 @@ class FeedbackVotesByUser(CommonBaseAbstractModel):
 
     class Meta:
         unique_together = (("voter", "feedback"),)
+

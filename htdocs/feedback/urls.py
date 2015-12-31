@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^archive/yearly/(?P<year>\d{4})/$', FeedbackYearArchiveView.as_view(), name="yearly"),
 
     url(r'^vote/$', FeedbackVotesByUserView.as_view(), name='vote'),
+
+    url(r'^comment/add/$', CommentCreateView.as_view(), name='comment_add'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
