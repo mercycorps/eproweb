@@ -1,3 +1,7 @@
-blockquote {
+blockquote.issue {
     border-left: 5px solid #EA8E04;
+}
+
+blockquote.comment {
+    border-left: 5px solid #F0C789;
 }

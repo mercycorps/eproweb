@@ -93,7 +93,6 @@ class CommentCreateView(FeedbackMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
-        print("feedback: %s" % form.cleaned_data['feedback'])
         temp = form.save(commit=False)
         parent = form['parent'].value()
         if parent == '':

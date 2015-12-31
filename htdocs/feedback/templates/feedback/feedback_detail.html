@@ -8,48 +8,46 @@
 {% endblock %}
 
 {% block feedback_content %}
-<nav>
-  <ul class="pager">
-    <li class="previous"><a href="{% url 'feedback_list' %}"><span aria-hidden="true">&larr;</span> Back to Issues List</a></li>
-    <!--<li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>-->
-  </ul>
-</nav>
-<blockquote>
-    <h3>{{ feedback.summary }}</h3>
-    <p>{{ feedback.description }}</p>
-    {% if feedback.reference %}
-        <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
-    {% endif %}
-    <p class="pull-right">
-        <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote up">
-            <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=true" id="vote_up_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;</a>
-            <span id="votes_up_count">{{ feedback.votes_up }}</span>
-        </span>
-        &nbsp;
-        <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote down">
-            <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=false" id="vote_dn_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;</a>
-            <span id="votes_dn_count">{{ feedback.votes_dn }}</span>
-        </span>
-    </p>
-    <div class="clearfix"></div>
-    <p><small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small></p>
-</blockquote>
+    <nav>
+      <ul class="pager">
+        <li class="previous"><a href="{% url 'feedback_list' %}"><span aria-hidden="true">&larr;</span> Back to Issues List</a></li>
+        <!--<li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>-->
+      </ul>
+    </nav>
+    <blockquote class="issue">
+        <h3>{{ feedback.summary }}</h3>
+        <p>{{ feedback.description }}</p>
+        {% if feedback.reference %}
+            <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
+        {% endif %}
+        <p class="pull-right">
+            <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote up">
+                <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=true" id="vote_up_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;</a>
+                <span id="votes_up_count">{{ feedback.votes_up }}</span>
+            </span>
+            &nbsp;
+            <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote down">
+                <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=false" id="vote_dn_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;</a>
+                <span id="votes_dn_count">{{ feedback.votes_dn }}</span>
+            </span>
+        </p>
+        <div class="clearfix"></div>
+        <p><small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small></p>
+    </blockquote>
 
-
-
-<h3>Threaded Comments</h3>
     {% crispy form %}
-    <ul id="commenters">
-    {% for comment in comment_tree %}     
-        <li id="{{comment.id}}" class="comment" style="margin-left:{{comment.depth|add:comment.depth}}em;">
-            <p class="poster">{{ comment.created_by }} - {{comment.created|naturaltime}}</p>
-            <p>{{comment.content}}</p>
-            <p><a href="" class="reply">reply</a></p>
-        </li>
-    {% empty %}
+
+    <div id="commenters">
+        {% for comment in comment_tree %}
+            <blockquote id="{{comment.id}}" class="comment" style="margin-left:{{comment.depth|add:comment.depth}}em;">
+                <p>{{comment.content}}</p>
+                <p class="poster"><small>{{ comment.created_by }} - {{comment.created|naturaltime}} <a href="" class="reply">reply</a></small> </p>
+            </blockquote>
+        {% empty %}
         <li>There are currently no comments. You can be first!</li>
     {% endfor %}
-    </ul>
+    </div>
+
 
 {% endblock feedback_content %}
 
@@ -81,9 +79,9 @@
         $("#commenters").on("click", ".reply", function(event){
             event.preventDefault();
             var form = $("#id_comment_form").clone(true);
-            
+
             // set the parent text box value
-            form.find('.parent').val($(this).parent().parent().attr('id'));
+            form.find('.parent').val($(this).parent().parent().parent().attr('id'));
             $(this).parent().append(form);
         });
     });
