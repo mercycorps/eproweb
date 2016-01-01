@@ -20,7 +20,14 @@ def get_feedback_archive_info(self):
     """
     This is to ge a count of feedback entries by month and year.
     """
-    feedback_entries = Feedback.objects.raw("select id, year(created) as year, month(created) as month, count(id) as num_entries from feedback_feedback  group by month order by year, month")
+    #feedback_entries = Feedback.objects.raw("select id, year(created) as year, month(created) as month, count(id) as num_entries from feedback_feedback  group by month order by year, month")
+    feedback_entries = Feedback.objects.all().\
+        annotate(year=DateTime("created", "year", pytz.timezone("Etc/UTC"))).\
+        annotate(month=DateTime("created", "month", pytz.timezone("Etc/UTC"))).\
+        values("year", "month").\
+        annotate(year_count=Count('year')).\
+        annotate(month_count=Count('month')).\
+        order_by("-year")
     prev_year = None
     years = {}
     months = []
