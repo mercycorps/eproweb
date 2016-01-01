@@ -88,14 +88,15 @@ class Tag(CommonBaseAbstractModel):
 
 
 class Feedback(CommonBaseAbstractModel):
-    reporter_role = models.ForeignKey(ReporterRole, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE)
-    issue_type = models.ForeignKey(IssueType, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE)
-    summary = models.CharField(max_length=80, null=False, blank=False, help_text="Provide a one sentence summary of the issue")
+    issue_type = models.ForeignKey(IssueType, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE,
+        help_text="<span style='color:red'>*</span> Select the type of issue your are reporting.")
+    summary = models.CharField(max_length=80, null=False, blank=False,
+        help_text="<span style='color:red'>*</span> Provide a one sentence summary of the issue")
     description = models.CharField(max_length=254, null=False, blank=False,
-        help_text="Provide detail description of the problem/bug including steps to replicate it; if it is a feature request, describe how the feature should work and what probelm will it solve")
+        help_text="<span style='color:red'>*</span> Provide detail description of the problem/bug including steps to replicate it; if it is a feature request, describe how the feature should work and what probelm will it solve")
     reference = models.URLField(null=True, blank=True,
-        help_text="Include the link to the page, where the bug/problem occurs or if applicable where the feature should be implemented")
-    tags = models.ManyToManyField(Tag, related_name='feedback')
+        help_text="Link to the page, where the issue occurs.")
+    tags = models.ManyToManyField(Tag, related_name='feedback', help_text="Apply tags so that it is easier to find it later")
     status = models.ForeignKey(IssueStatus, related_name="feedback", null=True, blank=True, on_delete=models.CASCADE)
     resolution = models.CharField(max_length=254, null=True, blank=True, help_text="Explaining the action taken on this issue")
     annotation = models.CharField(max_length=250, null=True, blank=True, help_text="Notes for the person working on resolving this issue.")

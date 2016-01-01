@@ -4,38 +4,46 @@
 {% load crispy_forms_tags %}
 
 {% block feedback_page_header %}
-
-{% endblock %}
-
-{% block feedback_content %}
     <nav>
       <ul class="pager">
         <li class="previous"><a href="{% url 'feedback_list' %}"><span aria-hidden="true">&larr;</span> Back to Issues List</a></li>
         <!--<li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>-->
       </ul>
     </nav>
+{% endblock %}
+
+{% block feedback_content %}
+
     <blockquote class="issue">
         <h3>{{ feedback.summary }}</h3>
         <p>{{ feedback.description }}</p>
         {% if feedback.reference %}
             <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
         {% endif %}
-        <p class="pull-right">
-            <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote up">
-                <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=true" id="vote_up_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;</a>
-                <span id="votes_up_count">{{ feedback.votes_up }}</span>
-            </span>
-            &nbsp;
-            <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote down">
-                <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=false" id="vote_dn_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;</a>
-                <span id="votes_dn_count">{{ feedback.votes_dn }}</span>
-            </span>
+        
+        
+        <p class="pull-left">
+            <small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small>
+            <div class="pull-right">
+                <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote up">
+                    <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=true" id="vote_up_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;</a>
+                    <span id="votes_up_count">{{ feedback.votes_up }}</span>
+                </span>
+                &nbsp;
+                <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Vote down">
+                    <a href="{% url 'vote' %}?feedback_id={{ feedback.id }}&voted=false" id="vote_dn_link" style="color: white;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;</a>
+                    <span id="votes_dn_count">{{ feedback.votes_dn }}</span>
+                </span>
+            </div>
         </p>
         <div class="clearfix"></div>
-        <p><small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small></p>
     </blockquote>
 
     {% crispy form %}
+
+    <div class="page-header" align="center">
+        <h4><small><p> -- Comments listed below -- </p></small></h4>
+    </div>
 
     <div id="commenters">
         {% for comment in comment_tree %}
@@ -44,11 +52,9 @@
                 <p class="poster"><small>{{ comment.created_by }} - {{comment.created|naturaltime}} <a href="" class="reply">reply</a></small> </p>
             </blockquote>
         {% empty %}
-        <li>There are currently no comments. You can be first!</li>
-    {% endfor %}
+            <div class="alert alert-info" role="alert">There are currently no comments.</div>
+        {% endfor %}
     </div>
-
-
 {% endblock feedback_content %}
 
 
@@ -56,6 +62,7 @@
 <script type = "text/javascript">
     "use strict";
 
+    // Any time someone clicks on the vote up link, vote it up.
     $('blockquote').on('click', '#vote_up_link', function(e) {
         e.preventDefault();
         $.post($(this).attr('href'))
@@ -66,6 +73,7 @@
         
     });
 
+    // Any time someone clicks on the vote down link, vote it down.
     $('blockquote').on('click', '#vote_dn_link', function(e) {
         e.preventDefault();
         $.post($(this).attr('href'))
@@ -76,6 +84,7 @@
     });
 
     $(document).ready(function(){
+        // clone the comment form and put it right below the "reply" that is clicked.
         $("#commenters").on("click", ".reply", function(event){
             event.preventDefault();
             var form = $("#id_comment_form").clone(true);
@@ -83,6 +92,7 @@
             // set the parent text box value
             form.find('.parent').val($(this).parent().parent().parent().attr('id'));
             $(this).parent().append(form);
+            form.find("#id_content").focus();
         });
     });
 </script>

@@ -38,14 +38,7 @@
 
 {% block feedback_extra_js %}
     <!-- any js that is is specific to this page goes here.. -->
-<script type="text/javascript">
-"use strict";
-$('body').on('click', 'a#id_add_feedback_link', function(e) {
-    e.preventDefault();
-    $("#app_modal_div_content_div").load($(this).attr("href"));
-    $('#app_modal_div').modal('show');
-});
-</script>
+
 {% endblock feedback_extra_js %}
 
 

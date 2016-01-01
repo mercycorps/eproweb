@@ -21,10 +21,10 @@ A generic method used for setting up similar bootstrap properties on crispy form
 def setup_boostrap_helpers(formtag=False):
     helper = FormHelper()
     helper.form_class = 'form-horizontal'
-    helper.label_class = 'col-sm-2'
-    helper.field_class = 'col-sm-10'
+    #helper.label_class = 'col-sm-2'
+    helper.field_class = 'col-sm-12'
     helper.html5_required = True
-    helper.form_show_labels = True
+    helper.form_show_labels = False
     helper.error_text_inline = True
     helper.help_text_inline = True
     helper.form_show_errors = True
@@ -35,7 +35,7 @@ def setup_boostrap_helpers(formtag=False):
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
-        fields = ['reporter_role', 'issue_type', 'summary', 'description', 'reference']
+        fields = ['issue_type', 'summary', 'description', 'reference', 'tags']
         widgets = {'description': Textarea(attrs={'cols': 30, 'rows': 3}),}
 
     def __init__(self, *args, **kwargs):
@@ -43,10 +43,42 @@ class FeedbackForm(forms.ModelForm):
         self.helper = setup_boostrap_helpers(formtag=True)
         self.helper.form_id = 'id_feedback_form'
         self.helper.form_action = reverse_lazy('feedback_add')
-        self.helper.label_class = 'col-sm-3'
-        self.helper.field_class = 'col-sm-9'
+        #self.helper.label_class = 'col-sm-3'
+        #self.helper.field_class = 'col-sm-9'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
-
+        self.helper.layout = Layout(
+            Div(
+                Column(
+                    Field('issue_type',),
+                    css_class="col-sm-6",
+                ), Column(
+                    Field('reference',),
+                    css_class="col-sm-6",
+                ),
+                css_class="row",
+            ),
+            Div(
+                Column(
+                    Field('summary'),
+                    css_class="col-sm-12",
+                ),
+                css_class="row",
+            ),
+            Div(
+                Column(
+                    Field('description'),
+                    css_class="col-sm-12",
+                ),
+                css_class="row",
+            ),
+            Div(
+                Column(
+                    Field('tags'),
+                    css_class="col-sm-12",
+                ),
+                css_class="row",
+            ),
+        )
 
 class CommentForm(forms.ModelForm):
     #Hidden value to get a child's parent
