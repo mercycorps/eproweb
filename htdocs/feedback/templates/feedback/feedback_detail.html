@@ -14,8 +14,8 @@
 
 {% block feedback_content %}
 
-    <blockquote class="issue">
-        <h3>{{ feedback.summary }}</h3>
+    <blockquote class="issue" style="font-size: 14px;">
+        <h4>{{ feedback.summary }}</h4>
         <p>{{ feedback.description }}</p>
         {% if feedback.reference %}
             <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
@@ -47,7 +47,7 @@
 
     <div id="commenters">
         {% for comment in comment_tree %}
-            <blockquote id="{{comment.id}}" class="comment" style="margin-left:{{comment.depth|add:comment.depth}}em;">
+            <blockquote id="{{comment.id}}" class="comment" style="font-size: 14px; margin-left:{{comment.depth|add:comment.depth}}em;">
                 <p>{{comment.content}}</p>
                 <p class="poster"><small>{{ comment.created_by }} - {{comment.created|naturaltime}} <a href="" class="reply">reply</a></small> </p>
             </blockquote>

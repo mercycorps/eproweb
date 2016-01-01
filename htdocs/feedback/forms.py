@@ -41,6 +41,7 @@ class FeedbackForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FeedbackForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
+        self.fields['issue_type'].empty_label = ""
         self.helper.form_id = 'id_feedback_form'
         self.helper.form_action = reverse_lazy('feedback_add')
         #self.helper.label_class = 'col-sm-3'

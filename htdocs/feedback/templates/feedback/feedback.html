@@ -23,8 +23,11 @@
     });
 
     $(document).ready(function() { 
-        $("#id_issue_type").select2();
-        $("#id_tags").select2();
+        $("#id_issue_type").select2({ placeholder: 'Issue Type', allowClear: true, });
+        $("#id_tags").select2({ 
+            placeholder: 'Add Tags', 
+            allowClear: true,
+        });
     });
 
     $("#feedback_div").on('submit', "#id_feedback_form", function(e) {
