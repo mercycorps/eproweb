@@ -2,7 +2,7 @@ import json
 import datetime
 import random
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, F
 from .models import Feedback, IssueType, IssueStatus, Tag
 
 class FeedbackMixin(object):
@@ -13,6 +13,8 @@ class FeedbackMixin(object):
         context['issue_types'] = get_issue_types(self)
         context['issues_by_status'] = get_issues_by_status(self)
         context['tags'] = get_tag_cloud(self)
+        tagz = Tag.objects.all().distinct().annotate(text=F('tag')).values('id', 'text')
+        context['tagz'] = json.dumps(list(tagz))
         return context
 
 

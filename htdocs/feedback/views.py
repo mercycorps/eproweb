@@ -28,7 +28,7 @@ class FeedbackListView(FeedbackMixin, ListView):
         qs = Feedback.objects.filter(**kwargs)
         return qs
 
-class FeedbackCreateView(SuccessMessageMixin, CreateView):
+class FeedbackCreateView(SuccessMessageMixin, FeedbackMixin, CreateView):
     model = Feedback
     form_class = FeedbackForm
     template_name = 'feedback/feedback.html'

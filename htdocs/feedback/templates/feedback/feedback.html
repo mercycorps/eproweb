@@ -14,7 +14,6 @@
     </div>
 </div>
 
-
 {% block feedback_extra_js %}
 <script type = "text/javascript">
 
@@ -23,10 +22,22 @@
     });
 
     $(document).ready(function() { 
+        var tags = $.parseJSON(`{{ tagz|safe }}`);
+
         $("#id_issue_type").select2({ placeholder: 'Issue Type', allowClear: true, });
-        $("#id_tags").select2({ 
+        $("#id_tagz").select2({ 
+            data: tags,
             placeholder: 'Add Tags', 
             allowClear: true,
+            tags: true,
+            //Allow manually entered text in drop down.
+            createSearchChoice:function(term, data) {
+                if ( $(data).filter( function() {
+                    return this.text.localeCompare(term)===0;
+                }).length===0) {
+                    return {id:term, text:term};
+                }
+            },
         });
     });
 

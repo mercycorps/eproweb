@@ -33,9 +33,11 @@ def setup_boostrap_helpers(formtag=False):
 
 
 class FeedbackForm(forms.ModelForm):
+    tagz = forms.CharField(label=_('Tags'), max_length=40, required=False,)
+
     class Meta:
         model = Feedback
-        fields = ['issue_type', 'summary', 'description', 'reference', 'tags']
+        fields = ['issue_type', 'summary', 'description', 'reference', 'tagz']
         widgets = {'description': Textarea(attrs={'cols': 30, 'rows': 3}),}
 
     def __init__(self, *args, **kwargs):
@@ -74,7 +76,7 @@ class FeedbackForm(forms.ModelForm):
             ),
             Div(
                 Column(
-                    Field('tags'),
+                    Field('tagz'),
                     css_class="col-sm-12",
                 ),
                 css_class="row",
