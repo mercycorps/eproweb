@@ -1,0 +1,117 @@
+[
+{
+    "fields": {
+        "region": null,
+        "iso_two_letters_code": "US",
+        "updated": null,
+        "name": "United States - Portland",
+        "created": "2016-01-04T22:11:51.552Z"
+    },
+    "model": "djangocosign.country",
+    "pk": 1
+},
+{
+    "fields": {
+        "region": null,
+        "iso_two_letters_code": "XX",
+        "updated": null,
+        "name": "Testing",
+        "created": "2016-01-04T22:11:56.299Z"
+    },
+    "model": "djangocosign.country",
+    "pk": 2
+},
+{
+    "fields": {
+        "updated": null,
+        "name": "AF01",
+        "created": "2016-01-04T22:16:02.657Z",
+        "country": 2,
+        "created_by": 1,
+        "long_name": "Kabul"
+    },
+    "model": "djangocosign.office",
+    "pk": 1
+},
+{
+    "fields": {
+        "updated": null,
+        "name": "AF02",
+        "created": "2016-01-04T22:16:14.027Z",
+        "country": 2,
+        "created_by": 1,
+        "long_name": "Kandahar"
+    },
+    "model": "djangocosign.office",
+    "pk": 2
+},
+{
+    "fields": {
+        "updated": null,
+        "name": "US01",
+        "created": "2016-01-04T22:16:27.643Z",
+        "country": 1,
+        "created_by": 1,
+        "long_name": "Portland"
+    },
+    "model": "djangocosign.office",
+    "pk": 3
+},
+{
+    "fields": {
+        "updated": null,
+        "name": "US02",
+        "created": "2016-01-04T22:16:45.051Z",
+        "country": 1,
+        "created_by": 1,
+        "long_name": "Washington, DC"
+    },
+    "model": "djangocosign.office",
+    "pk": 4
+},
+{
+    "fields": {
+        "updated": null,
+        "modified_by": 1,
+        "name": "Mahmood Khan",
+        "employee_number": 523320,
+        "country": 1,
+        "title": null,
+        "created": "2016-01-04T22:14:00.147Z",
+        "user": 1,
+        "countries": []
+    },
+    "model": "djangocosign.userprofile",
+    "pk": 1
+},
+{
+    "fields": {
+        "updated": null,
+        "modified_by": 2,
+        "name": "Joe Schmoe",
+        "employee_number": 268395,
+        "country": 2,
+        "title": null,
+        "created": "2016-01-04T22:11:56.303Z",
+        "user": 2,
+        "countries": []
+    },
+    "model": "djangocosign.userprofile",
+    "pk": 2
+},
+{
+    "fields": {
+        "updated": null,
+        "modified_by": 3,
+        "name": "Bob Doe",
+        "employee_number": 268395,
+        "country": 2,
+        "title": null,
+        "created": "2016-01-04T22:12:47.332Z",
+        "user": 3,
+        "countries": []
+    },
+    "model": "djangocosign.userprofile",
+    "pk": 3
+}
+]

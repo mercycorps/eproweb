@@ -1,0 +1,134 @@
+[
+{
+    "fields": {
+        "issue_type": "Bug",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:14:53.401Z"
+    },
+    "model": "feedback.issuetype",
+    "pk": 1
+},
+{
+    "fields": {
+        "issue_type": "Feature Request",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:01.697Z"
+    },
+    "model": "feedback.issuetype",
+    "pk": 2
+},
+{
+    "fields": {
+        "issue_type": "Suggestion",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:10.239Z"
+    },
+    "model": "feedback.issuetype",
+    "pk": 3
+},
+{
+    "fields": {
+        "issue_type": "Question",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:14.953Z"
+    },
+    "model": "feedback.issuetype",
+    "pk": 4
+},
+{
+    "fields": {
+        "status": "Open",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:14:12.577Z"
+    },
+    "model": "feedback.issuestatus",
+    "pk": 1
+},
+{
+    "fields": {
+        "status": "In Progress",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:14:21.009Z"
+    },
+    "model": "feedback.issuestatus",
+    "pk": 2
+},
+{
+    "fields": {
+        "status": "Resolved",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:14:35.703Z"
+    },
+    "model": "feedback.issuestatus",
+    "pk": 3
+},
+{
+    "fields": {
+        "status": "Rejected",
+        "updated": null,
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:14:42.136Z"
+    },
+    "model": "feedback.issuestatus",
+    "pk": 4
+},
+{
+    "fields": {
+        "updated": null,
+        "tag": "purchase request",
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:26.315Z"
+    },
+    "model": "feedback.tag",
+    "pk": 1
+},
+{
+    "fields": {
+        "updated": null,
+        "tag": "form entry",
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:31.494Z"
+    },
+    "model": "feedback.tag",
+    "pk": 2
+},
+{
+    "fields": {
+        "updated": null,
+        "tag": "loading time",
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:42.212Z"
+    },
+    "model": "feedback.tag",
+    "pk": 3
+},
+{
+    "fields": {
+        "updated": null,
+        "tag": "printing",
+        "updated_by": null,
+        "created_by": 1,
+        "created": "2016-01-04T22:15:46.806Z"
+    },
+    "model": "feedback.tag",
+    "pk": 4
+}
+]
