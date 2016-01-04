@@ -44,15 +44,15 @@
             placeholder: 'Add Tags', 
             allowClear: true,
             tags: true,
+            maximumInputLength: 30,
             formatNoMatches: function(term) {
-                var add_btn = "<a href='#' id='tagNotFoundLink' class='btn btn-default btn-xs' data-tag-not-found=" + term + " onclick='addTag();'> <span class='glyphicon glyphicon-plus'></span> Add</a>";
+                var add_btn = "<a href='#' id='tagNotFoundLink' class='btn btn-default btn-xs' onclick='addTag(\""+ term +"\");'> <span class='glyphicon glyphicon-plus'></span> Add</a>";
                 return "No matches found! Press add button to add it as a new tag. " + add_btn; 
             },
         });
     });
 
-    function addTag() {
-        var tag = ($("#tagNotFoundLink").data("tagNotFound"));
+    function addTag(tag) {
         var new_tag = {'id': tag, 'text': tag};
         tagz.push(new_tag);
         tagz_select.val([tagz_select.val(), tag]).trigger("change");

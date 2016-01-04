@@ -1,11 +1,10 @@
-
 from datetime import date, datetime, timedelta
-import datetime, time
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
 
 from django.utils import timezone
-from django.utils.timezone import utc
+#from django.utils.timezone import utc
+from django.utils import timezone
 
 from djangocosign.models import Country, Office, UserProfile
 
@@ -23,7 +22,8 @@ class CommonBaseAbstractModel(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        now_utc = datetime.datetime.utcnow().replace(tzinfo=utc)
+        #now_utc = datetime.datetime.utcnow().replace(tzinfo=utc)
+        now_utc = timezone.now()
         if self.id:
             self.updated = now_utc
         else:
@@ -58,7 +58,7 @@ class IssueStatus(CommonBaseAbstractModel):
 
 
 class Tag(CommonBaseAbstractModel):
-    tag = models.CharField(max_length=20, null=False, blank=False)
+    tag = models.CharField(max_length=30, null=False, blank=False)
 
     def __unicode__(self):
         return u'%s' % self.tag

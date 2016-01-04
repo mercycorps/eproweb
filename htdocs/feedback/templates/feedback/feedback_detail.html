@@ -2,6 +2,8 @@
 {% load humanize %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
+{% load feedbacktags %}
+
 
 {% block feedback_page_header %}
     <nav>
@@ -21,7 +23,7 @@
             <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
         {% endif %}
         
-        
+        <p> Attachment: <a href="{{ MEDIA_URL }}{{ feedback.attachments.all.0.attachment }}"> {{ feedback.attachments.all.0.attachment|filename }}</a></p>
         <p class="pull-left">
             <small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small>
             <div class="pull-right">
