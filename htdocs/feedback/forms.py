@@ -69,7 +69,7 @@ class FeedbackForm(forms.ModelForm):
         self.fields['issue_type'].empty_label = ""
         self.helper.form_id = 'id_feedback_form'
         self.helper.form_action = reverse_lazy('feedback_add')
-        self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
+        #self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.layout = Layout(
             Div(
                 Column(

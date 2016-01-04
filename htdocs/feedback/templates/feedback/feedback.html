@@ -7,17 +7,21 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title" id="myModalLabel">Your feedback is welcome!</h4>
             <p class="text-muted">
-                Your feedback is appreciated. However, not all feedback received will get implemented
+                Please note that all feedback received will not necessarily get implemented
                 in the next release or exactly as requested. Generally, bugs are fixed first followed
-                by issues with the highest number of votes. Therefore, it is wise to find a similar issue
-                and vote it up than creating a duplicate issue.
+                by issues with the highest number of votes.
             </p>
         </div>
         <div class="modal-body">
-<form action="{% url 'feedback_add' %}" class="form-horizontal" method="post" enctype="multipart/form-data">
-            {% crispy form %}
-            {% crispy attachment_formset attachment_formset_helper %}
-</form>
+            <form action="{% url 'feedback_add' %}" class="form-horizontal" method="post" enctype="multipart/form-data">
+                {% crispy form %}
+                {% crispy attachment_formset attachment_formset_helper %}
+                <div class="row">
+                    <div class="controls col-sm-12">
+                        <input name="submit" value="Submit" class="btn btn-primary btn-sm btn-primary" type="submit">
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

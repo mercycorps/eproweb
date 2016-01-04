@@ -4,15 +4,17 @@ from django.views.generic import TemplateView, FormView, View, DeleteView, Creat
 from django.views.generic.dates import ArchiveIndexView, MonthArchiveView, YearArchiveView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.forms import inlineformset_factory
 from django.utils import timezone
 
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
-from .models import Feedback, FeedbackVotesByUser, Comment, Tag, IssueStatus
-from .forms import FeedbackForm, CommentForm
+from .models import Feedback, FeedbackVotesByUser, Comment, Tag, IssueStatus, Attachment
+from .forms import FeedbackForm, CommentForm, AttachmentFormSet, AttachmentFormSetHelper
 from .mixins import FeedbackMixin
 from .utils import prepare_query_params
+
 
 
 class FeedbackListView(FeedbackMixin, ListView):
@@ -28,10 +30,6 @@ class FeedbackListView(FeedbackMixin, ListView):
         qs = Feedback.objects.filter(**kwargs)
         return qs
 
-
-from django.forms import inlineformset_factory
-from .models import Attachment
-from .forms import AttachmentFormSet, AttachmentFormSetHelper
 
 class FeedbackCreateView(SuccessMessageMixin, FeedbackMixin, CreateView):
     model = Feedback
