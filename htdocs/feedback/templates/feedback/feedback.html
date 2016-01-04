@@ -6,43 +6,54 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title" id="myModalLabel">Your feedback is welcome!</h4>
-            <p class="text-muted">Your feedback is appreciated and it helps make the app more useful. However, it is important to understand that all feedback received goes through a selection/prioritization process and, therefore, may not get implemented in the next release or exactly as requested.</p>
+            <p class="text-muted">
+                Your feedback is appreciated. However, not all feedback received will get implemented
+                in the next release or exactly as requested. Generally, bugs are fixed first followed
+                by issues with the highest number of votes. Therefore, it is wise to find a similar issue
+                and vote it up than creating a duplicate issue.
+            </p>
         </div>
         <div class="modal-body">
+<form action="{% url 'feedback_add' %}" class="form-horizontal" method="post" enctype="multipart/form-data">
             {% crispy form %}
+            {% crispy attachment_formset attachment_formset_helper %}
+</form>
         </div>
     </div>
 </div>
 
 {% block feedback_extra_js %}
 <script type = "text/javascript">
+    var tagz;
+    var tagz_select;
 
     $('#app_modal_div').on('shown.bs.modal', function (e) {
         $("#id_reporter_role").select2('focus');
     });
 
     $(document).ready(function() { 
-        var tags = $.parseJSON(`{{ tagz|safe }}`);
-
+        tagz = $.parseJSON(`{{ tagz|safe }}`);
+        
         $("#id_issue_type").select2({ placeholder: 'Issue Type', allowClear: true, });
-        $("#id_tagz").select2({ 
-            data: tags,
+        tagz_select = $("#id_tagz").select2({ 
+            data: tagz,
             placeholder: 'Add Tags', 
             allowClear: true,
+            tags: true,
             formatNoMatches: function(term) {
-                return "No matches found! Press ENTER to add <span class='label label-danger'>" + term  + "</span> as a new tag.";
+                var add_btn = "<a href='#' id='tagNotFoundLink' class='btn btn-default btn-xs' data-tag-not-found=" + term + " onclick='addTag();'> <span class='glyphicon glyphicon-plus'></span> Add</a>";
+                return "No matches found! Press add button to add it as a new tag. " + add_btn; 
             },
         });
-        $("#s2id_autogen2_search").on("keyup", function(e){
-            if (e.keyCode === 13) {
-                var new_tag  = $(this).val();
-                tags.push({'id': new_tag, 'text': new_tag});
-                $("#id_tagz").select2('val', new_tag); 
-                $("#id_tagz").select2('close');
-            }
-        });
     });
-    
+
+    function addTag() {
+        var tag = ($("#tagNotFoundLink").data("tagNotFound"));
+        var new_tag = {'id': tag, 'text': tag};
+        tagz.push(new_tag);
+        tagz_select.val([tagz_select.val(), tag]).trigger("change");
+    }
+
     $("#feedback_div").on('submit', "#id_feedback_form", function(e) {
         e.preventDefault();
         var form_url = $(this).attr('action');

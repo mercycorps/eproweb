@@ -106,6 +106,7 @@ class Feedback(CommonBaseAbstractModel):
         Used when we need to link to a specific feedback entry.
         """
         return reverse_lazy('feedback_view', kwargs={'pk': self.pk}) #args=[str(self.id)])
+        #return reverse_lazy('feedback_list') #args=[str(self.id)])
 
 
 class Comment(CommonBaseAbstractModel):

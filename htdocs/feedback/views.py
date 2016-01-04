@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
-from .models import Feedback, FeedbackVotesByUser, Comment, Tag
+from .models import Feedback, FeedbackVotesByUser, Comment, Tag, IssueStatus
 from .forms import FeedbackForm, CommentForm
 from .mixins import FeedbackMixin
 from .utils import prepare_query_params
@@ -28,14 +28,29 @@ class FeedbackListView(FeedbackMixin, ListView):
         qs = Feedback.objects.filter(**kwargs)
         return qs
 
+
+from django.forms import inlineformset_factory
+from .models import Attachment
+from .forms import AttachmentFormSet, AttachmentFormSetHelper
+
 class FeedbackCreateView(SuccessMessageMixin, FeedbackMixin, CreateView):
     model = Feedback
     form_class = FeedbackForm
     template_name = 'feedback/feedback.html'
     success_message = "Thank you for providing feedback."
 
+    def get_context_data(self, **kwargs):
+        context = super(FeedbackCreateView, self).get_context_data(**kwargs)
+        # if it is a GET request, then include an empty attachment formset
+        if not self.request.POST:
+            attachment_formset = AttachmentFormSet(instance=None)
+            context['attachment_formset'] = attachment_formset
+            context['attachment_formset_helper'] = AttachmentFormSetHelper()
+        return context
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
+        form.instance.status = IssueStatus.objects.get(status="Open")
         self.object = form.save()
         tagz = self.request.POST.get('tagz').split(",")
         for tag_id in tagz:
@@ -45,6 +60,9 @@ class FeedbackCreateView(SuccessMessageMixin, FeedbackMixin, CreateView):
             except ValueError:
                 tag, created = Tag.objects.get_or_create(tag=tag_id, defaults={'created': self.request.user.userprofile})
             self.object.tags.add(tag)
+        attachment_formset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        if attachment_formset.is_valid():
+            attachment_formset.save()
         return super(FeedbackCreateView, self).form_valid(form)
 
 
@@ -65,6 +83,7 @@ class FeedbackArchiveIndexView(FeedbackMixin, ArchiveIndexView):
     queryset = Feedback.objects.all()
     date_field = "created"
     allow_future = True
+    allow_empty = True
     context_object_name = 'feedback'
     template_name = "feedback/feedback_list.html"
 

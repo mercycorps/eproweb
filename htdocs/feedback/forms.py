@@ -12,7 +12,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Reset, Button, HTML, Layout, Field, Div, Column
 from crispy_forms.bootstrap import FormActions, AppendedText
 
-from .models import Country, Office, UserProfile, Feedback, Comment
+from .models import Country, Office, UserProfile, Feedback, Comment, Attachment
 
 
 """
@@ -27,9 +27,32 @@ def setup_boostrap_helpers(formtag=False):
     helper.form_show_labels = False
     helper.error_text_inline = True
     helper.help_text_inline = True
+    helper.render_required_fields = True
     helper.form_show_errors = True
     helper.form_tag = formtag
     return helper
+
+
+AttachmentFormSet = inlineformset_factory(
+        Feedback, Attachment,
+        extra=1,
+        can_delete=False,
+        fields=("attachment", "feedback"))
+
+class AttachmentFormSetHelper(FormHelper):
+    """
+    This is just a helper for the AttachmentFormSet defined above to make it crispier
+    """
+    def __init__(self, *args, **kwargs):
+        super(AttachmentFormSetHelper, self).__init__(*args, **kwargs)
+        self.html5_required = True
+        self.form_class = 'form-horizontal'
+        self.field_class = 'col-sm-12'
+        self.form_tag = False
+        self.render_required_fields = True
+        self.disable_csrf = True
+        self.form_show_labels = False
+
 
 
 class FeedbackForm(forms.ModelForm):
@@ -42,12 +65,10 @@ class FeedbackForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FeedbackForm, self).__init__(*args, **kwargs)
-        self.helper = setup_boostrap_helpers(formtag=True)
+        self.helper = setup_boostrap_helpers(formtag=False)
         self.fields['issue_type'].empty_label = ""
         self.helper.form_id = 'id_feedback_form'
         self.helper.form_action = reverse_lazy('feedback_add')
-        #self.helper.label_class = 'col-sm-3'
-        #self.helper.field_class = 'col-sm-9'
         self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
         self.helper.layout = Layout(
             Div(
