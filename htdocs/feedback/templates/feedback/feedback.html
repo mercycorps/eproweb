@@ -29,18 +29,20 @@
             data: tags,
             placeholder: 'Add Tags', 
             allowClear: true,
-            tags: true,
-            //Allow manually entered text in drop down.
-            createSearchChoice:function(term, data) {
-                if ( $(data).filter( function() {
-                    return this.text.localeCompare(term)===0;
-                }).length===0) {
-                    return {id:term, text:term};
-                }
+            formatNoMatches: function(term) {
+                return "No matches found! Press ENTER to add <span class='label label-danger'>" + term  + "</span> as a new tag.";
             },
         });
+        $("#s2id_autogen2_search").on("keyup", function(e){
+            if (e.keyCode === 13) {
+                var new_tag  = $(this).val();
+                tags.push({'id': new_tag, 'text': new_tag});
+                $("#id_tagz").select2('val', new_tag); 
+                $("#id_tagz").select2('close');
+            }
+        });
     });
-
+    
     $("#feedback_div").on('submit', "#id_feedback_form", function(e) {
         e.preventDefault();
         var form_url = $(this).attr('action');

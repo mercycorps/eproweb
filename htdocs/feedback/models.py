@@ -1,5 +1,6 @@
-import datetime, time
 
+from datetime import date, datetime, timedelta
+import datetime, time
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
 
@@ -43,19 +44,6 @@ class IssueType(CommonBaseAbstractModel):
         verbose_name = 'Issue Type'
 
 
-class ReporterRole(CommonBaseAbstractModel):
-    reporter_role = models.CharField(unique=True, max_length=100, null=False, blank=False)
-
-    def __unicode__(self):
-        return u'%s' % self.reporter_role
-
-    def __str__(self):
-        return '%s' % self.reporter_role
-
-    class Meta(object):
-        verbose_name = 'Reporter Role'
-
-
 class IssueStatus(CommonBaseAbstractModel):
     status = models.CharField(unique=True, max_length=100, null=False, blank=False)
 
@@ -89,7 +77,7 @@ class Tag(CommonBaseAbstractModel):
 
 class Feedback(CommonBaseAbstractModel):
     issue_type = models.ForeignKey(IssueType, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE,
-        help_text="<span style='color:red'>*</span> Select the type of issue your are reporting.")
+        help_text="<span style='color:red'>*</span> The type of issue your are reporting.")
     summary = models.CharField(max_length=80, null=False, blank=False,
         help_text="<span style='color:red'>*</span> Provide a one sentence summary of the issue")
     description = models.CharField(max_length=254, null=False, blank=False,
@@ -160,4 +148,37 @@ class FeedbackVotesByUser(CommonBaseAbstractModel):
 
     class Meta:
         unique_together = (("voter", "feedback"),)
+
+
+class Attachment(CommonBaseAbstractModel):
+    feedback = models.ForeignKey(Feedback, related_name='attachments', on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to='uploads/issues/%Y/%m/%d/', help_text="You may attach a file or screenshot if it helps to explain this issue better.")
+
+    def get_absolute_url(self):
+        """
+        Used when we need to link to a specific blog post.
+        """
+        return reverse_lazy('feedback_view', args=[str(self.feedback.pk)])
+
+
+class Notification(CommonBaseAbstractModel):
+    user = models.ForeignKey(UserProfile, related_name='notifications', null=False, blank=False, on_delete=models.CASCADE)
+    message = models.CharField(max_length=250, null=False, blank=False)
+    color = models.CharField(max_length=7, null=False, blank=False, default="#cccccc")
+    icon = models.CharField(max_length=20, null=False, blank=False, default="info")
+    seen = models.BooleanField(default=False, null=False, blank=False)
+    seen_date = models.DateField(blank=True, null=True)
+    expiration_date = models.DateField(default=date.today()+timedelta(days=30))
+
+    def save(self, *args, **kwargs):
+        notifications = Notification.objects.filter(expiration_date__lte=date.today())
+        if notifications.count() > 30:
+            for n in notifications:
+                n.delete()
+
+
+    def add(klass, users, message):
+        for user in users:
+            notification = klass(user=user, message=message)
+            notification.save()
 

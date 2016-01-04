@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
-from .models import Feedback, FeedbackVotesByUser, Comment
+from .models import Feedback, FeedbackVotesByUser, Comment, Tag
 from .forms import FeedbackForm, CommentForm
 from .mixins import FeedbackMixin
 from .utils import prepare_query_params
@@ -36,6 +36,15 @@ class FeedbackCreateView(SuccessMessageMixin, FeedbackMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
+        self.object = form.save()
+        tagz = self.request.POST.get('tagz').split(",")
+        for tag_id in tagz:
+            try:
+                tag_id = int(tag_id)
+                tag = Tag.objects.get(pk=tag_id)
+            except ValueError:
+                tag, created = Tag.objects.get_or_create(tag=tag_id, defaults={'created': self.request.user.userprofile})
+            self.object.tags.add(tag)
         return super(FeedbackCreateView, self).form_valid(form)
 
 
