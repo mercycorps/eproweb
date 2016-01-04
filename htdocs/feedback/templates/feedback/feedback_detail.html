@@ -22,8 +22,9 @@
         {% if feedback.reference %}
             <div class="alert alert-info" role="alert" style="font-size: 75%;"><strong>Reference </strong> <a href="{{ feedback.reference }}" target="_blank"> {{ feedback.reference }}</a></div>
         {% endif %}
-        
-        <p> Attachment: <a href="{{ MEDIA_URL }}{{ feedback.attachments.all.0.attachment }}"> {{ feedback.attachments.all.0.attachment|filename }}</a></p>
+        {% if feedback.attachments.all %}
+            <p> Attachment: <a href="{{ MEDIA_URL }}{{ feedback.attachments.all.0.attachment }}"> {{ feedback.attachments.all.0.attachment|filename }}</a></p>
+        {% endif %}
         <p class="pull-left">
             <small>Reported by {{ feedback.created_by }} on {{ feedback.created }}</small>
             <div class="pull-right">
