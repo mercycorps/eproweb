@@ -67,6 +67,9 @@ class FeedbackForm(forms.ModelForm):
         super(FeedbackForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=False)
         self.fields['issue_type'].empty_label = ""
+        self.fields['reference'].widget.attrs['placeholder'] = _('Reference')
+        self.fields['summary'].widget.attrs['placeholder'] = _('Summary')
+        self.fields['description'].widget.attrs['placeholder'] = _('Description')
         self.helper.form_id = 'id_feedback_form'
         self.helper.form_action = reverse_lazy('feedback_add')
         #self.helper.add_input(Submit('submit', 'Submit', css_class='btn-sm btn-primary'))
