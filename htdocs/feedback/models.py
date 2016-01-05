@@ -78,7 +78,7 @@ class Tag(CommonBaseAbstractModel):
 class Feedback(CommonBaseAbstractModel):
     issue_type = models.ForeignKey(IssueType, related_name="feedback", null=False, blank=False, on_delete=models.CASCADE,
         help_text="<span style='color:red'>*</span> The type of issue your are reporting.")
-    summary = models.CharField(max_length=80, null=False, blank=False,
+    summary = models.CharField(max_length=120, null=False, blank=False, db_index=True,
         help_text="<span style='color:red'>*</span> Provide a one sentence summary of the issue")
     description = models.CharField(max_length=254, null=False, blank=False,
         help_text="<span style='color:red'>*</span> Provide detail description of the problem/bug including steps to replicate it; if it is a feature request, describe how the feature should work and what probelm will it solve")

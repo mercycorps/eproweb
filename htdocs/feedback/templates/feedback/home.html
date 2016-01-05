@@ -25,9 +25,9 @@
 
         <div class="col-sm-3">
             <div class="input-group">
-                <input name="q" value="" placeholder="Search" class="form-control" type="search">
+                <input id="search" name="search" placeholder="Search" class="form-control" type="search">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="submit" id="filter-clear">
+                    <button class="btn btn-primary" type="submit" id="search_btn">
                         <i class="glyphicon glyphicon-search"></i>
                     </button>
                 </span>
@@ -94,6 +94,7 @@
     <!--<script type="text/javascript" src="{% static 'feedback/js/app_feedback.js' %}"></script>-->
     <script type = "text/javascript">
     "use strict";
+
     $(document).ready(function() { 
         //initialize all tooltips.
         $('[data-toggle="tooltip"]').tooltip();
@@ -104,6 +105,16 @@
             $(this).children('ul.tree').toggle(300);
             $(this).children('span').eq(0).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
         });
+        $("input#search").val(getUrlVars()["search"]);
+    });
+    
+    $('body').on('keyup', 'input#search', function(e) {
+        var key = e.keyCode || e.which;
+        if (key === 13) {
+            var url = `{% url "feedback_filter" %}`;
+            console.log(url +"?search=" + $(this).val());
+            window.location.href = url +"?search=" + $(this).val();;
+        }
     });
     $('body').on('click', 'a#id_add_feedback_link', function(e) {
         e.preventDefault();

@@ -1,5 +1,7 @@
+import operator
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.db.models import Q
 from django.views.generic import TemplateView, FormView, View, DeleteView, CreateView
 from django.views.generic.dates import ArchiveIndexView, MonthArchiveView, YearArchiveView
 from django.views.generic.detail import DetailView
@@ -26,8 +28,13 @@ class FeedbackListView(FeedbackMixin, ListView):
     context_object_name = 'feedback'
 
     def get_queryset(self):
+        search = self.request.GET.get('search', None)
+        # Had to do the following
+        # 1. create fulltext index summary_index on feedback_feedback(summary);
+        # 2. create fulltext index description_index on feedback_feedback(description)
+        args = ( Q( summary__search = search ) | Q( description__search = search ), )
         kwargs = prepare_query_params(self.request.GET)
-        qs = Feedback.objects.filter(**kwargs)
+        qs = Feedback.objects.filter(*args if search else (), **kwargs)
         return qs
 
 
