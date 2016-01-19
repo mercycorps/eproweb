@@ -1,11 +1,11 @@
 {% load crispy_forms_tags %}
 
-<div class="modal-header">
+<div class="modal-header" style="padding: 5px;">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="modal-title">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4>
     <span id="modal_messages"></span>
 </div>
-<div class="modal-body">
+<div class="modal-body" style="padding: 0px 2px 0px 2px;" >
     <!-- Nav tabs -->
     <ul id="pr_items_tabs_ul" class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
@@ -15,59 +15,92 @@
             <a href="#financecodes_tab" aria-controls="finance_codes_form" role="tab" data-toggle="tab"> Finance Codes</a>
         </li>
     </ul>
+
     <!-- Tab panes -->
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy form %}</div>
         <div role="tabpanel" class="tab-pane" id="financecodes_tab">
-            <div class = "table-responsive">
-                <table id="finance_codes_table" class="table table-bordered table-striped table-hover table-condensed">
-                    <tr>
-                        <th style="display:none;">ItemId</th>
-                        <th style="display:none;">FinanceCodesId</th>
-                        <th>GL</th>
-                        <th style="display:none;">FundId</th>
-                        <th>Fund</th>
-                        <th style="display:none;">DeptId</th>
-                        <th>Dept</th>
-                        <th style="display:none;">OfficeId</th>
-                        <th>Office</th>
-                        <th>LIN</th>
-                        <th>Activity</th>
-                        <th>Emp ID</th>
-                        <th>% Alloc</th>
-                        <th style="display:none;"></th>
-                        <th></th>
-                    </tr>
-                    {% for fc in item.finance_codes.all %}
-                        <tr>
-                            <td style="display:none;">{{ item.pk }}</td>
-                            <td style="display:none;">{{ fc.pk }}</td>
-                            <td>{{ fc.gl_account }}</td>
-                            <td style="display:none;">{{ fc.fund_code.pk }}</td>
-                            <td>{{ fc.fund_code }}</td>
-                            <td style="display:none;">{{ fc.dept_code.pk }}</td>
-                            <td>{{ fc.dept_code }}</td>
-                            <td style="display:none;">{{ fc.office_code.pk }}</td>
-                            <td>{{ fc.office_code }}</td>
-                            <td>{{ fc.lin_code }}</td>
-                            <td>{{ fc.activity_code }}</td>
-                            <td>{{ fc.employee_id }}</td>
-                            <td>{{ fc.allocation_percent }}</td>
-                            <td style="display:none;">{{ fc.default_for_new_items }}</td>
-                            <td>
-                                <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
-                                <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+            <div id="finance_codes_list_panel" class="panel panel-default">
+                <div class="panel-heading" style="padding: 5px 2px 5px 5px;">Assigned Cost Allocations
+                    <a role="button" id="add_new_finance_codes_btn" class="btn btn-xs btn-success pull-right" data-toggle="collapse" 
+                        data-parent="#finance_codes_list_panel" href="#financecodes_form_collapse_div" aria-expanded="true" aria-controls="financecodes_form_collapse_div">
+                        <span class="glyphicon glyphicon-plus"></span> Add Finance Dimensions</a>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+                {% if item.finance_codes.all %}
+                    <div class = "table-responsive">
+                        <table id="finance_codes_table" class="table table-bordered table-striped table-hover table-condensed">
+                            <tr>
+                                <th style="display:none;">ItemId</th>
+                                <th style="display:none;">FinanceCodesId</th>
+                                <th>GL</th>
+                                <th style="display:none;">FundId</th>
+                                <th>Fund</th>
+                                <th style="display:none;">DeptId</th>
+                                <th>Dept</th>
+                                <th style="display:none;">OfficeId</th>
+                                <th>Office</th>
+                                <th>LIN</th>
+                                <th>Activity</th>
+                                <th>Emp ID</th>
+                                <th>% Alloc</th>
+                                <th style="display:none;"></th>
+                                <th></th>
+                            </tr>
+                            {% for fc in item.finance_codes.all %}
+                                <tr>
+                                    <td style="display:none;">{{ item.pk }}</td>
+                                    <td style="display:none;">{{ fc.pk }}</td>
+                                    <td>{{ fc.gl_account }}</td>
+                                    <td style="display:none;">{{ fc.fund_code.pk }}</td>
+                                    <td>{{ fc.fund_code }}</td>
+                                    <td style="display:none;">{{ fc.dept_code.pk }}</td>
+                                    <td>{{ fc.dept_code }}</td>
+                                    <td style="display:none;">{{ fc.office_code.pk }}</td>
+                                    <td>{{ fc.office_code }}</td>
+                                    <td>{{ fc.lin_code }}</td>
+                                    <td>{{ fc.activity_code }}</td>
+                                    <td>{{ fc.employee_id }}</td>
+                                    <td>{{ fc.allocation_percent }}</td>
+                                    <td style="display:none;">{{ fc.default_for_new_items }}</td>
+                                    <td>
+                                        <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% else %}
+                    <span class="label label-info"> No Allocations entered yet.</span>
+                {% endif %}
+                <div class="panel-footer" style="padding: 2px;">
+                    {% if item.finance_codes.all %}
+                        <a class="btn btn-xs btn-warning pull-right" href="#">Make Default</a> 
+                        <div class="clearfix"></div>
+                    {% endif %}
+                </div>
+                
             </div>
-            {% crispy finance_codes_form %}
+            <div id="financecodes_form_collapse_div" class="collapse panel panel-default" style="padding: 5px;">
+                {% crispy finance_codes_form %}
+            </div>
+        </div>
     </div>
 </div>
 {% block epro_extra_js %}
 <script type = "text/javascript">
 
+    function resetFinanceCodesForm(){
+        // reset the dropdowns with select2 manually b/c reset button cannot reset them.
+        $("#id_gl_account").val("");
+        $("#id_fund_code").select2().val("").trigger("change");
+        $("#id_dept_code").select2().val("").trigger("change");
+        $("#id_office_code").select2().val("").trigger("change");
+        $("#id_employee_id").val("");
+        $("#id_allocation_percent").val(100);
+    }
     // Upon activating the Item tab, set the quantity field on focus.
     $('#pr_items_tabs_ul a[href="#item_tab"]').on('shown.bs.tab', function (e) {
         $("#id_quantity_requested").focus();
@@ -76,6 +109,7 @@
     // Upon activating the FinanceCodes tab, set the GL_Account field on focus.
     $('#pr_items_tabs_ul a[href="#financecodes_tab"]').on('shown.bs.tab', function (e) {
         $("#id_gl_account").focus();
+        //$("#financecodes_form_collapse_div").collapse("hide");
     });
 
     // Upon clicking the EDIT button FinanceCodes, update the FinanceCodes action url
@@ -106,9 +140,11 @@
         $("#id_default_for_new_items").prop('checked', Boolean($.trim($(tds[13]).text()) == 'True' ));
     });
 
-    // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
-    $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
 
+    // every time somonene clicks the Add New Finance Codes button, set the form action to add
+    $("#financecodes_tab").on("click", "#add_new_finance_codes_btn", function(e) {
+        e.preventDefault();
+        resetFinanceCodesForm();
         {% if item.pk %}
             // reset the form action to add finance codes not edit.
             $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
@@ -117,10 +153,16 @@
             url = url.replace('0', $("#id_finance_codes_form #id_item_id").val());
             $("#id_finance_codes_form").attr("action",  url);
         {% endif %}
-        // reset the dropdowns with select2 manually b/c reset button cannot reset them.
-        $("#id_fund_code").select2().val("").trigger("change");
-        $("#id_dept_code").select2().val("").trigger("change");
-        $("#id_office_code").select2().val("").trigger("change");
+    });
+
+    // every time the finance codes form is shown, set gl_account in focus.
+    $("#financecodes_form_collapse_div").on("shown.bs.collapse", function(e) {
+        $("#id_gl_account").focus();
+    });
+
+    // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
+    $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
+        resetFinanceCodesForm();
     });
 
 </script>

@@ -23,6 +23,7 @@ $( document )
         }
     })
     .ajaxError(function(e, xhr, settings, thrownError) {
+        //console.log("settings: " + settings);
         createAlert("danger", "Error " + xhr.status + ": " +  thrownError, false);
     });
 

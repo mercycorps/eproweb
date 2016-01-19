@@ -179,8 +179,8 @@ class FinanceCodesForm(forms.ModelForm):
     item_id = forms.IntegerField(widget=forms.HiddenInput())
     class Meta:
         model = FinanceCodes
-        fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', 'default_for_new_items', ]
-        labels = {'allocation_percent': _('Allocation %'), 'default_for_new_items': 'Set as Default',}
+        fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
+        labels = {'allocation_percent': _('Allocation %'), }
 
     def __init__(self, *args, **kwargs):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
@@ -208,13 +208,6 @@ class FinanceCodesForm(forms.ModelForm):
                     Field('employee_id',),
                     Field(AppendedText('allocation_percent', '%'),),
                     css_class="col-sm-6",
-                ),
-                css_class="row",
-            ),
-            Div(
-                Column(
-                    Field('default_for_new_items'),
-                    css_class="col-sm-12",
                 ),
                 css_class="row",
             ),
