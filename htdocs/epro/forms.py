@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
 
+from django.db.models import Sum
 from django import forms
 from django.forms import ModelForm, inlineformset_factory, HiddenInput, Textarea
 
@@ -182,6 +183,22 @@ class FinanceCodesForm(forms.ModelForm):
         fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
         labels = {'allocation_percent': _('Allocation %'), }
 
+    def clean_allocation_percent(self):
+        allocation_percent = self.cleaned_data.get('allocation_percent', None)
+        item_id = self.cleaned_data.get('item_id', None)
+        if not item_id:
+            raise ValidationError(_("Finance Codes must be added to an Item"))
+
+        if not allocation_percent:
+            raise ValidationError(_("Allocation_percent is required."))
+
+        item = Item.objects.get(pk=item_id).finance_codes.all().aggregate(Sum('allocation_percent'))
+        if item['allocation_percent__sum'] > 100:
+            raise ValidationError(_("Allocations cannot be more than 100%"))
+            print("raising error")
+
+        return allocation_percent
+
     def __init__(self, *args, **kwargs):
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
@@ -189,6 +206,7 @@ class FinanceCodesForm(forms.ModelForm):
         params = {}
         params['item_id'] = kwargs['initial'].get('item_id', None)
         if params['item_id'] is None:
+            params.pop('item_id')
             params['pk'] = kwargs['initial'].get('pk', None)
         self.helper.form_action = reverse_lazy(form_action, kwargs=params)
         self.helper.form_id = 'id_finance_codes_form'

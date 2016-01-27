@@ -122,6 +122,29 @@ class ActivityCode(CommonBaseAbstractModel):
         ordering = ['activity_code']
 
 
+class FinanceCodes(CommonBaseAbstractModel):
+    gl_account = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
+    fund_code = models.ForeignKey(FundCode, null=False, blank=False)
+    dept_code = models.ForeignKey(DeptCode, null=False, blank=False)
+    office_code = models.ForeignKey(Office, null=False, blank=False)
+    lin_code = models.ForeignKey(LinCode, blank=True, null=True)
+    activity_code = models.ForeignKey(ActivityCode, blank=True, null=True)
+    employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=True, blank=True)
+    allocation_percent = models.DecimalField(max_digits=5, decimal_places=2,
+                                validators=[MaxValueValidator(100.00), MinValueValidator(1.00) ],
+                                blank=False, null=False,
+                                default=Decimal("100.00"))
+
+    def __unicode__(self):
+        return "%s-%s" % (self.gl_account, str(self.fund_code))
+
+    def __str__(self):
+        return "%s-%s" % (self.gl_account, str(self.fund_code))
+
+    def get_absolute_url(self):
+        return reverse_lazy('pr_view', kwargs={'pk': 1})
+
+
 class PurchaseRequestStatus(CommonBaseAbstractModel):
     status = models.CharField(max_length=50, null=False, blank=False)
 
@@ -230,6 +253,7 @@ class PurchaseRequest(CommonBaseAbstractModel):
     cancellation_requested_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name='cancellation_requested_by', on_delete=models.SET_NULL)
     cancelled_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name='pr_cancelled_by', on_delete=models.SET_NULL)
     cancellation_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    default_finance_codes = models.ManyToManyField(FinanceCodes, related_name='prs')
     objects = PurchaseRequestManager() # Changing the default manager
 
     def __unicode__(self):
@@ -303,30 +327,6 @@ class Vendor(CommonBaseAbstractModel):
     class Meta(object):
         verbose_name = 'Vendor'
 
-
-class FinanceCodes(CommonBaseAbstractModel):
-    gl_account = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
-    fund_code = models.ForeignKey(FundCode, null=False, blank=False)
-    dept_code = models.ForeignKey(DeptCode, null=False, blank=False)
-    office_code = models.ForeignKey(Office, null=False, blank=False)
-    lin_code = models.ForeignKey(LinCode, blank=True, null=True)
-    activity_code = models.ForeignKey(ActivityCode, blank=True, null=True)
-    employee_id = models.PositiveIntegerField(validators=[validate_positive,], null=True, blank=True)
-    allocation_percent = models.DecimalField(max_digits=5, decimal_places=2,
-                                validators=[MaxValueValidator(100.00), MinValueValidator(1.00) ],
-                                blank=False, null=False,
-                                default=Decimal("100.00"))
-    default_for_new_items = models.BooleanField(default=False,
-            help_text='Set as default so that all new items for this PR will get the same Finance Codes')
-
-    def __unicode__(self):
-        return "%s-%s" % (self.gl_account, str(self.fund_code))
-
-    def __str__(self):
-        return "%s-%s" % (self.gl_account, str(self.fund_code))
-
-    def get_absolute_url(self):
-        return reverse_lazy('pr_view', kwargs={'pk': 1})
 
 class Item(CommonBaseAbstractModel):
     item_sno = models.PositiveIntegerField(verbose_name='SNo')
