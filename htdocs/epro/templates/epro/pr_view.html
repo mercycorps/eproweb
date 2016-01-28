@@ -185,8 +185,9 @@
 <script type = "text/javascript">
 
     $(function () {
-  $('[data-toggle="popover"]').popover()
-});
+        $('[data-toggle="popover"]').popover()
+    });
+
     // When the modal loads, apply select2 to the dropdowns in the financecodes form.
     $('#pr_items_modal_div').on('shown.bs.modal', function (e) {
         $("#id_fund_code").select2();
@@ -238,70 +239,6 @@
                 // Show django messages that may have been set in the View.
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
-            });
-    });
-
-
-    // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
-    $('#pr_items_modal_div').on('submit', '#id_finance_codes_form', function(event) {
-        event.preventDefault();
-        var form_url = $(this).attr('action');
-        var form_data = $(this).serialize();
-
-        $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
-            .done(function(data, textStatus, jqXHR) {
-
-                // Show django messages that may have been set in the View.
-                var json = $.parseJSON(jqXHR.responseText);
-                show_django_ajax_messages(json, "#modal_messages");
-
-                var fcid_editted = $("#id_submit_finance_codes_btn").data()['fcid'];
-                // if fcid is set, it's an update so find & update a row in the table instead of appending it.
-                if (fcid_editted != undefined) {
-                    //console.log("fcid_editted: " + fcid_editted);
-                    $("#finance_codes_table").find('tr').each(function (i, el) {
-                        var $tds = $(this).find('td'), fcid = $tds.eq(1).text(); 
-                        if (fcid_editted == fcid) {
-                            $tds.eq(2).html($("#id_gl_account").val());  // GL Account
-                            $tds.eq(3).html($("#id_fund_code").val()); // FundCodeId
-                            $tds.eq(4).html($( "#id_fund_code option:selected" ).text()); // FundCode
-                            $tds.eq(5).html($("#id_dept_code").val()); // DeptCodeId
-                            $tds.eq(6).html($( "#id_dept_code option:selected" ).text()); // DeptCode
-                            $tds.eq(7).html($("#id_office_code").val()); // OfficeCodeId
-                            $tds.eq(8).html($( "#id_office_code option:selected" ).text()); // OfficeCode
-                            $tds.eq(9).html($("#id_lin_code").val()); // LINCode
-                            $tds.eq(10).html($("#id_activity_code").val()); // ActivityCode
-                            $tds.eq(11).html($("#id_employee_id").val()); // EmployeeId
-                            $tds.eq(12).html($("#id_allocation_percent").val()); //AllocationPercent
-                        }
-                    });
-                } else {
-                    // append the new finance codes to the table.
-                    finance_code = data['object'][0];
-                    //console.log(finance_code);
-                    var tr = "<tr class='warning'>";
-                    tr += "<td style='display:none;'>" + $("#id_finance_codes_form #id_item_id").val() + '</td>';
-                    tr += "<td style='display:none;'>" + finance_code['id'] + "</td>";
-                    tr += "<td>" + finance_code['gl_account'] + "</td>";
-                    tr += "<td style='display:none;'>" + finance_code['fund_code'] + "</td>";
-                    tr += "<td>" + $( "#id_fund_code option:selected" ).text() + "</td>";
-                    tr += "<td style='display:none;'>" + finance_code['dept_code'] + "</td>";
-                    tr += "<td>" + $( "#id_dept_code option:selected" ).text() + "</td>";
-                    tr += "<td style='display:none;'>" + finance_code['office_code'] + "</td>";
-                    tr += "<td>" + $( "#id_office_code option:selected" ).text() + "</td>";
-                    tr += "<td>" + finance_code['lin_code'] + "</td>";
-                    tr += "<td>" + finance_code['activity_code'] + "</td>";
-                    tr += "<td>" + $("#id_employee_id").val() + "</td>";
-                    tr += "<td>" + finance_code['allocation_percent'] + "</td>";
-                    var url = "{% url 'financecodes_edit' 0 %}";
-                    url = url.replace('0', finance_code['id']);
-                    tr += "<td>\
-                                <a href=" + url + " data-finance-codes-id=" + finance_code['id'] + " class=\"edit\"><span class=\"glyphicon glyphicon-edit\"></span></a>\
-                                <a href=" + url + " data-finance-codes-id=" + finance_code['id'] + " class=\"del\" style=\"color:red;\"><span class=\"glyphicon glyphicon-trash\"></span></a>\
-                            </td>";
-                    $("#finance_codes_table").append(tr);
-                }
-                $("#id_cancel_finance_codes_btn").trigger("click");
             });
     });
 </script>

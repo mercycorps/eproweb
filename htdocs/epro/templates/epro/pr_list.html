@@ -17,54 +17,51 @@
         <h3 class="panel-title">Purchase Request List</h3>
         <div class="clearfix"></div>
     </div>
-    
-    <div class="panel-body">
-        <div class="table-responsive">
-            <table id="prs_table" class="table table-bordered table-striped table-hover table-condensed">
-                <thead>
-                    <tr>
-                        <th>PR No</th>
-                        <th>Project Reference</th>
-                        <th>Delivery Address</th>
-                        <th>Required Date</th>
-                        <th>Status</th>
-                        <th>Approver 1</th>
-                        {% if pr.approver2 %}
-                            <th>Approver 2</th>
-                        {% endif %}
-                        <th style="width:18px;"></th>
-                    </tr>
-                </thead>
-                <!--
-                <tfoot>
-                    <tr>
-                        <td colspan="7"></td>
-                    </tr>
-                </tfoot>
-                -->
-                <tbody>
-                {% for pr in prs %}
-                    <tr>
-                        <td><a href="{% url 'pr_view' pr.pk %}">{{ pr.office }}-{{ pr.sno }}</a></td>
-                        <td>{{ pr.project_reference }}</td>
-                        <td>{{ pr.delivery_address|default_if_none:'' }}</td>
-                        <td>{{ pr.required_date|date }}</td>
-                        <td>{{ pr.status }}</td>
-                        <td>{{ pr.approver1 }}</td>
-                        {% if pr.approver2 %}
-                            <td>{{ pr.approver2 }}</td>
-                        {% endif %}
-                        <td>
-                            <a href="{% url 'pr_edit' pr.pk %}" id='edit_pr_link'><span class="glyphicon glyphicon-edit"></span></a>
-                            <a href="#" data-href="/pr/delete/1/" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
-                        </td>
-                    </tr>
-                {% empty %}
-                    There are no Purchase Requests to show.
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive" style="padding: 5px 0px 5px 0px;">
+        <table id="prs_table" class="table table-bordered table-striped table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>PR No</th>
+                    <th>Project Reference</th>
+                    <th>Delivery Address</th>
+                    <th>Required Date</th>
+                    <th>Status</th>
+                    <th>Approver 1</th>
+                    {% if pr.approver2 %}
+                        <th>Approver 2</th>
+                    {% endif %}
+                    <th style="width:18px;"></th>
+                </tr>
+            </thead>
+            <!--
+            <tfoot>
+                <tr>
+                    <td colspan="7"></td>
+                </tr>
+            </tfoot>
+            -->
+            <tbody>
+            {% for pr in prs %}
+                <tr>
+                    <td><a href="{% url 'pr_view' pr.pk %}">{{ pr.office }}-{{ pr.sno }}</a></td>
+                    <td>{{ pr.project_reference }}</td>
+                    <td>{{ pr.delivery_address|default_if_none:'' }}</td>
+                    <td>{{ pr.required_date|date }}</td>
+                    <td>{{ pr.status }}</td>
+                    <td>{{ pr.approver1 }}</td>
+                    {% if pr.approver2 %}
+                        <td>{{ pr.approver2 }}</td>
+                    {% endif %}
+                    <td>
+                        <a href="{% url 'pr_edit' pr.pk %}" id='edit_pr_link'><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="#" data-href="/pr/delete/1/" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                    </td>
+                </tr>
+            {% empty %}
+                There are no Purchase Requests to show.
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
     <div class="panel-footer" id="pr_panel_footer_div">
         <nav>

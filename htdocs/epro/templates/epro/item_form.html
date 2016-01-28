@@ -20,12 +20,11 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy form %}</div>
         <div role="tabpanel" class="tab-pane" id="financecodes_tab">
-            <div id="finance_codes_list_panel" class="panel panel-default">
+            <div id="finance_codes_list_panel" class="panel panel-info">
                 <div class="panel-heading" style="padding: 5px 2px 5px 5px;">Assigned Cost Allocations
-                    <a role="button" id="add_new_finance_codes_btn" class="btn btn-xs btn-success pull-right" data-toggle="collapse" 
-                        data-parent="#finance_codes_list_panel" href="#financecodes_form_collapse_div" aria-expanded="true" aria-controls="financecodes_form_collapse_div">
+                    <button id="add_new_finance_codes_btn" class="btn btn-xs btn-success pull-right">
                         <span class="glyphicon glyphicon-plus"></span> Add Finance Dimensions</a>
-                    </a>
+                    </button>
                 </div>
                 <div class="clearfix"></div>
                 {% if item.finance_codes.all %}
@@ -66,7 +65,7 @@
                                     <td style="display:none;">{{ fc.default_for_new_items }}</td>
                                     <td>
                                         <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
-                                        <a href={% url 'financecodes_edit' fc.pk %} data-finance-codes-id={{ fc.pk }} class="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                                        <a href="#" data-finance-codes-id={{ fc.pk }} data-href="/item/delete/1/" data-toggle="modal" data-target="#confirm-delete" lass="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -83,24 +82,43 @@
                 </div>
                 
             </div>
-            <div id="financecodes_form_collapse_div" class="collapse panel panel-default" style="padding: 5px;">
-                {% crispy finance_codes_form %}
+            <div id="financecodes_form_collapse_div" class="collapse panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"> Finance Codes Form</h3>
+                </div>
+                <div id="financecodes_form_div" class="panel-body">
+                    {% crispy finance_codes_form %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% block epro_extra_js %}
 <script type = "text/javascript">
+    var stock_finance_codes_form;
+    $(document).ready(function() { 
+        stock_finance_codes_form = `{% crispy finance_codes_form %}`;
+    });
+    function reApplySelect2(){
+        $("#id_fund_code").select2({ placeholder: 'Fund Code', allowClear: true, });
+        $("#id_dept_code").select2({ placeholder: 'Dept Code', allowClear: true, });
+        $("#id_office_code").select2({ placeholder: 'Office Code', allowClear: true, });
+    }
 
     function resetFinanceCodesForm(){
         // reset the dropdowns with select2 manually b/c reset button cannot reset them.
+        /*
         $("#id_gl_account").val("");
-        $("#id_fund_code").select2().val("").trigger("change");
-        $("#id_dept_code").select2().val("").trigger("change");
-        $("#id_office_code").select2().val("").trigger("change");
+        $("#id_fund_code").select2({ placeholder: 'Fund Code', allowClear: true, }).val("").trigger("change");
+        $("#id_dept_code").select2({ placeholder: 'Dept Code', allowClear: true, }).val("").trigger("change");
+        $("#id_office_code").select2({ placeholder: 'Office Code', allowClear: true, }).val("").trigger("change");
         $("#id_employee_id").val("");
         $("#id_allocation_percent").val(100);
+        */
+        $("#financecodes_form_div").html(stock_finance_codes_form);
+        reApplySelect2();
     }
+
     // Upon activating the Item tab, set the quantity field on focus.
     $('#pr_items_tabs_ul a[href="#item_tab"]').on('shown.bs.tab', function (e) {
         $("#id_quantity_requested").focus();
@@ -115,13 +133,14 @@
     // Upon clicking the EDIT button FinanceCodes, update the FinanceCodes action url
     $('#finance_codes_table').on('click', 'a.edit', function(e) {
         e.preventDefault();
-
+        $("#financecodes_form_collapse_div").collapse('show');
+        
         // Set the FinanceCodes form action url to be that of the clicked edit button.
         $("#id_finance_codes_form").attr("action",  $(this).attr('href'));
 
         // Get the FinanceCodes ID from the edit button that was clicked.
         var finance_codes_pk = $(this).data("financeCodesId");
-        
+
         // Set the financeCodesId value as HTML5 data attribute on the form submit button,
         // which is later used in the form submit event to determine what row in the table 
         // above the form to update.
@@ -130,14 +149,14 @@
         // Get all of the td elements and extract its values to populate the form
         var tds = $(this).closest("tr").children();      
         $("#id_gl_account").val(parseInt($(tds[2]).text()));
-        $("#id_fund_code").select2().val( parseInt($(tds[3]).text()) ).trigger("change");
+        $("#id_fund_code").select2({ placeholder: 'Fund Code', allowClear: true, }).val( parseInt($(tds[3]).text()) ).trigger("change");
         $("#id_dept_code").select2().val( parseInt($(tds[5]).text()) ).trigger("change");
         $("#id_office_code").select2().val( parseInt($(tds[7]).text()) ).trigger("change");
         $("#id_lin_code").val( $.trim($(tds[9]).text()) );
         $("#id_activity_code").val( $.trim($(tds[10]).text()) );
         $("#id_employee_id").val( parseInt($.trim($(tds[11]).text())) );
         $("#id_allocation_percent").val( parseInt($.trim($(tds[12]).text())) );
-        $("#id_default_for_new_items").prop('checked', Boolean($.trim($(tds[13]).text()) == 'True' ));
+        //$("#id_default_for_new_items").prop('checked', Boolean($.trim($(tds[13]).text()) == 'True' ));
     });
 
 
@@ -145,6 +164,7 @@
     $("#financecodes_tab").on("click", "#add_new_finance_codes_btn", function(e) {
         e.preventDefault();
         resetFinanceCodesForm();
+        $("#financecodes_form_collapse_div").collapse('show');
         {% if item.pk %}
             // reset the form action to add finance codes not edit.
             $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
@@ -161,9 +181,32 @@
     });
 
     // Upon clicking the Cancel button of the FinanceCodes form, set the FinanceCodes form action to add
-    $("#id_finance_codes_form").on("click", "#id_cancel_finance_codes_btn", function(e) {
+    $("#financecodes_form_div").on("click", "#id_cancel_finance_codes_btn", function(e) {
         resetFinanceCodesForm();
+        $("#financecodes_form_collapse_div").collapse('hide');
     });
 
+    // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
+    $('#financecodes_form_div').on('submit', '#id_finance_codes_form', function(event) {
+        event.preventDefault();
+        var form_url = $(this).attr('action');
+        var form_data = $(this).serialize();
+        var fcid_editted = $("#id_submit_finance_codes_btn").data()['fcid'];
+        //$.post(form_url, form_data)
+        $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
+            .done(function(data, textStatus, jqXHR) {
+                if (jqXHR.getResponseHeader('error') == "True") {
+                    $("#financecodes_form_div").html(data);
+                    reApplySelect2();
+                    return;
+                }
+                $('#financecodes_form_collapse_div').collapse('hide');
+
+                // Show django messages that may have been set in the View.
+                var json = $.parseJSON(jqXHR.responseText);
+                show_django_ajax_messages(json, "#modal_messages");
+                
+        });
+    });
 </script>
 {% endblock epro_extra_js %}

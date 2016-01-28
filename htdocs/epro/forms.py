@@ -185,6 +185,11 @@ class FinanceCodesForm(forms.ModelForm):
 
     def clean_allocation_percent(self):
         allocation_percent = self.cleaned_data.get('allocation_percent', None)
+        try:
+            allocation_percent = float(allocation_percent)
+        except Exception as e:
+            raise ValidationError(_("Allocation Percent must be a number"))
+
         item_id = self.cleaned_data.get('item_id', None)
         if not item_id:
             raise ValidationError(_("Finance Codes must be added to an Item"))
@@ -193,9 +198,8 @@ class FinanceCodesForm(forms.ModelForm):
             raise ValidationError(_("Allocation_percent is required."))
 
         item = Item.objects.get(pk=item_id).finance_codes.all().aggregate(Sum('allocation_percent'))
-        if item['allocation_percent__sum'] > 100:
+        if ( float(item['allocation_percent__sum']) + allocation_percent) > 100:
             raise ValidationError(_("Allocations cannot be more than 100%"))
-            print("raising error")
 
         return allocation_percent
 
@@ -209,6 +213,10 @@ class FinanceCodesForm(forms.ModelForm):
             params.pop('item_id')
             params['pk'] = kwargs['initial'].get('pk', None)
         self.helper.form_action = reverse_lazy(form_action, kwargs=params)
+        self.fields['fund_code'].empty_label = ''
+        self.fields['dept_code'].empty_label = ''
+        self.fields['office_code'].empty_label = ''
+        self.fields['gl_account'].widget.attrs['placeholder'] = _('GL Account')
         self.helper.form_id = 'id_finance_codes_form'
         self.helper.label_class = 'col-sm-offset-0 col-sm-5'
         self.helper.field_class = 'col-sm-7'
