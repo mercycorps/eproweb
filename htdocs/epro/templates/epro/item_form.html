@@ -2,7 +2,7 @@
 
 <div class="modal-header" style="padding: 5px;">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4>
+    {% comment %} <h4 class="modal-title">{% if item.pk %} Updating Item {% else %} Adding Item {% endif %}</h4> {% endcomment %}
     <span id="modal_messages"></span>
 </div>
 <div class="modal-body" style="padding: 0px 2px 0px 2px;" >
@@ -18,7 +18,7 @@
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="item_tab"><br />{% crispy form %}</div>
+        <div role="tabpanel" class="tab-pane active" id="item_tab"> <br />{% crispy form %} </div>
         <div role="tabpanel" class="tab-pane" id="financecodes_tab">
             <div id="finance_codes_list_panel" class="panel panel-info">
                 <div class="panel-heading" style="padding: 5px 2px 5px 5px;">Assigned Cost Allocations
@@ -58,9 +58,9 @@
                                     <td>{{ fc.dept_code }}</td>
                                     <td style="display:none;">{{ fc.office_code.pk }}</td>
                                     <td>{{ fc.office_code }}</td>
-                                    <td>{{ fc.lin_code }}</td>
-                                    <td>{{ fc.activity_code }}</td>
-                                    <td>{{ fc.employee_id }}</td>
+                                    <td>{{ fc.lin_code|default:"" }}</td>
+                                    <td>{{ fc.activity_code|default:"" }}</td>
+                                    <td>{{ fc.employee_id|default:"" }}</td>
                                     <td>{{ fc.allocation_percent }}</td>
                                     <td style="display:none;">{{ fc.default_for_new_items }}</td>
                                     <td>
@@ -83,8 +83,8 @@
                 
             </div>
             <div id="financecodes_form_collapse_div" class="collapse panel panel-info">
-                <div class="panel-heading">
-                    <h3 class="panel-title"> Finance Codes Form</h3>
+                <div class="panel-heading" style="padding: 5px 2px 5px 5px;">
+                    Finance Codes Form
                 </div>
                 <div id="financecodes_form_div" class="panel-body">
                     {% crispy finance_codes_form %}

@@ -26,6 +26,13 @@ def validate_positive(value):
     if value <= 0:
         raise ValidationError('%s is not greater than zero' % value)
 
+def validate_gl_account(value):
+    try:
+        if len(str(int(value))) > 5:
+            raise ValidationError("%s must be a five digits long number" % value)
+    except Exception as e:
+        raise ValidationError("%s must be a five digits long number" % value)
+
 
 class CommonBaseAbstractModel(models.Model):
     created_by = models.ForeignKey(UserProfile, blank=True, null=True, related_name="%(app_label)s_%(class)s_created")
@@ -123,7 +130,7 @@ class ActivityCode(CommonBaseAbstractModel):
 
 
 class FinanceCodes(CommonBaseAbstractModel):
-    gl_account = models.PositiveIntegerField(validators=[validate_positive,], null=False, blank=False)
+    gl_account = models.PositiveIntegerField(validators=[validate_positive, validate_gl_account,], null=False, blank=False)
     fund_code = models.ForeignKey(FundCode, null=False, blank=False)
     dept_code = models.ForeignKey(DeptCode, null=False, blank=False)
     office_code = models.ForeignKey(Office, null=False, blank=False)
