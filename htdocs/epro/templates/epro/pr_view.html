@@ -110,6 +110,7 @@
     <div class="panel-body">
         <span class="glyphicon glyphicon-ok" style="color:green;"></span>
     </div>
+    {% comment %} role="button" data-toggle="collapse" href="#item__finance_codes_{{ item.pk }}" aria-expanded="false" aria-controls="item__finance_codes_{{ item.pk }}" {% endcomment %}
     -->
     <div class = "table-responsive">
         <table id="pr_items_table" class="table table-bordered table-striped table-hover table-condensed">
@@ -127,7 +128,39 @@
             </tr>
             {% for item in pr.items.all %}
                 <tr>
-                    <td><a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" data-content="Missing Finance Codes. Either add a default one or add for each item."><span class="glyphicon glyphicon-exclamation-sign" style="color:red;"></span></a></td>
+                    {% if item.finance_codes.all.count > 0 %}
+                        <td><a tabindex="0" class="items_with_finance_codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
+                            <span class="glyphicon glyphicon-ok-sign" style="color:green;"></span></a>
+                            <div class="collapse row" id="item__finance_codes_{{ item.pk }}">
+                                <table class="table table-bordered table-striped table-hover table-condensed" border="1">
+                                    <tr>
+                                        <th>GL Account</th>
+                                        <th>Fund</th>
+                                        <th>Dept</th>
+                                        <th>Office</th>
+                                        <th>LIN</th>
+                                        <th>Activity</th>
+                                        <th>Emp ID</th>
+                                        <th>% Alloc</th>
+                                    </tr>
+                                    {% for code in item.finance_codes.all %}
+                                        <tr>
+                                            <td>{{ code.gl_account }}</td>
+                                            <td>{{ code.fund_code }}</td>
+                                            <td>{{ code.dept_code }}</td>
+                                            <td>{{ code.office_code }}</td>
+                                            <td>{{ code.lin_code|default:"" }}</td>
+                                            <td>{{ code.activity_code|default:"" }}</td>
+                                            <td>{{ code.employee_id|default:"" }}</td>
+                                            <td>{{ code.allocation_percent }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </td>
+                    {% else %}
+                        <td><a tabindex="0" role="button" class="items_without_finance_codes" data-toggle="popover" data-trigger="focus" data-content="Missing Finance Codes."><span class="glyphicon glyphicon-exclamation-sign" style="color:red;"></span></a></td>
+                    {% endif %}
                     <td>{{ item.item_sno }}</td>
                     <td> {{ item.quantity_requested }} </td>
                     <td> {{ item.unit }} </td>
@@ -185,7 +218,14 @@
 <script type = "text/javascript">
 
     $(function () {
-        $('[data-toggle="popover"]').popover()
+        $('a[data-toggle="popover"].items_without_finance_codes').popover();
+        $('a[data-toggle="popover"].items_with_finance_codes').each(function(){
+            var item_id = $(this).data("item_id")
+            $(this).popover({
+                content: $('#item__finance_codes_' + item_id).html(),
+                html: true,
+            });
+        });
     });
 
     // When the modal loads, apply select2 to the dropdowns in the financecodes form.
