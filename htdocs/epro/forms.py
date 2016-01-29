@@ -183,6 +183,18 @@ class FinanceCodesForm(forms.ModelForm):
         fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
         labels = {'allocation_percent': _('Allocation %'), }
 
+    def clean_gl_account(self):
+        gl_account = self.cleaned_data.get('gl_account', None)
+        try:
+            gl_account_length = len(str(int(gl_account)))
+        except Exception as e:
+            raise ValidationError(_("GL Account must be a five digits number"))
+
+        if gl_account_length > 5 or gl_account_length < 5:
+            raise ValidationError(_("GL Account must be a five digits number"))
+
+        return gl_account
+
     def clean_allocation_percent(self):
         allocation_percent = self.cleaned_data.get('allocation_percent', None)
         try:
@@ -198,8 +210,12 @@ class FinanceCodesForm(forms.ModelForm):
             raise ValidationError(_("Allocation_percent is required."))
 
         item = Item.objects.get(pk=item_id).finance_codes.all().aggregate(Sum('allocation_percent'))
-        if ( float(item['allocation_percent__sum']) + allocation_percent) > 100:
-            raise ValidationError(_("Allocations cannot be more than 100%"))
+        if item['allocation_percent__sum']:
+            if ( float(item['allocation_percent__sum']) + allocation_percent) > 100:
+                raise ValidationError(_("Allocations cannot be more than 100%"))
+        else:
+            if allocation_percent > 100:
+                raise ValidationError(_("Allocations cannot be more than 100%"))
 
         return allocation_percent
 

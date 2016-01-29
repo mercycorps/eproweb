@@ -206,8 +206,8 @@ class PurchaseRequest(CommonBaseAbstractModel):
         (TYPE_SERVICES, 'Services'),
     )
 
-    EXPENSE_TYPE_PROGRAM = 'program'
-    EXPENSE_TYPE_OPERATIONAL = 'operational'
+    EXPENSE_TYPE_PROGRAM = '0'
+    EXPENSE_TYPE_OPERATIONAL = '1'
     EXPENSE_TYPE_CHOICES = (
         (EXPENSE_TYPE_PROGRAM, 'Program'),
         (EXPENSE_TYPE_OPERATIONAL, 'Operational'),

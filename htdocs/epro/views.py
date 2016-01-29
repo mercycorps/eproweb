@@ -2,13 +2,14 @@ from datetime import date
 import json
 
 from django.db.models import F
-from django.shortcuts import render
+from django.http import JsonResponse
 from django.views.generic import TemplateView, FormView, View, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from django.utils import timezone
 
+from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import *
@@ -86,6 +87,29 @@ class PurchaseRequestListView(PurchaseRequestActiveTabMixin, ListView):
     context_object_name = 'prs'
 
 
+class SetDefaultFinanceCodesForPR(LoginRequiredMixin, View):
+    """
+    Clears any existing default finance codes for a PR and adds new one
+    """
+    success_message = "Default Finance Codes Set for this Purchase Reqeuest."
+
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id', None)
+
+        if item_id is not None:
+            item = Item.objects.get(pk=item_id)
+            pr = item.purchase_request
+            # don't delete the FinanceCodes objects themselves; just clear the m2m rel.
+            pr.default_finance_codes.clear()
+            finance_codes = item.finance_codes.all()
+            for code in finance_codes:
+                pr.default_finance_codes.add(code)
+            messages.success(request, "Successfully set default Finance Codes for PR # %s-%s" % (pr.office.name, pr.sno))
+        else:
+            messages.error(request, "Could not find the any item to set its finance codes as default.")
+        return JsonResponse({"status": "completed"})
+
+
 class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
     """
     PR Item Create View
@@ -101,11 +125,9 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         self.object = form.save()
 
         try:
-            finance_codes = FinanceCodes.objects.get(items__purchase_request__pk=self.object.purchase_request.id, default_for_new_items=True)
-            finance_codes.pk = None
-            finance_codes.default_for_new_items = False
-            finance_codes.save()
-            self.object.finance_codes.add(finance_codes)
+            finance_codes = self.object.purchase_request.default_finance_codes.all()
+            for code in finance_codes:
+                self.object.finance_codes.add(code)
         except FinanceCodes.DoesNotExist as e:
             print("there is no default finance codes for this PR to be used for new items")
         except FinanceCodes.MultipleObjectsReturned as e:

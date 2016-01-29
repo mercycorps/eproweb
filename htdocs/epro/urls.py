@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^pr/edit/(?P<pk>\d+)/$', PurchaseRequestUpdateView.as_view(), name='pr_edit'),
     url(r'^pr/(?P<pk>\d+)/$', PurchaseRequestDetailView.as_view(), name='pr_view'),
     #url(r'^pr/del/(?P<pk>\d+)/$', PurchaseRequestDeleteView.as_view(), name='pr_del'),
+    url(r'^pr/default_codes/(?P<item_id>\d+)/$', SetDefaultFinanceCodesForPR.as_view(), name='set_pr_default_codes'),
 
     url(r'^item/add/(?P<pr>\d+)/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
     url(r'^item/edit/(?P<pk>\d+)/$', PurchaseRequestItemUpdateView.as_view(), name='item_edit'),
