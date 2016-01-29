@@ -384,6 +384,11 @@ class Item(CommonBaseAbstractModel):
     def get_absolute_url(self):
         return reverse_lazy('pr_view', kwargs={'pk': self.purchase_request.pk}) #args=[str(self.id)])
 
+    @property
+    def allocation_percent_total(self):
+        total = self.finance_codes.all().aggregate(Sum('allocation_percent'))['allocation_percent__sum']
+        return total
+
     class Meta(object):
         verbose_name = 'Item'
         ordering = ['purchase_request']

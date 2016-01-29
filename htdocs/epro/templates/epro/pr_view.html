@@ -129,8 +129,13 @@
             {% for item in pr.items.all %}
                 <tr>
                     {% if item.finance_codes.all.count > 0 %}
-                        <td><a tabindex="0" class="items_with_finance_codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
+                        {% if item.allocation_percent_total < 100 %}
+                            <td><a tabindex="0" class="items_with_incomplete_finance_codes" data-title="Incomplete Finance Codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
+                            <span class="glyphicon glyphicon-ok-sign" style="color:orange;"></span></a>
+                        {% else %}
+                            <td><a tabindex="0" class="items_with_finance_codes" data-title="Complete Finance Codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
                             <span class="glyphicon glyphicon-ok-sign" style="color:green;"></span></a>
+                        {% endif %}
                             <div class="collapse row" id="item__finance_codes_{{ item.pk }}">
                                 <table class="table table-bordered table-striped table-hover table-condensed" border="1">
                                     <tr>
@@ -159,7 +164,7 @@
                             </div>
                         </td>
                     {% else %}
-                        <td><a tabindex="0" role="button" class="items_without_finance_codes" data-toggle="popover" data-trigger="focus" data-content="Missing Finance Codes."><span class="glyphicon glyphicon-exclamation-sign" style="color:red;"></span></a></td>
+                        <td><a tabindex="0" role="button" class="items_without_finance_codes" data-title="No Finance Codes" data-toggle="popover" data-trigger="focus" data-content="Missing Finance Codes."><span class="glyphicon glyphicon-exclamation-sign" style="color:red;"></span></a></td>
                     {% endif %}
                     <td>{{ item.item_sno }}</td>
                     <td> {{ item.quantity_requested }} </td>
@@ -219,7 +224,7 @@
 
     $(function () {
         $('a[data-toggle="popover"].items_without_finance_codes').popover();
-        $('a[data-toggle="popover"].items_with_finance_codes').each(function(){
+        $('a[data-toggle="popover"].items_with_finance_codes, .items_with_incomplete_finance_codes').each(function(){
             var item_id = $(this).data("item_id")
             $(this).popover({
                 content: $('#item__finance_codes_' + item_id).html(),
