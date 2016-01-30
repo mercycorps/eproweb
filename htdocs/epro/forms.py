@@ -177,11 +177,11 @@ class FinanceCodesForm(forms.ModelForm):
     To add entries, this form has to be instantiated with initial values of item_id and form_action
     To edit entries, this form has to be instantiated with initial value of form_action.
     """
-    item_id = forms.IntegerField(widget=forms.HiddenInput())
     class Meta:
         model = FinanceCodes
-        fields = ['item_id', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
+        fields = ['item', 'gl_account', 'fund_code', 'dept_code', 'office_code', 'lin_code', 'activity_code', 'employee_id', 'allocation_percent', ]
         labels = {'allocation_percent': _('Allocation %'), }
+        widgets = {'item': forms.HiddenInput()}
 
     def clean_gl_account(self):
         gl_account = self.cleaned_data.get('gl_account', None)
@@ -192,7 +192,6 @@ class FinanceCodesForm(forms.ModelForm):
 
         if gl_account_length > 5 or gl_account_length < 5:
             raise ValidationError(_("GL Account must be a five digits number"))
-
         return gl_account
 
     def clean_allocation_percent(self):
@@ -202,32 +201,33 @@ class FinanceCodesForm(forms.ModelForm):
         except Exception as e:
             raise ValidationError(_("Allocation Percent must be a number"))
 
-        item_id = self.cleaned_data.get('item_id', None)
-        if not item_id:
+        item = self.cleaned_data.get('item', None)
+        if not item:
             raise ValidationError(_("Finance Codes must be added to an Item"))
 
         if not allocation_percent:
             raise ValidationError(_("Allocation_percent is required."))
 
-        item = Item.objects.get(pk=item_id).finance_codes.all().aggregate(Sum('allocation_percent'))
-        if item['allocation_percent__sum']:
-            if ( float(item['allocation_percent__sum']) + allocation_percent) > 100:
+        total = item.finance_codes.aggregate(Sum('allocation_percent'))
+        if total['allocation_percent__sum']:
+            if ( float(total['allocation_percent__sum']) + allocation_percent) > 100:
                 raise ValidationError(_("Allocations cannot be more than 100%"))
         else:
             if allocation_percent > 100:
                 raise ValidationError(_("Allocations cannot be more than 100%"))
-
         return allocation_percent
 
     def __init__(self, *args, **kwargs):
+        finance_codes_id = kwargs.pop('pk', None)
         super(FinanceCodesForm, self).__init__(*args, **kwargs)
         self.helper = setup_boostrap_helpers(formtag=True)
-        form_action = kwargs['initial'].pop('form_action')
-        params = {}
-        params['item_id'] = kwargs['initial'].get('item_id', None)
-        if params['item_id'] is None:
-            params.pop('item_id')
-            params['pk'] = kwargs['initial'].get('pk', None)
+        if finance_codes_id:
+            form_action = "financecodes_edit"
+            params = {"pk": finance_codes_id}
+        else:
+            form_action = "financecodes_new"
+            params = {"item_id": kwargs['initial'].get('item', None)}
+        print("form_action: %s params: %s" % (form_action, params))
         self.helper.form_action = reverse_lazy(form_action, kwargs=params)
         self.fields['fund_code'].empty_label = ''
         self.fields['dept_code'].empty_label = ''

@@ -246,7 +246,7 @@
     $('#pr_items_table').on('click', '#edit_item_link', function(e) {
         e.preventDefault();
         var item_id = $(this).data("itemId");
-        $("#id_finance_codes_form #id_item_id").val(item_id);
+        $("#id_finance_codes_form #id_item").val(item_id);
         $("#pr_items_modal_content_div").load($(this).attr("href"));
         $('#pr_items_modal_div').modal('show');
     });
@@ -272,7 +272,7 @@
             .done(function(data, textStatus, jqXHR) {
                 var item = data['object'][0];
                 // Set the item_id field in the FinanceCodes form to populate the m2m rel.
-                $("#id_finance_codes_form #id_item_id").val(item['id']);
+                $("#id_finance_codes_form #id_item").val(item['id']);
                 var url = "{% url 'financecodes_new' 0 %}";
                 url = url.replace('0', item['id']);
                 $("#id_finance_codes_form").attr("action",  url);

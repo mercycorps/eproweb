@@ -125,13 +125,15 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         self.object = form.save()
 
         try:
-            finance_codes = self.object.purchase_request.default_finance_codes.all()
-            for code in finance_codes:
-                self.object.finance_codes.add(code)
-        except FinanceCodes.DoesNotExist as e:
+            default_finance_codes = Item.objects.get(purchase_request=item.purchase_request.pk, default_finance_codes=True).finance_codes
+            for code in default_finance_codes:
+                code.pk= None
+                code.item = self.object.pk
+                code.save()
+        except Item.DoesNotExist as e:
             print("there is no default finance codes for this PR to be used for new items")
-        except FinanceCodes.MultipleObjectsReturned as e:
-            print("this should never happen")
+        except Item.MultipleObjectsReturned as e:
+            print("there should never be more than one default set of finance codes a RP")
         return super(PurchaseRequestItemCreateView, self).form_valid(form)
 
     def get_initial(self):
@@ -143,7 +145,7 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestItemCreateView, self).get_context_data(**kwargs)
-        context['finance_codes_form'] = FinanceCodesForm(initial={'form_action': 'financecodes_new', 'item_id': 0})
+        context['finance_codes_form'] = FinanceCodesForm(initial={'item': 0})
         return context
 
 
@@ -168,14 +170,11 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
     def get_context_data(self, **kwargs):
         context = super(PurchaseRequestItemUpdateView, self).get_context_data(**kwargs)
-        context['finance_codes_form'] = FinanceCodesForm(initial={
-            'form_action': 'financecodes_new',
-            'item_id': self.object.pk,
-        })
+        context['finance_codes_form'] = FinanceCodesForm(initial={'item': self.object.pk})
         return context
 
 
-class FinanceCodesCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
+class FinanceCodesCreateView(SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
     """ This form is always submitted via AJAX """
     model = FinanceCodes
     form_class = FinanceCodesForm
@@ -183,13 +182,12 @@ class FinanceCodesCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     success_message = "Finance Codes, added to PR %(description_pr)s successfully."
 
     def get_initial(self):
-        return { 'form_action': 'financecodes_new', 'item_id': self.kwargs['item_id']}
+        initial = {'item': self.kwargs.get('item_id', None)}
+        return initial
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user.userprofile
-        self.object = form.save()
-        item = Item.objects.get(pk=form.cleaned_data['item_id'])
-        item.finance_codes.add(self.object)
+        #self.object = form.save()
         return super(FinanceCodesCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -203,8 +201,11 @@ class FinanceCodesUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
     context_object_name = 'finance_codes'
     success_message = "Finance Codes, updated %(fundcode)s successfully."
 
-    def get_initial(self):
-        return { 'form_action': 'financecodes_edit', 'pk': self.object.pk, }
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword arguments."""
+        kwargs = super(FinanceCodesUpdateView, self).get_form_kwargs()
+        kwargs['pk'] = self.object.pk
+        return kwargs
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user.userprofile

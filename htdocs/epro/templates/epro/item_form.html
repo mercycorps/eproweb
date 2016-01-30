@@ -169,7 +169,7 @@
             $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
         {% else %}
             var url = "{% url 'financecodes_new' 0 %}";
-            url = url.replace('0', $("#id_finance_codes_form #id_item_id").val());
+            url = url.replace('0', $("#id_finance_codes_form #id_item").val());
             $("#id_finance_codes_form").attr("action",  url);
         {% endif %}
     });
