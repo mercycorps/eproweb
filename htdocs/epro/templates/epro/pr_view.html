@@ -130,10 +130,10 @@
                 <tr>
                     {% if item.finance_codes.all.count > 0 %}
                         {% if item.allocation_percent_total < 100 %}
-                            <td><a tabindex="0" class="items_with_incomplete_finance_codes" data-title="Incomplete Finance Codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
+                            <td><a tabindex="0" class="items_with_incomplete_finance_codes" data-title="Incomplete Finance Codes" data-item-id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
                             <span class="glyphicon glyphicon-ok-sign" style="color:orange;"></span></a>
                         {% else %}
-                            <td><a tabindex="0" class="items_with_finance_codes" data-title="Complete Finance Codes" data-item_id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
+                            <td><a tabindex="0" class="items_with_finance_codes" data-title="Complete Finance Codes" data-item-id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
                             <span class="glyphicon glyphicon-ok-sign" style="color:green;"></span></a>
                         {% endif %}
                             <div class="collapse row" id="item__finance_codes_{{ item.pk }}">
@@ -225,7 +225,7 @@
     $(function () {
         $('a[data-toggle="popover"].items_without_finance_codes').popover();
         $('a[data-toggle="popover"].items_with_finance_codes, .items_with_incomplete_finance_codes').each(function(){
-            var item_id = $(this).data("item_id")
+            var item_id = $(this).data("itemId")
             $(this).popover({
                 content: $('#item__finance_codes_' + item_id).html(),
                 html: true,
@@ -246,7 +246,7 @@
     $('#pr_items_table').on('click', '#edit_item_link', function(e) {
         e.preventDefault();
         var item_id = $(this).data("itemId");
-        $("#id_finance_codes_form #id_item").val(item_id);
+        // $("#id_finance_codes_form #id_item").val(item_id);
         $("#pr_items_modal_content_div").load($(this).attr("href"));
         $('#pr_items_modal_div').modal('show');
     });
@@ -270,13 +270,20 @@
         var form_data = $(this).serialize();
         $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
-                var item = data['object'][0];
+                var item = $.parseJSON(data['object'])[0];
+                var url = "{% url 'item_edit' 0 %}";
+                url = url.replace("0", item["id"]);
+                
+                console.log(url);
+                $("#id_pr_item_form").attr("action", url);
+                $("#id_pr_item_form").data("item_id", item["id"]);
                 // Set the item_id field in the FinanceCodes form to populate the m2m rel.
-                $("#id_finance_codes_form #id_item").val(item['id']);
-                var url = "{% url 'financecodes_new' 0 %}";
-                url = url.replace('0', item['id']);
-                $("#id_finance_codes_form").attr("action",  url);
-
+                // $("#id_finance_codes_form #id_item").val(item['id']);
+                // var url = "{% url 'financecodes_new' 0 %}";
+                // console.log(item);
+                // url = url.replace('0', item['id']);
+                // $("#id_finance_codes_form").attr("action",  url);
+            
                 // Show the Finance Codes tab now and switch to it.
                 $('#pr_items_tabs_ul a[href="#financecodes_tab"]').show();
                 $('#pr_items_tabs_ul a[href="#financecodes_tab"]').trigger('click');

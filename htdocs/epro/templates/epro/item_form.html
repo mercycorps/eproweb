@@ -164,12 +164,19 @@
         e.preventDefault();
         resetFinanceCodesForm();
         $("#financecodes_form_collapse_div").collapse('show');
+        //The Item Edit button must be clicked if item's pk is available.
         {% if item.pk %}
             // reset the form action to add finance codes not edit.
             $("#id_finance_codes_form").attr("action",  "{% url 'financecodes_new' item.pk %}");
         {% else %}
+            // This must be a new item so do the following in order
+            // Retrive the item_id set as HTML5 data attribute on the item form
             var url = "{% url 'financecodes_new' 0 %}";
-            url = url.replace('0', $("#id_finance_codes_form #id_item").val());
+            var item_id = $("#id_pr_item_form").data("item_id");
+            url = url.replace('0', item_id);
+            // Set the value of the finance codes form's item_id value
+            $("#id_finance_codes_form #id_item").val(item_id);
+            // Finally set the action url of the form.
             $("#id_finance_codes_form").attr("action",  url);
         {% endif %}
     });

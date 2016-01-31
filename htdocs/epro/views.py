@@ -125,7 +125,7 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         self.object = form.save()
 
         try:
-            default_finance_codes = Item.objects.get(purchase_request=item.purchase_request.pk, default_finance_codes=True).finance_codes
+            default_finance_codes = Item.objects.get(purchase_request=self.object.purchase_request.pk, default_finance_codes=True).finance_codes
             for code in default_finance_codes:
                 code.pk= None
                 code.item = self.object.pk
