@@ -106,12 +106,7 @@
         </table>
     </div>
     <div class="clearfix"></div>
-    <!--
-    <div class="panel-body">
-        <span class="glyphicon glyphicon-ok" style="color:green;"></span>
-    </div>
-    {% comment %} role="button" data-toggle="collapse" href="#item__finance_codes_{{ item.pk }}" aria-expanded="false" aria-controls="item__finance_codes_{{ item.pk }}" {% endcomment %}
-    -->
+
     <div class = "table-responsive">
         <table id="pr_items_table" class="table table-bordered table-striped table-hover table-condensed">
             <tr>
@@ -270,19 +265,18 @@
         var form_data = $(this).serialize();
         $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
+                // if there are any erros show them and then STOP
+                if (jqXHR.getResponseHeader('error') == "True") {
+                    $("#pr_items_modal_content_div").html(data);
+                    return;
+                }
+                // Get the Item that was created
                 var item = $.parseJSON(data['object'])[0];
+                // Update the item_form action URL so that clicking the SAVE button again does not create duplicate items.
                 var url = "{% url 'item_edit' 0 %}";
                 url = url.replace("0", item["id"]);
-                
-                console.log(url);
                 $("#id_pr_item_form").attr("action", url);
                 $("#id_pr_item_form").data("item_id", item["id"]);
-                // Set the item_id field in the FinanceCodes form to populate the m2m rel.
-                // $("#id_finance_codes_form #id_item").val(item['id']);
-                // var url = "{% url 'financecodes_new' 0 %}";
-                // console.log(item);
-                // url = url.replace('0', item['id']);
-                // $("#id_finance_codes_form").attr("action",  url);
             
                 // Show the Finance Codes tab now and switch to it.
                 $('#pr_items_tabs_ul a[href="#financecodes_tab"]').show();
