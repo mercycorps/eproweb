@@ -99,11 +99,20 @@ class SetDefaultFinanceCodesForPR(LoginRequiredMixin, View):
         if item_id is not None:
             item = Item.objects.get(pk=item_id)
             pr = item.purchase_request
-            # don't delete the FinanceCodes objects themselves; just clear the m2m rel.
-            pr.default_finance_codes.clear()
-            finance_codes = item.finance_codes.all()
-            for code in finance_codes:
-                pr.default_finance_codes.add(code)
+            try:
+                existing_item_with_default = Item.objects.get(purchase_request=pr.pk, default_finance_codes=True)
+                existing_item_with_default.default_finance_codes = False
+                existing_item_with_default.save()
+            except Item.DoesNotExist as e:
+                pass
+            except Item.MultipleObjectsReturned as e:
+                items = Item.objects.filter(purchase_request=pr.pk, default_finance_codes=True)
+                for i in items:
+                    i.default_finance_codes = False
+                    i.save()
+
+            item.default_finance_codes = True
+            item.save()
             messages.success(request, "Successfully set default Finance Codes for PR # %s-%s" % (pr.office.name, pr.sno))
         else:
             messages.error(request, "Could not find the any item to set its finance codes as default.")
@@ -125,10 +134,10 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         self.object = form.save()
 
         try:
-            default_finance_codes = Item.objects.get(purchase_request=self.object.purchase_request.pk, default_finance_codes=True).finance_codes
+            default_finance_codes = Item.objects.get(purchase_request=self.object.purchase_request.pk, default_finance_codes=True).finance_codes.all()
             for code in default_finance_codes:
+                code.item = self.object
                 code.pk= None
-                code.item = self.object.pk
                 code.save()
         except Item.DoesNotExist as e:
             print("there is no default finance codes for this PR to be used for new items")
