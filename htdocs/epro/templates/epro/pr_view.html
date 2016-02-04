@@ -185,9 +185,9 @@
                         <span class="label label-default">USD Exchange Rate</span>
                         <span class="label label-primary">{{ pr.dollar_exchange_rate }}</span>
                     </td>
-                    <td>{{ total_local|floatformat:"2"|intword|intcomma }}</td>
+                    <td id="total_local_td">{{ total_local|floatformat:"2"|intword|intcomma }}</td>
                     <td></td>
-                    <td colspan=2>{{ total_usd|floatformat:"2"|intword|intcomma }}</td>
+                    <td colspan=2 id="total_usd_td">{{ total_usd|floatformat:"2"|intword|intcomma }}</td>
                 </tr>
             </tfoot>
         </table>
@@ -259,6 +259,8 @@
         $.post(url)
             .done(function(data, textStatus, jqXHR) {
                 row.remove();
+                $("#total_usd_td").html(data["total_usd"]);
+                $("#total_local_td").html(data["total_local"]);
             });
     });
 
