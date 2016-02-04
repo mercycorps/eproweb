@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^item/add/(?P<pr>\d+)/$', PurchaseRequestItemCreateView.as_view(), name='item_new'),
     url(r'^item/edit/(?P<pk>\d+)/$', PurchaseRequestItemUpdateView.as_view(), name='item_edit'),
     #url(r'^item/view/(?P<pk>\d+)/$', PurchaseRequestItemDetailView.as_view(), name='item_view'),
-    #url(r'^item/del/(?P<pk>\d+)/$', PurchaseRequestItemDeleteView.as_view(), name='item_del'),
+    url(r'^item/del/(?P<pk>\d+)/$', PurchaseRequestItemDeleteView.as_view(), name='item_del'),
 
     url(r'^financecodes/add/(?P<item_id>\d+)/$', FinanceCodesCreateView.as_view(), name='financecodes_new'),
     url(r'^financecodes/edit/(?P<pk>\d+)/$', FinanceCodesUpdateView.as_view(), name='financecodes_edit'),

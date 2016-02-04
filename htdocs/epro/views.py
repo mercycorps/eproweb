@@ -7,6 +7,8 @@ from django.views.generic import TemplateView, FormView, View, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from django.core.exceptions import PermissionDenied
+
 from django.utils import timezone
 
 from django.contrib import messages
@@ -208,6 +210,26 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         context = super(PurchaseRequestItemUpdateView, self).get_context_data(**kwargs)
         context['finance_codes_form'] = FinanceCodesForm(initial={'item': self.object.pk})
         return context
+
+
+class PurchaseRequestItemDeleteView(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_message = "Item was deleted successfully."
+    object = None
+
+    def get_success_url(self):
+        return reverse_lazy('pr_view', kwargs={'pk': self.object.purchase_request.id})
+
+    def get_object(self, queryset=None):
+        #Hook to ensure object is owned by request.user.
+        self.object = super(PurchaseRequestItemDeleteView, self).get_object()
+        if not self.object.created_by == self.request.user.userprofile:
+            raise PermissionDenied
+        return self.object
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, self.success_message)
+        return super(PurchaseRequestItemDeleteView, self).delete(request, *args, **kwargs)
 
 
 class FinanceCodesCreateView(SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
