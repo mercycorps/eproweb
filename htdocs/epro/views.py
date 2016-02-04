@@ -211,8 +211,12 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
         context['finance_codes_form'] = FinanceCodesForm(initial={'item': self.object.pk})
         return context
 
-
+from epro.models import Item
+from epro.serializers import *
 class PurchaseRequestItemDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Deletes an Item in a Purchase Request
+    """
     model = Item
     success_message = "Item was deleted successfully."
     object = None
@@ -229,7 +233,8 @@ class PurchaseRequestItemDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, self.success_message)
-        return super(PurchaseRequestItemDeleteView, self).delete(request, *args, **kwargs)
+        super(PurchaseRequestItemDeleteView, self).delete(request, *args, **kwargs)
+        return JsonResponse({"status": "complete"})
 
 
 class FinanceCodesCreateView(SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
