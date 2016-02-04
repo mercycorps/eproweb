@@ -87,6 +87,33 @@ class PurchaseRequestListView(PurchaseRequestActiveTabMixin, ListView):
     context_object_name = 'prs'
 
 
+class ApplyDefaultFinanceCodesToAllItems(LoginRequiredMixin, View):
+    """
+    Applies the default Finance Codes, if set for an item in this PR, to all items in this PR
+    """
+    def post(self, request, *args, **kwargs):
+        pr_id = kwargs.get('pr_id', None)
+        if pr_id is not None:
+            try:
+                item_with_default_codes = Item.objects.get(purchase_request=pr_id, default_finance_codes=True)
+                default_finance_codes = item_with_default_codes.finance_codes.all()
+                items = Item.objects.filter(purchase_request=pr_id, default_finance_codes=False)
+                for item in items:
+                    # delete existing finance codes from each item
+                    item.finance_codes.all().delete()
+                    # add finance codes from the item that has the default_finance_codes attribute set to True
+                    for code in default_finance_codes:
+                        code.item = item
+                        code.pk = None
+                        code.save()
+            except Item.DoesNotExist as e:
+                messages.error(request, "There is no item with default finance codes set in this PR (%s)" % pr_id)
+            except Item.MultipleObjectsReturned as e:
+                messages.error(request, "There are multiple items with default finance codes in this PR (%s)" % pr_id)
+            messages.success(request, "Successfully set default finance codes for all items.")
+        return JsonResponse({"status": "completed"})
+
+
 class SetDefaultFinanceCodesForPR(LoginRequiredMixin, View):
     """
     Clears any existing default finance codes for a PR and adds new one
