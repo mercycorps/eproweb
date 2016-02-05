@@ -123,7 +123,7 @@
                 <th style="width: 45px;"></th>
             </tr>
             {% for item in pr.items.all %}
-                <tr id="row_for_item_id_{{item.pk}}">
+                <tr id="row_for_item_id_{{item.pk}}" {% if item.default_finance_codes %} class="success" {% endif %}>
                     {% if item.finance_codes.all.count > 0 %}
                         {% if item.allocation_percent_total < 100 %}
                             <td><a tabindex="0" class="items_with_incomplete_finance_codes" data-title="Incomplete Finance Codes" data-item-id={{item.pk}} role="button" data-toggle="popover" data-trigger="focus">
