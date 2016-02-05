@@ -169,6 +169,24 @@ class SetDefaultFinanceCodesForPR(LoginRequiredMixin, View):
         return JsonResponse({"status": "completed"})
 
 
+class UnsetDefaultCodesForPR(LoginRequiredMixin, View):
+    """
+    Unsets the default_finance_codes attribute for an item
+    """
+    success_message = "Successfully unset default finance codes."
+
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get("item_id", None)
+
+        if item_id is not None:
+            item = Item.objects.get(pk=item_id)
+            item.default_finance_codes = False
+            item.save()
+            messages.success(request, "Successfully unset default Finance Codes")
+        return JsonResponse({"status": "completed"})
+
+
+
 class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, CreateView):
     """
     PR Item Create View
@@ -209,9 +227,7 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
 
 class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, UpdateView):
-    """
-    PR Item Update View
-    """
+    """ PR Item Update View """
     model = Item
     form_class = PurchaseRequestItemForm
     context_object_name = 'item'
@@ -234,9 +250,7 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
 
 
 class PurchaseRequestItemDeleteView(LoginRequiredMixin, DeleteView):
-    """
-    Deletes an Item in a Purchase Request
-    """
+    """ Deletes an Item in a Purchase Request """
     model = Item
     success_message = "Item was deleted successfully."
     object = None

@@ -75,7 +75,11 @@
                 {% endif %}
                 <div class="panel-footer" style="padding: 2px;">
                     {% if item.finance_codes.all %}
-                        <a id="make_default_finance_codes_btn" class="btn btn-xs btn-warning pull-right" href="{% url 'set_pr_default_codes' item.pk %}">Make Default</a> 
+                        {% if item.default_finance_codes %}
+                            <a id="unset_default_finance_codes_btn" class="btn btn-xs btn-warning pull-right" href="{% url 'unset_default_finance_codes' item.pk %}">Unset Default</a>
+                        {% else %}
+                            <a id="set_default_finance_codes_btn" class="btn btn-xs btn-warning pull-right" href="{% url 'set_pr_default_codes' item.pk %}">Set Default</a> 
+                        {% endif %}
                         <div class="clearfix"></div>
                     {% endif %}
                 </div>
@@ -214,7 +218,17 @@
                 
         });
     });
-    $("#finance_codes_list_panel").on("click", "#make_default_finance_codes_btn", function(e) {
+
+    $("#finance_codes_list_panel").on("click", "#unset_default_finance_codes_btn", function(e) {
+        e.preventDefault();
+        $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )
+            .done(function(data, textStatus, jqXHR) {
+                var json = $.parseJSON(jqXHR.responseText);
+                show_django_ajax_messages(json, "#modal_messages");
+            });
+    });
+
+    $("#finance_codes_list_panel").on("click", "#set_default_finance_codes_btn", function(e) {
         e.preventDefault();
         $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )
             .done(function(data, textStatus, jqXHR) {
