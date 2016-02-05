@@ -110,6 +110,7 @@
 
     <div class = "table-responsive">
         <table id="pr_items_table" class="table table-bordered table-striped table-hover table-condensed">
+            <thead>
             <tr>
                 <th style="width: 25px;"></th>
                 <th>#</th>
@@ -122,6 +123,8 @@
                 <th>Total_$</th>
                 <th style="width: 45px;"></th>
             </tr>
+            </thead>
+            <tbody>
             {% for item in pr.items.all %}
                 <tr id="row_for_item_id_{{item.pk}}" {% if item.default_finance_codes %} class="success" {% endif %}>
                     {% if item.finance_codes.all.count > 0 %}
@@ -176,6 +179,7 @@
                     </td>
                 </tr>
             {% endfor %}
+            </tbody>
             <tfoot>
                 <tr class="info">
                     <td colspan="6">
@@ -217,7 +221,9 @@
 <!-- http://damienfremont.com/2014/12/19/how-to-expandcollapse-table-rows-with-bootstrap/ -->
 {% block epro_extra_js %}
 <script type = "text/javascript">
+"use strict";
 
+    
     $(function () {
         $('a[data-toggle="popover"].items_without_finance_codes').popover();
         $('a[data-toggle="popover"].items_with_finance_codes, .items_with_incomplete_finance_codes').each(function(){
@@ -226,6 +232,14 @@
                 content: $('#item__finance_codes_' + item_id).html(),
                 html: true,
             });
+        });
+
+    // Apply datatables to the items list above
+    $("#pr_items_table").DataTable({
+            "oLanguage": {
+                "sSearch": '',
+                "sSearchPlaceholder": "Search ",
+            }
         });
     });
 

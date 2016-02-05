@@ -88,7 +88,7 @@
         /*
         setTimeout(function(){
             $("#prs_table").DataTable();
-        }, 3000); 
+        }, 3000);
         */
     });
     
@@ -107,8 +107,6 @@
         var url = $(this).attr("href");
         var url_array = url.split("/");
         var row = $("#row_for_pr_id_" + url_array[url_array.length-2]);
-        console.log(url);
-        //console.log(row);
 
         $.post(url)
             .done(function(data, textStatus, jqXHR) {
