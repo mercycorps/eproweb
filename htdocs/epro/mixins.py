@@ -10,6 +10,10 @@ from .serializers import FlatJsonSerializer
 from .models import Country, Office, UserProfile, Currency, PurchaseRequest
 from .forms import PurchaseRequestForm
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 class LoginRequiredMixin(View):
     """

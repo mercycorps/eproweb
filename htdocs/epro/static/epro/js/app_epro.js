@@ -49,13 +49,6 @@ function update_pr_currency(country_id) {
 }
 
 
-$('body').on('click', 'a.add_new_pr_link, a#pr_edit_btn', function(e) {
-    e.preventDefault();
-    $("#app_modal_div_content_div").load($(this).attr("href"));
-    $('#app_modal_div').modal('show');
-});
-
-
 
 $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
@@ -64,6 +57,7 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
 
 
 // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
+/*
 $('body').on('submit', '#id_prform', function(event) {
     event.preventDefault();
     var form_url = $(this).attr('action');
@@ -78,3 +72,4 @@ $('body').on('submit', '#id_prform', function(event) {
             }
         });
 });
+*/

@@ -69,6 +69,9 @@ class PurchaseRequestUpdateView(LoginRequiredMixin, SuccessMessageMixin,
         kwargs['pk'] = self.object.pk
         return kwargs
 
+    def get_success_url(self):
+        return reverse_lazy('pr_list')
+
 
 class PurchaseRequestDetailView(PurchaseRequestActiveTabMixin, DetailView):
     """ PR Detail View """

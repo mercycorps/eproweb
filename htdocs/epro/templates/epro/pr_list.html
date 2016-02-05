@@ -91,7 +91,13 @@
         }, 3000);
         */
     });
-    
+
+    //When New PR or Edit PR links are clicked, show the form in a bootstrap modal.
+    $('body').on('click', 'a.add_new_pr_link, a#pr_edit_btn', function(e) {
+        e.preventDefault();
+        $("#app_modal_div_content_div").load($(this).attr("href"));
+        $('#app_modal_div').modal('show');
+    });
 
     $('body').on('click', 'a#edit_pr_link', function(e) {
         e.preventDefault();
