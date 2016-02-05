@@ -19,6 +19,10 @@ from .forms import *
 from .mixins import AjaxFormResponseMixin, LoginRequiredMixin, PurchaseRequestMixin, PurchaseRequestActiveTabMixin
 from .serializers import FlatJsonSerializer
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 class PurchaseRequestCreateView(LoginRequiredMixin, SuccessMessageMixin,
             AjaxFormResponseMixin, PurchaseRequestActiveTabMixin, PurchaseRequestMixin, CreateView):
@@ -130,9 +134,13 @@ class ApplyDefaultFinanceCodesToAllItems(LoginRequiredMixin, View):
                         code.pk = None
                         code.save()
             except Item.DoesNotExist as e:
-                messages.error(request, "There is no item with default finance codes set in this PR (%s)" % pr_id)
+                msg = "There is no item with default finance codes set in this PR (%s)" % pr_id
+                messages.error(request, msg)
+                logger.warn(msg)
             except Item.MultipleObjectsReturned as e:
-                messages.error(request, "There are multiple items with default finance codes in this PR (%s)" % pr_id)
+                msg = "There are multiple items with default finance codes in this PR (%s)" % pr_id
+                messages.error(request, msg)
+                logger.error(msg)
             messages.success(request, "Successfully set default finance codes for all items.")
         return JsonResponse({"status": "completed"})
 
@@ -154,8 +162,9 @@ class SetDefaultFinanceCodesForPR(LoginRequiredMixin, View):
                 existing_item_with_default.default_finance_codes = False
                 existing_item_with_default.save()
             except Item.DoesNotExist as e:
-                pass
+                logger.debug("There is no default finance codes for pr # %s" % pr.pk)
             except Item.MultipleObjectsReturned as e:
+                logger.error("There are multiple items with default finance codes in this PR (%s)" % pr.pk)
                 items = Item.objects.filter(purchase_request=pr.pk, default_finance_codes=True)
                 for i in items:
                     i.default_finance_codes = False
@@ -208,9 +217,9 @@ class PurchaseRequestItemCreateView(LoginRequiredMixin, SuccessMessageMixin, Aja
                 code.pk= None
                 code.save()
         except Item.DoesNotExist as e:
-            print("there is no default finance codes for this PR to be used for new items")
+            logger.info("there is no default finance codes for this PR(%s) to be used for new items" % self.object.purchase_request.pk)
         except Item.MultipleObjectsReturned as e:
-            print("there should never be more than one default set of finance codes a RP")
+            logger.error("There are multiple items with default finance codes in this PR (%s)" % self.object.purchase_request.pk)
         return super(PurchaseRequestItemCreateView, self).form_valid(form)
 
     def get_initial(self):
@@ -263,6 +272,7 @@ class PurchaseRequestItemDeleteView(LoginRequiredMixin, DeleteView):
         #Hook to ensure object is owned by request.user.
         self.object = super(PurchaseRequestItemDeleteView, self).get_object()
         if not self.object.created_by == self.request.user.userprofile:
+            logger.info("%s tried to delete an item # (%s) that s/he does not own." % (self.request.user.userprofile, self.object.pk))
             raise PermissionDenied
         return self.object
 
