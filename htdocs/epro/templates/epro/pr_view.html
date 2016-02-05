@@ -238,6 +238,7 @@
     });
 
 
+    // When the user clicks on "apply default codes" from the burger menu.
     $("ul").on("click", "#apply_default_codes_to_all_link", function(e) {
         e.preventDefault();
         $.post($(this).attr("href"))

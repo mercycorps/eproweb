@@ -54,7 +54,7 @@
                     {% endif %}
                     <td>
                         <a href="{% url 'pr_edit' pr.pk %}" id='edit_pr_link'><span class="glyphicon glyphicon-edit"></span></a>
-                        <a href="#" data-href="/pr/delete/1/" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                        <a href="#" data-href="{% url 'pr_del' pr.pk %}" data-toggle="modal" data-target="#confirm-delete" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                     </td>
                 </tr>
             {% empty %}

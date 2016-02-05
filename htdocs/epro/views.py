@@ -89,6 +89,27 @@ class PurchaseRequestListView(PurchaseRequestActiveTabMixin, ListView):
     context_object_name = 'prs'
 
 
+class PurchaseRequestDeleteView(LoginRequiredMixin, DeleteView):
+    model = PurchaseRequest
+    success_message = "Purchase Request was deleted successfully."
+    object = None
+
+    def get_success_url(self):
+        return reverse_lazy('pr_list')
+
+    def get_object(self, queryset=None):
+        #Hook to ensure object is owned by request.user.
+        self.object = super(PurchaseRequestDeleteView, self).get_object()
+        if not self.object.created_by == self.request.user.userprofile:
+            raise PermissionDenied
+        return self.object
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, self.success_message)
+        super(PurchaseRequestDeleteView, self).delete(request, *args, **kwargs)
+        return JsonResponse({"status": "complete"})
+
+
 class ApplyDefaultFinanceCodesToAllItems(LoginRequiredMixin, View):
     """
     Applies the default Finance Codes, if set for an item in this PR, to all items in this PR
