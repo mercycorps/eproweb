@@ -42,7 +42,7 @@
             -->
             <tbody>
             {% for pr in prs %}
-                <tr>
+                <tr id="row_for_pr_id_{{ pr.pk }}">
                     <td><a href="{% url 'pr_view' pr.pk %}">{{ pr.office }}-{{ pr.sno }}</a></td>
                     <td>{{ pr.project_reference }}</td>
                     <td>{{ pr.delivery_address|default_if_none:'' }}</td>
@@ -99,5 +99,21 @@
         $('#app_modal_div').modal('show');
     });
 
+    // When the delete action is confirmed in the modal
+    $(".modal-footer").on("click", ".btn-ok", function(e) {
+        e.preventDefault();
+        $("#confirm-delete").modal("hide");
+
+        var url = $(this).attr("href");
+        var url_array = url.split("/");
+        var row = $("#row_for_pr_id_" + url_array[url_array.length-2]);
+        console.log(url);
+        //console.log(row);
+
+        $.post(url)
+            .done(function(data, textStatus, jqXHR) {
+                row.remove();
+            });
+    });
 </script>
 {% endblock epro_extra_js %}
