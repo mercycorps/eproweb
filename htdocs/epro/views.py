@@ -243,6 +243,7 @@ class PurchaseRequestItemUpdateView(LoginRequiredMixin, SuccessMessageMixin, Aja
     model = Item
     form_class = PurchaseRequestItemForm
     context_object_name = 'item'
+    template_name = 'epro/item_form.html'
     success_message = "Item updated successfully."
 
     def get_form_kwargs(self):

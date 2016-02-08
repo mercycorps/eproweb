@@ -99,8 +99,10 @@
 {% block epro_extra_js %}
 <script type = "text/javascript">
     var stock_finance_codes_form;
+    var is_something_changed_in_item_form;
     $(document).ready(function() { 
         stock_finance_codes_form = `{% crispy finance_codes_form %}`;
+        is_something_changed_in_item_form = false;
     });
     function reApplySelect2(){
         $("#id_fund_code").select2({ placeholder: 'Fund Code', allowClear: true, });
@@ -196,6 +198,37 @@
         $("#financecodes_form_collapse_div").collapse('hide');
     });
 
+    // Submit ItemForm via AJAX for adding and editing ITEMS of a PR.
+    $('#pr_items_modal_div').on('submit', '#id_pr_item_form', function(e) {
+        e.preventDefault();
+        var form_url = $(this).attr('action');
+        var form_data = $(this).serialize();
+        $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
+            .done(function(data, textStatus, jqXHR) {
+                // if there are any erros show them and then STOP
+                if (jqXHR.getResponseHeader('error') == "True") {
+                    $("#pr_items_modal_content_div").html(data);
+                    return;
+                }
+                is_something_changed_in_item_form = true;
+                // Get the Item that was created
+                var item = $.parseJSON(data['object'])[0];
+                // Update the item_form action URL so that clicking the SAVE button again does not create duplicate items.
+                var url = "{% url 'item_edit' 0 %}";
+                url = url.replace("0", item["id"]);
+                $("#id_pr_item_form").attr("action", url);
+                $("#id_pr_item_form").data("item_id", item["id"]);
+            
+                // Show the Finance Codes tab now and switch to it.
+                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').show();
+                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').trigger('click');
+                
+                // Show django messages that may have been set in the View.
+                var json = $.parseJSON(jqXHR.responseText);
+                show_django_ajax_messages(json, "#modal_messages");
+            });
+    });
+
     // Submit FinanceCodes Form via AJAX for adding and editing of finance codes.
     $('#financecodes_form_div').on('submit', '#id_finance_codes_form', function(event) {
         event.preventDefault();
@@ -210,6 +243,7 @@
                     reApplySelect2();
                     return;
                 }
+                is_something_changed_in_item_form = true;
                 $('#financecodes_form_collapse_div').collapse('hide');
 
                 // Show django messages that may have been set in the View.
@@ -223,6 +257,7 @@
         e.preventDefault();
         $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )
             .done(function(data, textStatus, jqXHR) {
+                is_something_changed_in_item_form = true;
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
             });
@@ -232,9 +267,25 @@
         e.preventDefault();
         $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )
             .done(function(data, textStatus, jqXHR) {
+                is_something_changed_in_item_form = true;
                 var json = $.parseJSON(jqXHR.responseText);
                 show_django_ajax_messages(json, "#modal_messages");
             });
+    });
+
+    // When the PR Item/Finace Codes modal window is closed, refresh the page if necessary.
+    $('#pr_items_modal_div').on('hidden.bs.modal', function (e) {
+        if (is_something_changed_in_item_form == true) {
+            location.reload();
+        } 
+    });
+
+    // When the modal loads, apply select2 to the dropdowns in the financecodes form.
+    $('#pr_items_modal_div').on('shown.bs.modal', function (e) {
+        $("#id_fund_code").select2();
+        $("#id_dept_code").select2();
+        $("#id_office_code").select2();
+        $("#id_quantity_requested").focus();
     });
 </script>
 {% endblock epro_extra_js %}

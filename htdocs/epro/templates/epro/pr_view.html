@@ -239,16 +239,9 @@
             "oLanguage": {
                 "sSearch": '',
                 "sSearchPlaceholder": "Search ",
-            }
+            },
+            "order": [[ 1, "asc" ]],
         });
-    });
-
-    // When the modal loads, apply select2 to the dropdowns in the financecodes form.
-    $('#pr_items_modal_div').on('shown.bs.modal', function (e) {
-        $("#id_fund_code").select2();
-        $("#id_dept_code").select2();
-        $("#id_office_code").select2();
-        $("#id_quantity_requested").focus();
     });
 
 
@@ -257,7 +250,7 @@
         e.preventDefault();
         $.post($(this).attr("href"))
             .done(function(data, textStatus, jqXHR) {
-                console.log(data);
+                //console.log(data);
             });
     });
 
@@ -298,37 +291,6 @@
             $('#pr_items_tabs_ul a[href="#financecodes_tab"]').hide();
         });
         $('#pr_items_modal_div').modal('show');
-    });
-
-
-    // Submit ItemForm via AJAX for adding and editing ITEMS of a PR.
-    $('#pr_items_modal_div').on('submit', '#id_pr_item_form', function(e) {
-        e.preventDefault();
-        var form_url = $(this).attr('action');
-        var form_data = $(this).serialize();
-        $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
-            .done(function(data, textStatus, jqXHR) {
-                // if there are any erros show them and then STOP
-                if (jqXHR.getResponseHeader('error') == "True") {
-                    $("#pr_items_modal_content_div").html(data);
-                    return;
-                }
-                // Get the Item that was created
-                var item = $.parseJSON(data['object'])[0];
-                // Update the item_form action URL so that clicking the SAVE button again does not create duplicate items.
-                var url = "{% url 'item_edit' 0 %}";
-                url = url.replace("0", item["id"]);
-                $("#id_pr_item_form").attr("action", url);
-                $("#id_pr_item_form").data("item_id", item["id"]);
-            
-                // Show the Finance Codes tab now and switch to it.
-                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').show();
-                $('#pr_items_tabs_ul a[href="#financecodes_tab"]').trigger('click');
-                
-                // Show django messages that may have been set in the View.
-                var json = $.parseJSON(jqXHR.responseText);
-                show_django_ajax_messages(json, "#modal_messages");
-            });
     });
 </script>
 {% endblock epro_extra_js %}
