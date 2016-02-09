@@ -223,7 +223,6 @@
 <script type = "text/javascript">
 "use strict";
 
-    
     $(function () {
         $('a[data-toggle="popover"].items_without_finance_codes').popover();
         $('a[data-toggle="popover"].items_with_finance_codes, .items_with_incomplete_finance_codes').each(function(){
@@ -261,14 +260,16 @@
         $("#confirm-delete").modal("hide");
 
         var url = $(this).attr("href");
-        var url_array = url.split("/");
-        var row = $("#row_for_item_id_" + url_array[url_array.length-2]);
+
+        //var url_array = url.split("/");
+        //var row = $("#row_for_item_id_" + url_array[url_array.length-2]);
 
         $.post(url)
             .done(function(data, textStatus, jqXHR) {
-                row.remove();
-                $("#total_usd_td").html(data["total_usd"]);
-                $("#total_local_td").html(data["total_local"]);
+                //row.remove();
+                //$("#total_usd_td").html(data["total_usd"]);
+                //$("#total_local_td").html(data["total_local"]);
+                location.reload();
             });
     });
 

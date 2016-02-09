@@ -64,7 +64,7 @@
                                     <td>{{ fc.allocation_percent }}</td>
                                     <td>
                                         <a href="{% url 'financecodes_edit' fc.pk %}" data-finance-codes-id={{ fc.pk }} class="edit"><span class="glyphicon glyphicon-edit"></span></a>
-                                        <a href="#" data-finance-codes-id={{ fc.pk }} data-href="/item/delete/1/" data-toggle="modal" data-target="#confirm-delete" lass="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
+                                        <a href="#" data-finance-codes-id={{ fc.pk }} data-href="{% url 'financecodes_del' fc.pk %}" data-toggle="modal" data-target="#confirm-delete" lass="del" style="color:red;"><span class="glyphicon glyphicon-trash"></span></a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -235,7 +235,6 @@
         var form_url = $(this).attr('action');
         var form_data = $(this).serialize();
         var fcid_editted = $("#id_submit_finance_codes_btn").data()['fcid'];
-        //$.post(form_url, form_data)
         $.ajax( {method: 'POST', url: form_url, data: form_data,  global: false, } )
             .done(function(data, textStatus, jqXHR) {
                 if (jqXHR.getResponseHeader('error') == "True") {
@@ -253,6 +252,7 @@
         });
     });
 
+    // Remove default finance codes from PR
     $("#finance_codes_list_panel").on("click", "#unset_default_finance_codes_btn", function(e) {
         e.preventDefault();
         $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )
@@ -263,6 +263,7 @@
             });
     });
 
+    // Set default finance codes for PR
     $("#finance_codes_list_panel").on("click", "#set_default_finance_codes_btn", function(e) {
         e.preventDefault();
         $.ajax( {method: 'POST', url: $(this).attr('href'), data: {},  global: false, } )

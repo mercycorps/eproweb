@@ -328,5 +328,8 @@ class FinanceCodesUpdateView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormRe
         return self.success_message % dict(cleaned_data, fundcode=self.object.fund_code)
 
 
-class FinanceCodesDeleteView(LoginRequiredMixin, SuccessMessageMixin, AjaxFormResponseMixin, DeleteView):
+class FinanceCodesDeleteView(LoginRequiredMixin, DeleteView):
     model = FinanceCodes
+
+    def get_success_url(self):
+        return reverse_lazy('pr_view', kwargs={'pk': self.object.item.purchase_request.pk})
